@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 import json
 
 class Vacancy(models.Model):
@@ -50,8 +50,12 @@ class HRUser(AbstractUser):
     department = models.CharField(max_length=255)   # Отдел, в котором работает HR-специалист
     position = models.CharField(max_length=255)     # Должность HR-специалиста
 
+    groups = None
+    user_permissions = None
+
     def __str__(self):
         return self.username
+
 
 
 class Feedback(models.Model):
