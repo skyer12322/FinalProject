@@ -1,3 +1,65 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+import json
 
-# Create your models here.
+class Vacancy(models.Model):
+    ''' Модель для вакансий '''
+    title = models.CharField(max_length=255)                # Название вакансии
+    description = models.TextField()                        # Описание вакансии
+    required_skills = models.JSONField()                    # Требуемые навыки
+    required_experience = models.PositiveIntegerField()     # Требуемый опыт (в годах)
+    required_education = models.CharField(max_length=255)   # Требуемое образование
+    created_at = models.DateTimeField(auto_now_add=True)    # Когда создано
+    updated_at = models.DateTimeField(auto_now=True)        # Когда в последний раз обновили
+
+    def __str__(self):
+        return self.title
+
+
+class Resume(models.Model):
+    ''' Модель для резюме кандидатов '''
+    first_name = models.CharField(max_length=255)           # Имя кандидата
+    last_name = models.CharField(max_length=255)            # Фамилия кандидата
+    email = models.EmailField()                             # Почта кандидата
+    phone = models.CharField(max_length=20)                 # Телефон кандидата
+    skills = models.JSONField()                             # JSON поле для хранения списка навыков кандидата
+    work_experience = models.PositiveIntegerField()         # Опыт работы (в годах)
+    education = models.CharField(max_length=255)            # Образование
+    resume_file = models.FileField(upload_to='resumes/')    # Файл резюме
+    uploaded_at = models.DateTimeField(auto_now_add=True)   # Дата загрузки резюме
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+
+class CandidateScore(models.Model):
+    ''' Модель для хранения оценок кандидатов по вакансиям '''
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)    # Связь с моделью Resume
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)  # Связь с моделью Vacancy
+    score = models.PositiveIntegerField()                           # Оценка соответствия кандидата вакансии
+    matching_skills = models.JSONField()                            # JSON поле для хранения совпадающих навыков
+    shortlisted = models.BooleanField(default=False)                # Флаг шорт листа
+    evaluated_at = models.DateTimeField(auto_now_add=True)          # Дата оценки
+
+    def __str__(self):
+        return f"Score for {self.resume} on {self.vacancy}"
+
+
+class HRUser(AbstractUser):
+    ''' Модель для пользователей HR '''
+    department = models.CharField(max_length=255)   # Отдел, в котором работает HR-специалист
+    position = models.CharField(max_length=255)     # Должность HR-специалиста
+
+    def __str__(self):
+        return self.username
+
+
+class Feedback(models.Model):
+    ''' Модель для отзывов о резюме '''
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)    # Связь с моделью Resume
+    hr_user = models.ForeignKey(HRUser, on_delete=models.CASCADE)   # Связь с моделью HRUser
+    comment = models.TextField()                                    # Текстовый комментарий HR-специалиста
+    created_at = models.DateTimeField(auto_now_add=True)            # Дата создания отзыва
+
+    def __str__(self):
+        return f"Feedback for {self.resume} by {self.hr_user}"
