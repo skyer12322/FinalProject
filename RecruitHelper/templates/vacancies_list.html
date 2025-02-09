@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>Vacancies links</title>
+</head>
+<body class="vacancies-list-body">
+    {% include "menu.html" %}
+    <div class="vacancies-list-container">
+        <h1 class="vacancies-list-h1">Available vacancies</h1>
+    </div>
+</body>
+</html>
