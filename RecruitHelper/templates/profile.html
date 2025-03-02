@@ -1,0 +1,33 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="profile-body">
+    {% include "menu.html" %}
+
+    <div class="vacancy-detail-container">
+        <h1 class="vacancy-title">Профиль пользователя</h1>
+        
+        <div class="profile-card">
+            <img src="{% static 'images/user-avatar.png' %}" alt="Аватар пользователя" class="profile-avatar" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 20px;">
+            <h2 class="profile-name">{{ user.username }}</h2>
+            <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
+            <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+        </div>
+
+        <div class="profile-actions">
+            <button class="voting-list-button" onclick=location.href = #>Редактировать профиль</button>
+            <button class="voting-list-button" onclick=location.href = #>Выйти</button>
+        </div>
+    </div>
+</body>
+
+</html>
