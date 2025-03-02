@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница HR</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="hr-body">
+    {% include "menu.html" %}
+
+    <div class="hr-container">
+        <div class="hr-logo">
+            <img src="{% static 'images/company-logo.png' %}" alt="Логотип компании" class="company-logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+        </div>
+
+        <h1 class="company-name">asd</h1>
+
+        <div class="about-section">
+            <h2>О нас</h2>
+            <p>asd</p>
+        </div>
+    </div>
+</body>
+
+</html>

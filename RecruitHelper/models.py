@@ -6,7 +6,7 @@ class Vacancy(models.Model):
     ''' Модель для вакансий '''
     title = models.CharField(max_length=255)                # Название вакансии
     description = models.TextField()                        # Описание вакансии
-    required_skills = models.JSONField()                    # Требуемые навыки
+    required_skills = models.JSONField(default=list)        # Требуемые навыки
     required_experience = models.PositiveIntegerField()     # Требуемый опыт (в годах)
     required_education = models.CharField(max_length=255)   # Требуемое образование
     created_at = models.DateTimeField(auto_now_add=True)    # Когда создано
@@ -14,7 +14,6 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class Resume(models.Model):
     ''' Модель для резюме кандидатов '''
