@@ -1,17 +1,34 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
-<head>
 
+<html lang="ru">
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список вакансий</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <title>Vacancies links</title>
 </head>
+
 <body class="vacancies-list-body">
     {% include "menu.html" %}
     <div class="vacancies-list-container">
-        <h1 class="vacancies-list-h1">Available vacancies</h1>
+        <h1 class="vacancies-list-h1">Список вакансий</h1>
+        <ul>
+            {% for vacancy in vacancies %}
+                <li>
+                    <a href="{% url 'vacancy_detail' vacancy.id %}" class="vacancy-title-link">
+                        {{ vacancy.title }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>Нет вакансий.</li>
+            {% endfor %}
+        </ul>
+
+        <button class="index-button" onclick="location.href='{% url 'add_vacancy' %}'">Добавить вакансию</button>
     </div>
+
 </body>
 </html>
+
