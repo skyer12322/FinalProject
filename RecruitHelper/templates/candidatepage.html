@@ -1,0 +1,34 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница кандидата</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="candidate-body">
+    {% include "menu.html" %}
+
+    <div class="candidate-container">
+        <h1 class="candidate-title">Информация о кандидате</h1>
+
+        <div class="candidate-card">
+            <img src="{% static 'images/candidate-photo.jpg' %}" alt="Фото кандидата" class="candidate-photo" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 20px;">
+            <h2 class="candidate-name">вася пупин</h2>
+        </div>
+
+        <div class="candidate-details">
+            <h3>Опыт работы</h3>
+            <p>11</p>
+
+            <h3>Образование</h3>
+            <p>11</p>
+        </div>
+    </div>
+</body>
+
+</html>
