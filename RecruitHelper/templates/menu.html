@@ -2,10 +2,10 @@
 
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
-<nav>
+<nav class="navbar">
     <ul>
         <li><a href="{% url 'home' %}">Главная</a></li>
         <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
-        <!-- Добавьте другие пункты меню по мере необходимости -->
+        <li><a href="{% url 'profile' %}">личный кабинет</a></li>
     </ul>
 </nav>
