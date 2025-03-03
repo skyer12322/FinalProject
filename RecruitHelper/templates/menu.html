@@ -1,0 +1,11 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<nav>
+    <ul>
+        <li><a href="{% url 'home' %}">Главная</a></li>
+        <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
+        <!-- Добавьте другие пункты меню по мере необходимости -->
+    </ul>
+</nav>
