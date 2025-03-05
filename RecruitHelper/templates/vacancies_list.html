@@ -12,18 +12,14 @@
 
 <body class="vacancies-list-body">
     {% include "menu.html" %}
+    
     <div class="vacancies-list-container">
         <h1 class="vacancies-list-h1">Список вакансий</h1>
         <ul>
-            {% for vacancy in vacancies %}
                 <li>
-                    <a href="{% url 'vacancy_detail' vacancy.id %}" class="vacancy-title-link">
-                        {{ vacancy.title }}
-                    </a>
+                    {{ vacancy.title }}
                 </li>
-            {% empty %}
                 <li>Нет вакансий.</li>
-            {% endfor %}
         </ul>
 
         <button class="index-button" onclick="location.href='{% url 'add_vacancy' %}'">Добавить вакансию</button>

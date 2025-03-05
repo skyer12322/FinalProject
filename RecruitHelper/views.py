@@ -6,6 +6,10 @@ def home(req):
     context = { }
     return render(req, 'index.html', context)
 
+def login(req):
+    context = { }
+    return render(req, 'login.html', context)
+
 def HR(req):
     context = { }
     return render(req, 'HRpage.html', context)

@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #00c853, #0091ea);
+    background: #f0e2f2;
     color: white;
     margin: 0;
     padding: 0;
@@ -237,8 +237,60 @@ button:hover {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 10px;
+    background-color: rgb(16, 5, 13);
 }
 
 .vacancy-detail-container p {
     font-size: 16px;
+}
+
+
+
+.candidate-profile-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.candidate-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3498db;
+}
+
+.candidate-name {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    color: #34495e;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.experience-skills li {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    margin: 5px;
+    display: inline-block;
+}
+
+.candidate-actions {
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+    text-align: center;
 }
