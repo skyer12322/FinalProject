@@ -21,9 +21,9 @@ class CustomUser(AbstractUser):
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)                              # Файл резюме
     favorite_hr = models.ManyToManyField('HRUser', related_name='favorite_candidates', blank=True)      # Избранные HR
     favorite_vacancies = models.ManyToManyField('Vacancy', related_name='favorited_by', blank=True)     # Избранные вакансии
-
-    def __str__(self):
-        return self.username
+    
+    groups = None
+    user_permissions = None
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
