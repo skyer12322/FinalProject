@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <nav class="navbar">
+    <img src="{% static 'images/logo.jpg' %}" alt="Лого компании", class="logo", style="width: 37px; height: 37px; border-radius: 10%; position: absolute; left: 10px; top: 2px;">
     <ul class="navbar-links">
         <li><a href="{% url 'home' %}">Главная</a></li>
         <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
