@@ -4,16 +4,16 @@ import json
 
 class Vacancy(models.Model):
     ''' Модель для вакансий '''
-    title = models.CharField(max_length=255)                # Название вакансии
+    title = models.CharField(max_length=255)                                 # Название вакансии
     company = models.CharField(max_length=255,default="Anonym")              # Название компании
-    location = models.CharField(max_length=255, blank=True) # Географическое положение
-    salary = models.PositiveIntegerField()                  # Зарплата
-    description = models.TextField()                        # Описание вакансии
-    required_skills = models.JSONField(default=list)        # Требуемые навыки
-    required_experience = models.PositiveIntegerField()     # Требуемый опыт (в годах)
-    required_education = models.CharField(max_length=255)   # Требуемое образование
-    created_at = models.DateTimeField(auto_now_add=True)    # Когда создано
-    updated_at = models.DateTimeField(auto_now=True)        # Когда в последний раз обновили
+    location = models.CharField(max_length=255, blank=True)                  # Географическое положение
+    salary = models.PositiveBigIntegerField(default=15000)    # Зарплата
+    description = models.TextField()                                         # Описание вакансии
+    required_skills = models.JSONField(default=list)                         # Требуемые навыки
+    required_experience = models.PositiveIntegerField()                      # Требуемый опыт (в годах)
+    required_education = models.CharField(max_length=255, default="None")                    # Требуемое образование
+    created_at = models.DateTimeField(auto_now_add=True)                     # Когда создано
+    updated_at = models.DateTimeField(auto_now=True)                         # Когда в последний раз обновили
     ai_rating = models.PositiveIntegerField(default=0)
 
     def __str__(self):
