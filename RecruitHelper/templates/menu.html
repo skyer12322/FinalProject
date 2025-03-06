@@ -3,9 +3,12 @@
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <nav class="navbar">
-    <ul>
+    <ul class="navbar-links">
         <li><a href="{% url 'home' %}">Главная</a></li>
         <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
-        <li><a href="{% url 'profile' %}">личный кабинет</a></li>
+        <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
+        <a href="{% url 'profile' %}">
+            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар пользователя" class="user-avatar" style="width: 37px; height: 37px; border-radius: 50%; position: absolute; right: 10px; top: 2px;">
+        </a>
     </ul>
 </nav>

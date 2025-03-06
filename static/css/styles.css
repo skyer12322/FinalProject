@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #00c853, #0091ea);
-    color: white;
+    background: #f4f4f4; /* Light background for a clean look */
+    color: #333; /* Darker text for better readability */
     margin: 0;
     padding: 0;
     text-align: center;
@@ -9,28 +9,42 @@ body {
 
 .voting-list-container,
 .vote-container,
-.index-container {
-    max-width: 400px;
-    margin: 50px auto;
+.index-container,
+.vacancies-list-container,
+.vacancy-detail-container {
+    max-width: 600px; /* Increased width for better content display */
+    margin: 20px auto;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: #ffffff; /* White background for containers */
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: #333; /* Dark text for better readability */
 }
 
 .voting-list-h1,
 .vote-h1,
-.index-h1 {
-    color: white;
+.index-h1,
+.vacancies-list-h1 {
+    color: #6a0dad; /* HeadHunter's primary color */
     text-align: center;
+    font-size: 24px; /* Larger font size for headings */
+    margin-bottom: 20px; /* Space below headings */
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover; /* Сохраняет пропорции изображения */
 }
 
 .voting-list-button,
 .vote-button,
-.index-button {
-    padding: 10px;
-    background: #0091ea;
+.index-button,
+.vacancy-form button {
+    padding: 12px;
+    background: #6a0dad; /* Primary button color */
     color: white;
     border: none;
     border-radius: 4px;
@@ -38,32 +52,41 @@ body {
     width: 100%;
     font-size: 16px;
     font-weight: bold;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 .voting-list-button:hover,
 .vote-button:hover,
-.index-button:hover {
-    transform: scale(1.05);
-    background: #0073cc;
+.index-button:hover,
+.vacancy-form button:hover {
+    background: #5a0a9c; /* Darker shade on hover */
 }
 
 .navbar {
-    background: linear-gradient(to right, #00c853, #0091ea);
-    padding: 10px 0;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex; /* Используем flexbox для выравнивания */
+    justify-content: space-between; /* Разделяет элементы навбара */
+    align-items: center; /* Выравнивание по центру */
+    padding: 10px 20px; /* Отступы */
+    background: #6a0dad; /* Цвет фона навбара */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень для навбара */
+    position: relative; /* Добавьте это свойство */
 }
 
-.navbar ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+.navbar-links {
+    flex-grow: 1; /* Позволяет этому блоку занимать доступное пространство */
+    display: flex; /* Горизонтальное выравнивание элементов списка */
+    justify-content: center; /* Центрирует ссылки */
+}
+
+.navbar-links ul {
+    list-style-type: none; /* Убираем маркеры списка */
+    padding: 0; /* Убираем отступы */
+    margin: 0; /* Убираем отступы */
+    display: flex; /* Горизонтальное выравнивание элементов списка */
 }
 
 .navbar li {
-    display: inline;
-    margin: 0 15px;
+    margin: 0 15px; /* Отступы между элементами списка */
 }
 
 .navbar a {
@@ -75,7 +98,18 @@ body {
 }
 
 .navbar a:hover {
-    color: #ffeb3b;
+    color: #ffeb3b; /* Highlight color on hover */
+}
+
+.navbar-user-avatar {
+    margin-left: 20px; /* Отступ слева для аватара */
+}
+
+.user-avatar {
+    width: 40px; /* Ширина аватара */
+    height: 40px; /* Высота аватара */
+    border-radius: 50%; /* Круглая форма */
+    object-fit: cover; /* Сохраняет пропорции изображения */
 }
 
 .vacancy-form {
@@ -95,32 +129,22 @@ body {
     margin-bottom: 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
-}
-
-.vacancy-form button {
-    background: #0091ea;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: bold;
+    box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 .vacancy-list h2 {
-    color: white;
+    color: #6a0dad; /* HeadHunter's primary color */
     font-size: 22px;
 }
 
 .vacancy-item {
     margin-bottom: 10px;
-    color: white;
+    color: #333; /* Dark text for better readability */
 }
 
 .vacancy-checkbox {
     display: block;
-    color: white;
+    color: #333; /* Dark text for better readability */
     font-size: 16px;
 }
 
@@ -132,64 +156,35 @@ select {
     padding: 10px;
     width: 100%;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 16px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 button {
     padding: 10px;
-    background-color: #6a0dad;
+    background-color: #6a0dad; /* Primary button color */
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     width: 100%;
     font-size: 16px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Ensure padding is included in width */
 }
 
 button:hover {
-    background-color: #5a0a9c;
-}
-
-.vacancies-list-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.vacancies-list-h1 {
-    color: #6a0dad;
-    text-align: center;
-}
-
-.vacancies-list-container {
-    margin-top: 20px;
-}
-
-.vacancies-list-container label {
-    color: #000;
-}
-
-.vacancies-list-container input[type="text"],
-.vacancies-list-container input[type="password"],
-.vacancies-list-container textarea,
-.vacancies-list-container select {
-    color: #000;
+    background-color: #5a0a9c; /* Darker shade on hover */
 }
 
 .no-vacancies-message {
-    color: black;
+    color: #333; /* Dark text for better readability */
     font-size: 16px;
     font-weight: bold;
 }
 
 .form-error {
-    color: red;
+    color : red;
     font-size: 12px;
 }
 
@@ -207,28 +202,25 @@ button:hover {
 }
 
 .vacancies-list-container li {
-    color: black;
+    color: #333; /* Dark text for better readability */
     font-size: 16px;
     margin-bottom: 10px;
 }
 
-.vacancies-list-container {
-    text-align: center;
-}
-
 .vacancy-title-link {
     font-size: 18px;
-    color: #000;
+    color: #6a0dad; /* HeadHunter's primary color */
     text-decoration: none;
     display: block;
     padding: 10px;
     border: 1px solid #ccc;
     margin: 10px 0;
     border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .vacancy-title-link:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Light background on hover */
 }
 
 .vacancy-detail-container {
@@ -237,8 +229,48 @@ button:hover {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 10px;
+    background-color: #ffffff; /* White background for details */
 }
 
 .vacancy-detail-container p {
     font-size: 16px;
+    color: #333; /* Dark text for better readability */
+}
+
+.vacancy-form button {
+    margin-bottom: 10px;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between; /* Разделяет элементы навбара */
+    align-items: center; /* Выравнивание по центру */
+    padding: 10px 20px; /* Отступы */
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Горизонтальное выравнивание элементов списка */
+}
+
+.navbar li {
+    margin: 0 15px; /* Отступы между элементами списка */
+}
+
+.navbar-user-avatar {
+    margin-left: auto; /* Сдвигает аватар вправо */
+}
+
+.user-avatar {
+    width: 40px; /* Ширина аватара */
+    height: 40px; /* Высота аватара */
+    border-radius: 50%; /* Круглая форма */
 }
