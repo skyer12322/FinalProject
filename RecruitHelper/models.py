@@ -4,28 +4,30 @@ import json
 
 class Vacancy(models.Model):
     ''' Модель для вакансий '''
-    title = models.CharField(max_length=255)                # Название вакансии
-    description = models.TextField()                        # Описание вакансии
-    required_skills = models.JSONField(default=list)        # Требуемые навыки
-    required_experience = models.PositiveIntegerField()     # Требуемый опыт (в годах)
-    required_education = models.CharField(max_length=255)   # Требуемое образование
-    created_at = models.DateTimeField(auto_now_add=True)    # Когда создано
-    updated_at = models.DateTimeField(auto_now=True)        # Когда в последний раз обновили
+    title = models.CharField(max_length=255)                                 # Название вакансии
+    company = models.CharField(max_length=255,default="Anonym")              # Название компании
+    location = models.CharField(max_length=255, blank=True)                  # Географическое положение
+    salary = models.PositiveBigIntegerField(default=15000)    # Зарплата
+    description = models.TextField()                                         # Описание вакансии
+    required_skills = models.JSONField(default=list)                         # Требуемые навыки
+    required_experience = models.PositiveIntegerField()                      # Требуемый опыт (в годах)
+    required_education = models.CharField(max_length=255, default="None")                    # Требуемое образование
+    created_at = models.DateTimeField(auto_now_add=True)                     # Когда создано
+    updated_at = models.DateTimeField(auto_now=True)                         # Когда в последний раз обновили
+    ai_rating = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
 
-class Resume(models.Model):
-    ''' Модель для резюме кандидатов '''
-    first_name = models.CharField(max_length=255)           # Имя кандидата
-    last_name = models.CharField(max_length=255)            # Фамилия кандидата
-    email = models.EmailField()                             # Почта кандидата
-    phone = models.CharField(max_length=20)                 # Телефон кандидата
-    skills = models.JSONField()                             # JSON поле для хранения списка навыков кандидата
-    work_experience = models.PositiveIntegerField()         # Опыт работы (в годах)
-    education = models.CharField(max_length=255)            # Образование
-    resume_file = models.FileField(upload_to='resumes/')    # Файл резюме
-    uploaded_at = models.DateTimeField(auto_now_add=True)   # Дата загрузки резюме
+
+class CustomUser(AbstractUser):
+    ''' Модель для пользователей, наследуемая от AbstractUser '''
+    resume = models.FileField(upload_to='resumes/', null=True, blank=True)                              # Файл резюме
+    favorite_hr = models.ManyToManyField('HRUser', related_name='favorite_candidates', blank=True)      # Избранные HR
+    favorite_vacancies = models.ManyToManyField('Vacancy', related_name='favorited_by', blank=True)     # Избранные вакансии
+    
+    groups = None
+    user_permissions = None
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -33,7 +35,7 @@ class Resume(models.Model):
 
 class CandidateScore(models.Model):
     ''' Модель для хранения оценок кандидатов по вакансиям '''
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)    # Связь с моделью Resume
+    resume = models.ForeignKey(CustomUser, on_delete=models.CASCADE)    # Связь с моделью Resume
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)  # Связь с моделью Vacancy
     score = models.PositiveIntegerField()                           # Оценка соответствия кандидата вакансии
     matching_skills = models.JSONField()                            # JSON поле для хранения совпадающих навыков
@@ -59,7 +61,7 @@ class HRUser(AbstractUser):
 
 class Feedback(models.Model):
     ''' Модель для отзывов о резюме '''
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE)    # Связь с моделью Resume
+    resume = models.ForeignKey(CustomUser, on_delete=models.CASCADE)    # Связь с моделью Resume
     hr_user = models.ForeignKey(HRUser, on_delete=models.CASCADE)   # Связь с моделью HRUser
     comment = models.TextField()                                    # Текстовый комментарий HR-специалиста
     created_at = models.DateTimeField(auto_now_add=True)            # Дата создания отзыва

@@ -5,6 +5,7 @@ body {
     margin: 0;
     padding: 0;
     text-align: center;
+    position: relative;
 }
 
 .voting-list-container,
@@ -298,4 +299,31 @@ button:hover {
     border-top: 1px solid #eee;
     padding-top: 30px;
     text-align: center;
+}
+
+.footer {
+    background: linear-gradient(to right, #00c853, #0091ea);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.footer-links li {
+    display: inline;
+    margin: 0 15px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
 }
