@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    color: #333;
+    background: #f9f9f9;
+    color: white;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -9,42 +9,28 @@ body {
 
 .voting-list-container,
 .vote-container,
-.index-container,
-.vacancies-list-container,
-.vacancy-detail-container {
-    max-width: 600px;
-    margin: 20px auto;
+.index-container {
+    max-width: 400px;
+    margin: 50px auto;
     padding: 20px;
-    background: #ffffff;
+    background: rgba(0, 0, 0, 0.7);
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    color: white;
 }
 
 .voting-list-h1,
 .vote-h1,
-.index-h1,
-.vacancies-list-h1 {
-    color: #6a0dad;
+.index-h1 {
+    color: white;
     text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.profile-avatar {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    object-fit: cover;
 }
 
 .voting-list-button,
 .vote-button,
-.index-button,
-.vacancy-form button {
-    padding: 12px;
-    background: #6a0dad;
+.index-button {
+    padding: 10px;
+    background: #0091ea;
     color: white;
     border: none;
     border-radius: 4px;
@@ -52,14 +38,14 @@ body {
     width: 100%;
     font-size: 16px;
     font-weight: bold;
-    transition: background 0.3s ease;
+    transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .voting-list-button:hover,
 .vote-button:hover,
-.index-button:hover,
-.vacancy-form button:hover {
-    background: #5a0a9c;
+.index-button:hover {
+    transform: scale(1.05);
+    background: #0073cc;
 }
 
 .navbar {
@@ -75,13 +61,6 @@ body {
     margin: 0;
 }
 
-.vote-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 .navbar li {
     display: inline;
     margin: 0 15px;
@@ -95,6 +74,9 @@ body {
     transition: color 0.3s ease;
 }
 
+.navbar a:hover {
+    color: #ffeb3b;
+}
 
 .vacancy-form {
     margin-bottom: 30px;
@@ -113,22 +95,32 @@ body {
     margin-bottom: 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
-    box-sizing: border-box;
+}
+
+.vacancy-form button {
+    background: #0091ea;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .vacancy-list h2 {
-    color: #6a0dad;
+    color: white;
     font-size: 22px;
 }
 
 .vacancy-item {
     margin-bottom: 10px;
-    color: #333;
+    color: white;
 }
 
 .vacancy-checkbox {
     display: block;
-    color: #333;
+    color: white;
     font-size: 16px;
 }
 
@@ -140,7 +132,7 @@ select {
     padding: 10px;
     width: 100%;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     box-sizing: border-box;
 }
@@ -150,7 +142,7 @@ button {
     background-color: #6a0dad;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     width: 100%;
     font-size: 16px;
@@ -161,14 +153,43 @@ button:hover {
     background-color: #5a0a9c;
 }
 
+.vacancies-list-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.vacancies-list-h1 {
+    color: #6a0dad;
+    text-align: center;
+}
+
+.vacancies-list-container {
+    margin-top: 20px;
+}
+
+.vacancies-list-container label {
+    color: #000;
+}
+
+.vacancies-list-container input[type="text"],
+.vacancies-list-container input[type="password"],
+.vacancies-list-container textarea,
+.vacancies-list-container select {
+    color: #000;
+}
+
 .no-vacancies-message {
-    color: #333;
+    color: black;
     font-size: 16px;
     font-weight: bold;
 }
 
 .form-error {
-    color : red;
+    color: red;
     font-size: 12px;
 }
 
@@ -186,21 +207,24 @@ button:hover {
 }
 
 .vacancies-list-container li {
-    color: #333;
+    color: black;
     font-size: 16px;
     margin-bottom: 10px;
 }
 
+.vacancies-list-container {
+    text-align: center;
+}
+
 .vacancy-title-link {
     font-size: 18px;
-    color: #6a0dad;
+    color: #000;
     text-decoration: none;
     display: block;
     padding: 10px;
     border: 1px solid #ccc;
     margin: 10px 0;
     border-radius: 5px;
-    transition: background-color 0.3s ease;
 }
 
 .vacancy-title-link:hover {
@@ -210,29 +234,68 @@ button:hover {
 .vacancy-detail-container {
     max-width: 800px;
     margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(16, 5, 13, 0.07),
+                0 2px 6px rgba(16, 5, 13, 0.05),
+                0 1px 3px rgba(16, 5, 13, 0.04);
+    transform: translateY(-2px);
+    border: none;
+    color:#000;
 }
 
 .vacancy-detail-container p {
     font-size: 16px;
-    color: #333;
 }
 
-.vacancy-form button {
+
+
+.candidate-profile-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.candidate-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3498db;
+}
+
+.candidate-name {
+    font-size: 2.5rem;
+    color: #2c3e50;
     margin-bottom: 10px;
 }
 
-.profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.section-title {
+    color: #34495e;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
 }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.experience-skills li {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    margin: 5px;
+    display: inline-block;
+}
+
+.candidate-actions {
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+    text-align: center;
 }
