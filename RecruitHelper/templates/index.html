@@ -72,32 +72,21 @@
         <section class="featured-jobs mb-5">
             <h2 class="section-title">Рекомендованные вакансии</h2>
             <div class="row g-4">
+                {% for it in vacancies %}
                 <div class="col-md-6">
                     <div class="job-card">
                         <div class="job-header">
-                            <h3>Frontend разработчик</h3>
+                            <h3>{{ it.title }}</h3>
                             <span class="ai-rating">AI рейтинг: 94%</span>
                         </div>
                         <div class="job-meta">
-                            <span class="company">TechCorp</span>
-                            <span class="location">Москва</span>
-                            <span class="salary">от 150 000 ₽</span>
+                            <span class="company">{{ it. }}</span>
+                            <span class="location">{{ it.location }}</span>
+                            <span class="salary">{{ it.salary }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="job-card">
-                        <div class="job-header">
-                            <h3>Менеджер проектов</h3>
-                            <span class="ai-rating">AI рейтинг: 88%</span>
-                        </div>
-                        <div class="job-meta">
-                            <span class="company">DigitalAgency</span>
-                            <span class="location">Санкт-Петербург</span>
-                            <span class="salary">от 120 000 ₽</span>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </section>
     </div>
