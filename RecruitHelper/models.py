@@ -5,7 +5,7 @@ import json
 class Vacancy(models.Model):
     ''' Модель для вакансий '''
     title = models.CharField(max_length=255)                # Название вакансии
-    company = models.CharField(max_length=255)              # Название компании
+    company = models.CharField(max_length=255,default="Anonym")              # Название компании
     location = models.CharField(max_length=255, blank=True) # Географическое положение
     salary = models.PositiveIntegerField()                  # Зарплата
     description = models.TextField()                        # Описание вакансии
