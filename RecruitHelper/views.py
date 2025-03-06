@@ -4,15 +4,8 @@ from django import forms
 import random
 
 def home(req):
-    vacancies_context = list()
-    if Vacancy.objects.count() > 6:
-        for i in range(6):
-            vacancy_id = random.sample(1, Vacancy.objects.count())
-            vacancy = Vacancy.objects.get(id=vacancy_id)
-            vacancies_context.append(vacancy)
-    else:
-        vacancies_context = Vacancy.objects.all()
-    context = {"vacancies": vacancies_context}
+   
+    context = { }
     return render(req, 'index.html', context)
 
 def login(req):

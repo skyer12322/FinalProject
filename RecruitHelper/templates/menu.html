@@ -3,12 +3,66 @@
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <nav class="navbar">
-    <ul class="navbar-links">
-        <li><a href="{% url 'home' %}">Главная</a></li>
-        <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
-        <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
-        <a href="{% url 'profile' %}">
-            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар пользователя" class="user-avatar" style="width: 37px; height: 37px; border-radius: 50%; position: absolute; right: 10px; top: 2px;">
-        </a>
-    </ul>
+    <div class="nav-container">
+        <ul class="centered-menu">
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
+            <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
+        </ul>
+        
+        <div class="avatar-wrapper">
+            <a href="{% url 'profile' %}">
+                <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" 
+                     alt="Аватар" 
+                     class="user-avatar">
+            </a>
+        </div>
+    </div>
 </nav>
+
+<style>
+    .nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+
+    .centered-menu {
+        display: flex;
+        gap: 40px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .centered-menu a {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .centered-menu a:hover {
+        color: #236b9b;
+    }
+
+    .avatar-wrapper {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #3498db;
+    }
+</style>
