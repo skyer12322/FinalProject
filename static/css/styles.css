@@ -302,7 +302,7 @@ button:hover {
 }
 
 .footer {
-    background-color: #6a0dad;
+    background: linear-gradient(to right, #00c853, #0091ea);
     color: white;
     padding: 20px 0;
     text-align: center;
