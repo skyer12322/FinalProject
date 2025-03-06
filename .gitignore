@@ -4,6 +4,8 @@ venv/
 ENV/
 
 # Database
+venv
+.idea
 *.sqlite3
 *.db
 
