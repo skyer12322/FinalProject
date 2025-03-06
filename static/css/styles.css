@@ -301,42 +301,29 @@ button:hover {
     text-align: center;
 }
 
-.main-content {
-    padding: 20px; /* Отступы для основного контента */
-}
-
 .footer {
-    background-color: #6a0dad; /* Цвет фона футера */
-    color: white; /* Цвет текста футера */
-    padding: 20px 0; /* Отступы */
-    text-align: center; /* Центрирование текста */
-    position: relative; /* Позиционирование относительно родителя */
-    bottom: -100px; /* Скрываем футер за пределами видимости */
-    left: 0; /* Привязываем футер к левому краю */
-    right: 0; /* Привязываем футер к правому краю */
-    transition: bottom 0.3s; /* Плавный переход для появления футера */
-}
-
-.footer.visible {
-    bottom: 0; /* Показываем футер, когда он должен быть виден */
+    background-color: #6a0dad;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
 }
 
 .footer-links {
-    list-style-type: none; /* Убираем маркеры списка */
-    padding: 0; /* Убираем отступы */
-    margin: 10px 0 0; /* Отступы сверху и снизу */
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0;
 }
 
 .footer-links li {
-    display: inline; /* Горизонтальное выравнивание элементов списка */
-    margin: 0 15px; /* Отступы между ссылками */
+    display: inline;
+    margin: 0 15px;
 }
 
 .footer-links a {
-    color: white; /* Цвет ссылок */
-    text-decoration: none; /* Убираем подчеркивание */
+    color: white;
+    text-decoration: none;
 }
 
 .footer-links a:hover {
-    text-decoration: underline; /* Подчеркивание при наведении */
+    text-decoration: underline;
 }
