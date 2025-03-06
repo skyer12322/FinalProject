@@ -14,7 +14,7 @@ class Vacancy(models.Model):
     required_education = models.CharField(max_length=255)   # Требуемое образование
     created_at = models.DateTimeField(auto_now_add=True)    # Когда создано
     updated_at = models.DateTimeField(auto_now=True)        # Когда в последний раз обновили
-    ai_rating = models.PositiveIntegerField()
+    ai_rating = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
