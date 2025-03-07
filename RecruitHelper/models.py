@@ -9,7 +9,7 @@ class Vacancy(models.Model):
     location = models.CharField(max_length=255, blank=True)                  # Географическое положение
     salary = models.PositiveBigIntegerField(default=15000)    # Зарплата
     description = models.TextField()                                         # Описание вакансии
-    required_skills = models.JSONField(default=list)                         # Требуемые навыки
+    required_skills = models.TextField(default=None)                         # Требуемые навыки
     required_experience = models.PositiveIntegerField()                      # Требуемый опыт (в годах)
     required_education = models.CharField(max_length=255, default="None")                    # Требуемое образование
     created_at = models.DateTimeField(auto_now_add=True)                     # Когда создано
