@@ -19,6 +19,10 @@ def login(req):
     context = { }
     return render(req, 'login.html', context)
 
+def register(req):
+    context = { }
+    return render(req, 'registration.html', context)
+
 def HR(req):
     context = { }
     return render(req, 'HRpage.html', context)

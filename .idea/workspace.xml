@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2d1b1c25-de84-485b-a00f-0c7ac7ab4fbf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/RecruitHelper/templates/registration.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RecruitHelper/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/RecruitHelper/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinalProject/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/FinalProject/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RecruitHelper/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/RecruitHelper/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,16 +39,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.manage.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "feature/html",
-    "last_opened_file_path": "/home/prom/Рабочий стол/final-project-team-deadlyparkourkillerdarkbrawlstarsassassinstalkerussniper1998rus"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.manage.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/html&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/prom/Рабочий стол/final-project-team-deadlyparkourkillerdarkbrawlstarsassassinstalkerussniper1998rus&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\kguse\PycharmProjects\final-project-team-deadlyparkourkillerdarkbrawlstarsassassinstalkerussniper1998rus\RecruitHelper\templates" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="manage" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="final-project-team-deadlyparkourkillerdarkbrawlstarsassassinstalkerussniper1998rus" />
