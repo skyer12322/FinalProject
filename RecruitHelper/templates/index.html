@@ -79,17 +79,24 @@
             <div class="row g-4">
                 {% for it in vacancies %}
                 <div class="col-md-6">
-                    <div class="job-card">
-                        <div class="job-header">
-                            <h3>{{ it.title }}</h3>
-                            <span class="ai-rating">AI рейтинг: {{ it.ai_rating }}</span>
+                        <div class="job-card">
+                            <div class="job-header">
+                                <a href={% url 'vacancy' vacancy_id=it.id %} style="text-decoration: none;">
+                                    <h3>{{ it.title }}</h3>
+                                </a>
+                                <span class="ai-rating">AI рейтинг: {{ it.ai_rating }}</span>
+                            </div>
+                            <div class="job-meta">
+                                <div class="company-link">
+                                    <a href={% url "company"  company_id=it.id %} style="text-decoration: none;">
+                                        <span class="company">{{ it.company }}</span>
+                                    </a>
+                                </div>
+                                <span class="location">{{ it.location }}</span>
+                                <span class="salary">{{ it.salary }}</span>
+                            </div>
                         </div>
-                        <div class="job-meta">
-                            <span class="company">{{ it.company }}</span>
-                            <span class="location">{{ it.location }}</span>
-                            <span class="salary">{{ it.salary }}</span>
-                        </div>
-                    </div>
+                    </a>
                 </div>
                 {% endfor %}
             {% endif %}
