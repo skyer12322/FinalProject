@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Vacancy
+from .models import *
+from .forms import *
 from django import forms
 import random
 
@@ -47,7 +48,24 @@ class VacancyForm(forms.ModelForm):
 
 def vacancies_list(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
-    return render(request, 'vacancies_list.html', {'vacancies': vacancies})
+    form = VacancyFilterForm(request.GET or None)
+
+    if form.is_valid():
+        category = form.cleaned_data.get('category')
+        city = form.cleaned_data.get('city')
+        min_salary = form.cleaned_data.get('min_salary')
+        max_salary = form.cleaned_data.get('max_salary')
+
+        # Фильтрация
+        if category:
+            vacancies = vacancies.filter(category__icontains=category)
+        if city:
+            vacancies = vacancies.filter(city__icontains=city)
+        if min_salary:
+            vacancies = vacancies.filter(salary__gte=min_salary)
+        if max_salary:
+            vacancies = vacancies.filter(salary__lte=max_salary)
+    return render(request, 'vacancy_list.html', {'form': form, 'vacancies': vacancies})
 
 
 def add_vacancy(request):
