@@ -23,7 +23,7 @@ def register(req):
     context = { }
     return render(req, 'registration.html', context)
 
-def HR(req):
+def company(req):
     context = { }
     return render(req, 'HRpage.html', context)
 
@@ -32,7 +32,7 @@ def profile(req):
     context = { }
     return render(req, 'profile.html',context)
 
-def candidatepage(req):
+def candidate(req):
     context = { }
     return render(req, 'candidatepage.html',context)
 
@@ -45,7 +45,7 @@ class VacancyForm(forms.ModelForm):
         }
 
 
-def vacancies_list(request):
+def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
     return render(request, 'vacancies_list.html', {'vacancies': vacancies})
 
@@ -61,6 +61,6 @@ def add_vacancy(request):
 
     return render(request, 'add_vacancy.html', {'form': form})
 
-def vacancy_detail(request, vacancy_id):
+def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
