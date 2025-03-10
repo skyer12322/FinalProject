@@ -79,17 +79,19 @@
             <div class="row g-4">
                 {% for it in vacancies %}
                 <div class="col-md-6">
-                    <div class="job-card">
-                        <div class="job-header">
-                            <h3>{{ it.title }}</h3>
-                            <span class="ai-rating">AI рейтинг: {{ it.ai_rating }}</span>
+                    <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
+                        <div class="job-card vacancy">
+                            <div class="job-header">
+                                <h3>{{ it.title }}</h3>
+                                <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
+                            </div>
+                            <div class="job-meta">
+                                <span class="company">{{ it.company }}</span>
+                                <span class="location">{{ it.location }}</span>
+                                <span class="salary">{{ it.salary }}</span>
+                            </div>
                         </div>
-                        <div class="job-meta">
-                            <span class="company">{{ it.company }}</span>
-                            <span class="location">{{ it.location }}</span>
-                            <span class="salary">{{ it.salary }}</span>
-                        </div>
-                    </div>
+                    </a>
                 </div>
                 {% endfor %}
             {% endif %}
@@ -173,6 +175,14 @@
             padding-top: 10px;
             border-top: 2px solid #ecf0f1;
             color: black
+        }
+
+        .vacancy {
+            transition: transform 0.2s;
+        }
+        .vacancy:hover{
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
     </style>
 </body>

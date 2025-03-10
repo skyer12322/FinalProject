@@ -5,9 +5,11 @@ import random
 
 def home(req):
     vacancies_context = list()
-    if Vacancy.objects.count() > 6:
-        for i in range(6):
-            vacancy_id = random.sample(1, Vacancy.objects.count())
+    vacancy_count = Vacancy.objects.count()
+    if vacancy_count > 4:
+        vacancy_ids = list(Vacancy.objects.values_list('id', flat=True))
+        random_ids = random.sample(vacancy_ids, 4)
+        for vacancy_id in random_ids:
             vacancy = Vacancy.objects.get(id=vacancy_id)
             vacancies_context.append(vacancy)
     else:
