@@ -11,9 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
-STATIC_URL = '/static/'
-STATIC_ROOT = '/static/'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -69,15 +68,11 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
             ],
         },
     },
 ]
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Adjust this path as necessary
-]
-
 
 WSGI_APPLICATION = 'FinalProject.wsgi.application'
 
@@ -128,6 +123,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, '..', 'static'),
+)
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

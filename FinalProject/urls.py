@@ -10,10 +10,14 @@ urlpatterns = [
     path("", home, name='home'),
     path('vacancies/', vacancies, name='vacancies_list'),
     path('vacancies/add/', add_vacancy, name='add_vacancy'),
-    path('vacancies/<int:vacancy_id>/', vacancy, name='vacancy'),
+    path('vacancies/<int:vacancy_id>/', vacancy, name='vacancy_detail'),
     path('profile/', profile, name='profile'),
-    path('candidate/', candidate, name='candidate'),
-    path('company/<int:company_id>/', company, name="company"),
+    path('candidatepage/', candidate, name='candidatepage'),
+    path('HR/', company, name="HRpage"),
     path('login/', login, name="login"),
     path('register/', register, name="register"),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+# Добавляем статические файлы только в режиме разработки
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
