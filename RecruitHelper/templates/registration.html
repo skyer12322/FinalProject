@@ -1,96 +1,142 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     {% include "menu.html" %}
 
-    <div class="container mt-5">
-        <h2 class="text-center">Регистрация</h2>
-        <form>
-            <div class="form-group">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="companyCheckbox">
-                    <label class="form-check-label" for="companyCheckbox">
-                        Регистрация компании
-                    </label>
-                </div>
-            </div>
+    <div class="container mt-5 w-50" 
+        style="box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+        <h2>Регистрация нового пользователя</h2>
+        <form id="registrationForm" method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="row justify-content-center">
+                <div class="col-md-7">
+                    <div class="container mt-5">
+                        <div class="form-group">
+                            <div class="form-check form-switch" style="text-align: left;">
+                                <input class="form-check-input form-control-md" type="checkbox" role="switch"
+                                    id="flexSwitchCheckDefault">
+                                <label class="form-check-label" for="flexSwitchCheckDefault">Регистрация компании</label>
+                            </div>
+                        </div>
+                    </div>
 
-            <div id="userFields">
-                <div class="form-group">
-                    <label for="firstName">Имя</label>
-                    <input type="text" class="form-control" id="firstName" placeholder="Введите имя">
-                </div>
-                <div class="form-group">
-                    <label for="secondName">Фамилия</label>
-                    <input type="text" class="form-control" id="secondName" placeholder="Введите фамилию">
-                </div>
-                <div class="form-group">
-                    <label for="username">Имя пользователя</label>
-                    <input type="text" class="form-control" id="username" placeholder="Введите имя пользователя">
-                </div>
-                <div class="form-group">
-                    <label for="email">E-mail</label>
-                    <input type="email" class="form-control" id="email" placeholder="Введите e-mail">
-                </div>
-                <div class="form-group">
-                    <label for="password">Пароль</label>
-                    <input type="password" class="form-control" id="password" placeholder="Введите пароль">
-                </div>
-            </div>
+                    <div id="userFields">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="firstName" placeholder="">
+                            <label for="firstName">Имя</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="lastName" placeholder="">
+                            <label for="lastName">Фамилия</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="username" placeholder="">
+                            <label for="username">Имя пользователя</label>
+                        </div>
+                        <div class="input-group mb-3 align-items-center">
+                            <select class="form-select form-select-sm flex-grow-1" onchange="updateFlag(this)" id="inputGroupSelect01"
+                                style="max-width: 120px;">
+                            </select>
+                            <div class="form-floating flex-grow-1" style="border-style: none; padding: 0 0 0;">
+                                <input type="tel" class="form-control" id="phone" placeholder="" pattern="s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}">
+                                <label for="phone">Телефон</label>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" placeholder="">
+                            <label for="email">Почта</label>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="password" placeholder="">
+                                <label for="floatingPassword">Пароль</label>
+                            </div>
+                            <div id="form_alerts_password" class="mt-2"></div>
+                        </div>
+                    </div>
 
-            <div id="companyFields" style="display: none;">
-                <div class="form-group">
-                    <label for="companyName">Название компании</label>
-                    <input type="text" class="form-control" id="companyName" placeholder="Введите название компании">
-                </div>
-                <div class="form-group">
-                    <label for="contactEmail">Контактный e-mail</label>
-                    <input type="email" class="form-control" id="contactEmail" placeholder="Введите контактный e-mail">
-                </div>
-                <div class="form-group">
-                    <label for="contactPhone">Контактный номер телефона</label>
-                    <input type="text" class="form-control" id="contactPhone" placeholder="Введите контактный номер телефона">
-                </div>
-            </div>
+                    <div id="companyFields" style="display: none;">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="companyName" placeholder="">
+                            <label for="companyName">Название компании</label>
+                        </div>
+                        <div class="input-group mb-3 align-items-center">
+                            <select class="form-select form-select-sm flex-grow-1" onchange="updateFlag(this)" id="inputGroupSelect02"
+                                style="max-width: 120px;">
+                            </select>
+                            <div class="form-floating flex-grow-1" style="border-style: none; padding: 0 0 0;">
+                                <input type="tel" class="form-control" id="companyPhone" placeholder="" pattern="s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}">
+                                <label for="companyPhone">Телефон</label>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="companyEmail" placeholder="">
+                            <label for="companyEmail">Контактная почта</label>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="companyPassword" placeholder="">
+                                <label for="companyPassword">Пароль</label>
+                            </div>
+                            <div id="form_alerts_password_company" class="mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="form-check form-checkbox" style="text-align:left">
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="termsCheckbox">
-                <label class="form-check-label" for="termsCheckbox">
-                    Я согласен с <a href="/terms">Условиями обслуживания</a>
-                </label>
-            </div>
+                        <div class="d-flex justify-content-center mb-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheckbox1">
+                                <label class="form-check-label" for="termsCheckbox">
+                                    Я согласен с <a href="/terms">Условиями обслуживания</a>
+                                </label>
+                            </div>
+                        </div>
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="newsletterCheckbox">
-                <label class="form-check-label" for="newsletterCheckbox">
-                    Подписаться на рассылку
-                </label>
-            </div>
+                        <div class="d-flex justify-content-center mb-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheckbox2">
+                                <label class="form-check-label" for="termsCheckbox">
+                                    Я согласен с <a href="/policy">Политикой конфиденциальности</a>
+                                </label>
+                            </div>
+                        </div>
 
-            <button type="submit" class="btn btn-primary mt-3">Зарегистрироваться</button>
+                        <div class="d-flex justify-content-center mb-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="checkbox1">
+                                <label class="form-check-label" for="checkbox1">
+                                    Подписаться на рассылку
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary mt-3 w-75" id="registerButton">Зарегистрироваться</button>
+                <div id="form_alerts" class="mt-2"></div>
+            </div>
         </form>
+
+        </label>
     </div>
 
-    <script>
-        document.getElementById('companyCheckbox').addEventListener('change', function() {
-            const userFields = document.getElementById('userFields');
-            const companyFields = document.getElementById('companyFields');
-            if (this.checked) {
-                userFields.style.display = 'none';
-                companyFields.style.display = 'block';
-            } else {
-                userFields.style.display = 'block';
-                companyFields.style.display = 'none';
-            }
-        });
-    </script>
-
     {% include "footer.html" %}
+
+    <link rel="stylesheet" href="{% static 'css/register/register.css' %}">
+    <script src="{% static 'js/register/validation.js' %}"></script>
+    <script src="{% static 'js/register/phones.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
