@@ -1,6 +1,69 @@
+# Virtual Environment
 .venv
+venv/
+ENV/
+
+# Database
 venv
 .idea
 *.sqlite3
+*.db
+
+# Django
 */migrations/
-**/__pycache__/
+*.log
+local_settings.py
+db.sqlite3-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Media and Static files (uncomment if you're not using version control for these)
+# media/
+# static/
+
+# Compiled Python files
+*.pyc
+
+# Backup files
+*.bak
+
+# Environment variables
+.env
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
