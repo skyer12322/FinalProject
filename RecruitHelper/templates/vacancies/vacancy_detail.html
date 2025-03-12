@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vacancy.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body class="vacancy-detail-body">
+    {% include "menu.html" %}
+
+    <div class="vacancy-detail-container">
+        <h1 class="vacancy-title">{{ vacancy.title }}</h1>
+        <p><strong>Описание:</strong> {{ vacancy.description }}</p>
+        <p><strong>Требуемый опыт:</strong> {{ vacancy.required_experience }} лет</p>
+        <p><strong>Требуемое образование:</strong> {{ vacancy.required_education }}</p>
+        <p><strong>Требуемые навыки:</strong> {{ vacancy.required_skills|join:", " }}</p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+.alert {
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+}
+.country-select {
+    width: 30px !important;
+    max-width: 30% !important;
+    height: auto !important;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    font-size: 16px;
+}
+
+.country-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+}
+
+.country-flag {
+    font-size: 20px;
+}
+
+.input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group .form-select,
+.input-group .form-control {
+    /* height: auto !important; */
+    min-height: 58px;
+    /* border-radius: 0.375rem !important; */
+
+}
+
+.input-group .form-floating {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}

@@ -8,5 +8,16 @@ from RecruitHelper.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", home, name='home'),
-    path("vacancies/", vacancies_list, name='vacancies_list'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('vacancies/', vacancies, name='vacancies_list'),
+    path('vacancies/add/', add_vacancy, name='add_vacancy'),
+    path('vacancies/<int:vacancy_id>/', vacancy, name='vacancy'),
+    path('profile/', profile, name='profile'),
+    path('candidatepage/', candidate, name='candidatepage'),
+    path('HR/', company, name="HRpage"),
+    path('login/', login, name="login"),
+    path('register/', register, name="register"),
+]
+
+# Добавляем статические файлы только в режиме разработки
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

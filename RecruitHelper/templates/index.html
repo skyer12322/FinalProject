@@ -4,15 +4,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аналог HH.ru</title>
+    <title>AI Career - Главная</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="index-body">
-    {% include "footer.html" %}
-    <div class="index-container">
-        <h1 class="index-h1">Добро пожаловать!</h1>
-        <p>Оценка резюме с помощью ИИ и подбор подходящих вакансий</p>
-        <button class="animated-button index-button" onclick="location.href='{% url 'vacancies_list' %}'">Перейти</button>
+    {% include "menu.html" %}
+
+    <div class="main-search-section">
+        <div class="container">
+            <div class="search-header">
+                <h1>Найди работу мечты</h1>
+                <p>С помощью AI-аналитики резюме и вакансий</p>
+            </div>
+            
+            <div class="search-box">
+                <form class="search-form">
+                    <div class="input-group">
+                        <input style="border-radius: 8px;" type="text" 
+                               class="form-control" 
+                               placeholder="Должность или ключевые слова">
+                        <input style="border-radius: 8px;" type="text" 
+                               class="form-control" 
+                               placeholder="Город или регион">
+                        <button class="btn btn-primary" style="border-radius: 8px;">Найти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <div class="container mt-5">
+        <section class="category-section mb-5">
+            <h2 class="section-title">Популярные категории</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <div class="category-icon it">💻</div>
+                        <h3>IT</h3>
+                        <p>1324 вакансии</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <div class="category-icon finance">💰</div>
+                        <h3>Финансы</h3>
+                        <p>876 вакансий</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <div class="category-icon sales">📈</div>
+                        <h3>Продажи</h3>
+                        <p>945 вакансий</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <div class="category-icon engineering">⚙️</div>
+                        <h3>Инженерия</h3>
+                        <p>678 вакансий</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-jobs mb-5">
+            {% if vacancies|length == 0 %}
+            <div class="row g-4">
+                <h1 class="no-vacancies">Пока что никто не разместил вакансий!</h1>
+            </div>
+            {% else %}
+            <h2 class="section-title">Рекомендованные вакансии</h2>
+            <div class="row g-4">
+                {% for it in vacancies %}
+                <div class="col-md-6">
+                    <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
+                        <div class="job-card vacancy">
+                            <div class="job-header">
+                                <h3>{{ it.title }}</h3>
+                                <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
+                            </div>
+                            <div class="job-meta">
+                                <span class="company">{{ it.company }}</span>
+                                <span class="location">{{ it.location }}</span>
+                                <span class="salary">{{ it.salary }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </section>
+    </div>
+
+    {% include "footer.html" %}
+
+    
+
+    <style>
+        .main-search-section {
+            background: linear-gradient(135deg, #527d96, #3498db);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .search-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-form .input-group {
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+            color:black;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: black;
+        }
+
+        .ai-rating {
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 15px;
+            color: rgb(132, 132, 132);
+        }
+
+        .no-vacancies {
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 2px solid #ecf0f1;
+            color: black
+        }
+
+        .vacancy {
+            transition: transform 0.2s;
+        }
+        .vacancy:hover{
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+    </style>
 </body>
 </html>
