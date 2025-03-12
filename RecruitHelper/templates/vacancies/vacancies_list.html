@@ -13,7 +13,7 @@
 </head>
 
 <body class="vacancies-list-body">
-    {% include "menu.html" %}
+    {% include "../main/menu.html" %}
     
     <div class="container mt-5">
         <section class="featured-jobs mb-5">
@@ -44,58 +44,9 @@
         </section>
     </div>
 
-    {% include "footer.html" %}
+    {% include "../main/footer.html" %}
 
-    <style>
-        .no-vacancies {
-            margin-top: 25px;
-            padding-top: 10px;
-            color: black
-        }
-
-        .vacancies-title {
-            margin-top: 25px;
-            padding-top: 10px;
-            color: black;
-            border-bottom: 2px solid #ecf0f1;
-        }
-
-        .job-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .job-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            color: black;
-        }
-
-        .ai-rating {
-            background: #27ae60;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-        }
-
-        .job-meta {
-            display: flex;
-            gap: 15px;
-            color: rgb(132, 132, 132);
-        }
-
-        .no-vacancies {
-            margin-top: 25px;
-            padding-top: 10px;
-            border-top: 2px solid #ecf0f1;
-            color: black
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
 
 </body>
 </html>

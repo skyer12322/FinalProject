@@ -59,7 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'RecruitHelper/templates'
+            'RecruitHelper/templates/'
         ],
         'APP_DIRS': True,
         'OPTIONS': {

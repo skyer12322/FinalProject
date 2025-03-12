@@ -15,28 +15,28 @@ def home(req):
     else:
         vacancies_context = Vacancy.objects.all()
     context = {"vacancies": vacancies_context}
-    return render(req, 'index.html', context)
+    return render(req, 'main/index.html', context)
 
 def login(req):
     context = { }
-    return render(req, 'login.html', context)
+    return render(req, 'auth/login.html', context)
 
 def register(req):
     context = { }
-    return render(req, 'registration.html', context)
+    return render(req, 'auth/registration.html', context)
 
 def company(req):
     context = { }
-    return render(req, 'HRpage.html', context)
+    return render(req, 'users/HRpage.html', context)
 
 
 def profile(req):
     context = { }
-    return render(req, 'profile.html',context)
+    return render(req, 'users/profile.html',context)
 
 def candidate(req):
     context = { }
-    return render(req, 'candidatepage.html',context)
+    return render(req, 'users/candidatepage.html',context)
 
 class VacancyForm(forms.ModelForm):
     class Meta:
@@ -49,7 +49,7 @@ class VacancyForm(forms.ModelForm):
 
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
-    return render(request, 'vacancies_list.html', {'vacancies': vacancies})
+    return render(request, 'vacancies/vacancies_list.html', {'vacancies': vacancies})
 
 
 def add_vacancy(request):
@@ -61,7 +61,7 @@ def add_vacancy(request):
     else:
         form = VacancyForm()
 
-    return render(request, 'add_vacancy.html', {'form': form})
+    return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
