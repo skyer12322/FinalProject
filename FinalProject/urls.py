@@ -3,7 +3,6 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from RecruitHelper.views import *
-from RecruitHelper import views
 
 
 urlpatterns = [
