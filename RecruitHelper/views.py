@@ -32,7 +32,7 @@ def company(req):
 
 def login(req):
     context = { }
-    return render(req, 'login.html', context)
+    return render(req, 'auth/login.html', context)
 
 def profile(req):
     context = { }
@@ -84,6 +84,6 @@ def add_vacancy(request):
 
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
-def vacancy_detail(request, vacancy_id):
+def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
