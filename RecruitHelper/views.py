@@ -34,6 +34,10 @@ def login(req):
     context = { }
     return render(req, 'auth/login.html', context)
 
+def ab_us(req):
+    context = { }
+    return render(req, 'abot_us.html', context)
+
 def profile(req):
     context = { }
     return render(req, 'users/profile.html',context)
