@@ -17,6 +17,7 @@ urlpatterns = [
     path('HR/', company, name="HRpage"),
     path('login/', login, name="login"),
     path('register/', register, name="register"),
+    path('privacy/', privacy, name="privacy"),
 ]
 
 # Добавляем статические файлы только в режиме разработки

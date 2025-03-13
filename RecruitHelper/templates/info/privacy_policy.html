@@ -1,0 +1,154 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/info/privacy.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    {% include "../main/menu.html" %}
+    <div class="container md-3 text-container">
+        <div class="row">
+            <div class="col-4">
+                <nav id="text-navbar" class="h-100 flex-column align-items-stretch pe-4 border-end" style="text-align: left">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#entrance">1. Введение</a>
+                        <a class="nav-link" href="#data-collection">2. Сбор данных</a>
+                        <a class="nav-link" href="#ai-usage">3. Использование ИИ</a>
+                        <a class="nav-link" href="#data-usage">4. Цели обработки данных</a>
+                        <a class="nav-link" href="#coop-data-usage">5. Совместное использование данных</a>
+                        <a class="nav-link" href="#storage-and-security">6. Хранение и безопасность</a>
+                        <a class="nav-link" href="#user-rights">7. Права пользователей</a>
+                        <a class="nav-link" href="#storage-time">8. Срок хранения данных</a>
+                        <a class="nav-link" href="#children-privacy">9. Конфиденциальность детей</a>
+                        <a class="nav-link" href="#policy-changes">10. Изменения политики</a>
+                        <a class="nav-link" href="#contacts">11. Контакты</a>
+                    </nav>
+                </nav>
+            </div>
+
+            <div class="col-8">
+                <div data-bs-spy="scroll" data-bs-target="#text=navbar" data-bs-smooth-scroll="true"
+                    class="scrollspy-example-2" tabindex="0" style="text-align: left">
+                    <div id="header">
+                        <h2><strong>Политика конфиденциальности
+                            AI Career
+                        </strong></h2>
+                        <h5><i>
+                            Последнее обновление: 13.03.2025
+                        </i></h5>
+                    </div>
+                    <div id="item-1">
+                        <h4><strong>1. Введение</strong></h4>
+                        <p>AI Career (далее — «Компания», «мы», «нас») стремится защищать вашу конфиденциальность.
+                            Настоящая политика описывает, как мы собираем, используем и защищаем персональные данные пользователей
+                            нашего сервиса, основанного на искусственном интеллекте (ИИ), для подбора сотрудников. Используя наш
+                            сервис, вы соглашаетесь с условиями этой политики.
+                        </p>
+                    </div>
+                    <div id="data-collection">
+                        <h4><strong>2. Сбор данных</strong></h4>
+                        <p>Мы собираем следующие категории данных:
+                            <ul>
+                                <li>Персональная информация : имя, контактные данные, резюме, образование, навыки.</li>
+                                <li>Данные оценки : результаты тестов, анализ навыков, предоставленные через ИИ.</li>
+                                <li>Техническая информация : IP-адрес, данные cookies (если применимо), логи использования платформы.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="ai-usage">
+                        <h4><strong>3. Использование ИИ</strong></h4>
+                        <p>
+                            <ul>
+                                <li>Анализ данных : ИИ анализирует резюме, оценивает соответствие вакансиям и ранжирует кандидатов работодателям.</li>
+                                <li>Автоматизированные решения : ИИ может ранжировать кандидатов, но окончательные решения принимаются людьми.</li>
+                                <li>Обучение модели : данные анонимизируются для улучшения алгоритмов, чтобы минимизировать bias и повысить точность.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="data-usage">
+                        <h4><strong>4. Цели обработки данных</strong></h4>
+                        <p>Данные используются для:
+                            <ul>
+                                <li>Подбора кандидатов на вакансии.</li>
+                                <li>Улучшения алгоритмов ИИ и функционала платформы.</li>
+                                <li>Обеспечения связи с пользователями (например, уведомления о статусе заявки).</li>
+                                <li>Соблюдения юридических требований.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="coop-data-usage">
+                        <h4><strong>5. Совместное использование данных</strong></h4>
+                        <p>Мы передаем данные только в следующих случаях:
+                            <ul>
+                                <li>Работодателям : для рассмотрения вашей кандидатуры.</li>
+                                <li>Партнерам : IT-провайдерам, облачным сервисам (например, Amazon Web Services) для хранения данных.</li>
+                                <li>Законодательные требования : по запросу судов или регуляторов.</li>
+                            </ul>
+                            <i>Мы не продаем данные третьим лицам.</i>
+                        </p>
+                    </div>
+                    <div id="storage-and-security">
+                        <h4><strong>6. Хранение и безопасность</strong></h4>
+                        <p>
+                            <ul>
+                                <li>География хранения : данные хранятся на серверах в Российской Федрации, защищенных шифрованием.</li>
+                                <li>Меры безопасности : многофакторная аутентификация, регулярные аудиты, ограничение доступа сотрудников.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="user-rights">
+                        <h4><strong>7. Права пользователей</strong></h4>
+                        <p>Вы можете:
+                            <ul>
+                                <li>Запросить доступ, исправление или удаление ваших данных.</li>
+                                <li>Отозвать согласие на обработку.</li>
+                                <li>Воспользоваться правом на переносимость данных.</li>
+                                <li>Сообщить о нарушениях через administration@ai-career.com</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="storage-time">
+                        <h4><strong>8. Срок хранения данных</strong></h4>
+                        <p>Данные хранятся до:
+                            <ul>
+                                <li>Удаления вами аккаунта.</li>
+                                <li>Истечения 3 лет бездействия, если иное не требуется законом.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div id="children-privacy">
+                        <h4><strong>9. Конфиденциальность детей</strong></h4>
+                        <p>Сервис не предназначен для лиц младше 16 лет. Мы не собираем данные несовершеннолетних.</p>
+                    </div>
+                    <div id="policy-changes">
+                        <h4><strong>10. Изменения политики</strong></h4>
+                        <p>Изменения вступают в силу после публикации на сайте. Мы уведомим вас о значимых обновлениях.</p>
+                    </div>
+                    <div id="contacts">
+                        <h4><strong>11. Контакты</strong></h4>
+                        <p>По вопросам конфиденциальности обращайтесь:
+                            <ul>
+                                <li>Email: administration@ai-career.com</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <p>
+                        <i>Настоящая политика соответствует GDPR, CCPA и другим применимым регуляторным стандартам.</i>
+                    </p>
+                    <p>Используя наш сервис, вы подтверждаете, что ознакомились и согласны с условиями политики.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "../main/footer.html" %}
+</body>
+</html>
