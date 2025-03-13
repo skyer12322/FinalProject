@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Vacancy
+from .models import *
+from .forms import *
 from django import forms
 import random
 
@@ -29,6 +30,9 @@ def company(req):
     context = { }
     return render(req, 'users/HRpage.html', context)
 
+def login(req):
+    context = { }
+    return render(req, 'login.html', context)
 
 def profile(req):
     context = { }
@@ -49,7 +53,24 @@ class VacancyForm(forms.ModelForm):
 
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
-    return render(request, 'vacancies/vacancies_list.html', {'vacancies': vacancies})
+    form = VacancyFilterForm(request.GET or None)
+
+    if form.is_valid():
+        category = form.cleaned_data.get('category')
+        city = form.cleaned_data.get('city')
+        min_salary = form.cleaned_data.get('min_salary')
+        max_salary = form.cleaned_data.get('max_salary')
+
+        # Фильтрация
+        if category:
+            vacancies = vacancies.filter(category__icontains=category)
+        if city:
+            vacancies = vacancies.filter(city__icontains=city)
+        if min_salary:
+            vacancies = vacancies.filter(salary__gte=min_salary)
+        if max_salary:
+            vacancies = vacancies.filter(salary__lte=max_salary)
+    return render(request, 'vacancies/vacancy_list.html', {'form': form, 'vacancies': vacancies})
 
 
 def add_vacancy(request):
@@ -63,6 +84,6 @@ def add_vacancy(request):
 
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
-def vacancy(request, vacancy_id):
+def vacancy_detail(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})

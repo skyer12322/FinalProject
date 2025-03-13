@@ -14,3 +14,9 @@ class VacancyForm(forms.ModelForm):
             'required_experience',
             'required_education',
         )
+
+class VacancyFilterForm(forms.Form):
+    category = forms.CharField(required=False, label="Категория")
+    city = forms.CharField(required=False, label="Город")
+    min_salary = forms.DecimalField(required=False, label="Минимальная зарплата")
+    max_salary = forms.DecimalField(required=False, label="Максимальная зарплата")
