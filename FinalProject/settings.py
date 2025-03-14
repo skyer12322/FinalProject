@@ -136,9 +136,9 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'yourapp.CustomUser'  # или 'yourapp.CustomHRUser'
+AUTH_USER_MODEL = 'RecruitHelper.CUser'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'yourapp.backends.CustomAuthBackend',
+    'RecruitHelper.backends.CustomAuthBackend',
 ]

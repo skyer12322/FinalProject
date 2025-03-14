@@ -1,6 +1,6 @@
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
-from RecruitHelper.models import CustomHRUser
+from RecruitHelper.models import Company
 
 
 class CustomAuthBackend(BaseBackend):
@@ -12,10 +12,10 @@ class CustomAuthBackend(BaseBackend):
                 return user
         except UserModel.DoesNotExist:
             try:
-                hr_user = CustomHRUser.objects.get(email=username)
+                hr_user = Company.objects.get(email=username)
                 if hr_user.check_password(password):
                     return hr_user
-            except CustomHRUser.DoesNotExist:
+            except Company.DoesNotExist:
                 return None
         return None
 
@@ -25,6 +25,6 @@ class CustomAuthBackend(BaseBackend):
             return UserModel.objects.get(pk=user_id)
         except UserModel.DoesNotExist:
             try:
-                return CustomHRUser.objects.get(pk=user_id)
-            except CustomHRUser.DoesNotExist:
+                return Company.objects.get(pk=user_id)
+            except Company.DoesNotExist:
                 return None
