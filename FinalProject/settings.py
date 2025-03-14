@@ -139,6 +139,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'RecruitHelper.CUser'
 
 AUTHENTICATION_BACKENDS = [
+    'RecruitHelper.backends.CUserAuthBackend',
+    'RecruitHelper.backends.CompanyAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'RecruitHelper.backends.CustomAuthBackend',
 ]
