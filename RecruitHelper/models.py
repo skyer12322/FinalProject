@@ -4,8 +4,14 @@ from django.utils import timezone
 
 class CUserManager(BaseUserManager):
     def create_user(self, email, username, first_name, last_name, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The username field must be set')
+        if not first_name:
+            raise ValueError('The first name field must be set')
+        if not last_name:
+            raise ValueError('The last name field must be set')
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError('The email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, first_name=first_name, last_name=last_name, **extra_fields)
         user.set_password(password)
@@ -14,8 +20,10 @@ class CUserManager(BaseUserManager):
     
 class CompanyManager(BaseUserManager):
     def create_user(self, email, company_name, password=None, **extra_fields):
+        if not company_name:
+            raise ValueError('The company name field must be set')
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError('The email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, company_name=company_name, **extra_fields)
         user.set_password(password)
