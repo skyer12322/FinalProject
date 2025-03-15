@@ -87,3 +87,6 @@ def add_vacancy(request):
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
+
+def news(request):
+    return render(request, 'vacancies/news.html')

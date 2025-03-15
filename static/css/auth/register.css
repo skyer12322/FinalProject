@@ -31,9 +31,7 @@
 
 .input-group .form-select,
 .input-group .form-control {
-    /* height: auto !important; */
     min-height: 58px;
-    /* border-radius: 0.375rem !important; */
 
 }
 

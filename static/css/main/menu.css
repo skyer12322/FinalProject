@@ -112,13 +112,13 @@
     font-weight: bold;
     padding: 8px 15px;
     border-radius: 50px;
-    transition: background-color 0.3s;
+    transition: background-color 0.5s !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .login-button:hover {
-    background-color: #45a049;
-}
+    background-color: #3C9F40;
+}   
 
 .avatar-wrapper {
     display: flex;
