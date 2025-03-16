@@ -18,6 +18,7 @@ urlpatterns = [
     path('register/', register, name="register"),
     path('privacy/', privacy, name="privacy"),
     path('news/', news, name="news"),
+    path('about/', about_us, name="about"),
 ]
 
 # Добавляем статические файлы только в режиме разработки

@@ -93,3 +93,7 @@ def privacy(request):
 
 def news(request):
     return render(request, 'vacancies/news.html')
+
+def about_us(req):
+    context = { }
+    return render(req, 'info/about_us.html', context)
