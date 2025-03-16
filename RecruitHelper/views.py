@@ -90,3 +90,6 @@ def vacancy(request, vacancy_id):
 
 def privacy(request):
     return render(request, 'info/privacy_policy.html')
+
+def news(request):
+    return render(request, 'vacancies/news.html')

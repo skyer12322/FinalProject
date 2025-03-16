@@ -3,7 +3,6 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from RecruitHelper.views import *
-from RecruitHelper import views
 
 
 urlpatterns = [
@@ -18,6 +17,7 @@ urlpatterns = [
     path('login/', login, name="login"),
     path('register/', register, name="register"),
     path('privacy/', privacy, name="privacy"),
+    path('news/', news, name="news"),
 ]
 
 # Добавляем статические файлы только в режиме разработки

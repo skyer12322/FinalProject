@@ -100,9 +100,6 @@ footer {
     transition: color 0.3s ease;
 }
 
-.navbar a:hover {
-    color: #ffeb3b;
-}
 
 .vacancy-form {
     margin-bottom: 30px;
@@ -165,7 +162,7 @@ select {
 
 button {
     padding: 10px;
-    background-color: #6a0dad;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 8px;
@@ -176,7 +173,7 @@ button {
 }
 
 button:hover {
-    background-color: #5a0a9c;
+    background-color: #3C9F40;
 }
 
 .vacancies-list-container {
@@ -186,11 +183,6 @@ button:hover {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.vacancies-list-h1 {
-    color: #6a0dad;
-    text-align: center;
 }
 
 .vacancies-list-container {

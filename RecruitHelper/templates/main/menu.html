@@ -1,26 +1,35 @@
 {% load static %}
 
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/main/menu.css' %}">
 
 <nav class="navbar">
     <div class="nav-container">
         <div class="logo-wrapper">
-            <img src="{% static 'images/logo.jpg' %}" alt="Лого компании" class="logo", style="width: 50px; height: 50px; border-radius: 10%;">
+            <img src="{% static 'images/logo.jpg' %}" alt="Лого компании" class="logo" style="width: 50px; height: 50px; border-radius: 10%;">
         </div>
         <ul class="centered-menu">
             <li><a href="{% url 'home' %}">Главная</a></li>
-            <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
-            <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
+            {% if request.path != '/login/' %}
+                <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
+            {% endif %}
+            <li><a href="{% url 'news' %}">Новости</a></li>
         </ul>
-        
-        <div class="avatar-wrapper">
-            <a href="{% url 'profile' %}">
-                <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" 
-                     alt="Аватар" 
-                     class="user-avatar">
-            </a>
+
+        <div class="auth-wrapper">
+            {% if request.path != '/login/' %}
+                {% if user.is_authenticated %}
+                    <div class="avatar-wrapper">
+                        <a href="{% url 'profile' %}">
+                            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}"
+                                alt="Аватар"
+                                class="user-avatar">
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-button">Войти</a>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 </nav>
-
-<link rel="stylesheet" href="{% static 'css/main/menu.css' %}">
