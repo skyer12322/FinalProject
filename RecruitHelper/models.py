@@ -30,6 +30,12 @@ class CompanyManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    
+class Occupation(models.Model):
+    name = models.CharField(max_length=255)
+
 class ChatMessage(models.Model):
     user = models.IntegerField(default=-1)
     company = models.IntegerField(default=-1)
@@ -60,6 +66,8 @@ class Vacancy(models.Model):
     chat = models.ForeignKey(Chat, related_name="vacancy", null=True, blank=True, on_delete=models.SET_NULL)
     user = models.ForeignKey('CUser', related_name='vacancy_user', null=True, blank=True, on_delete=models.CASCADE)
     company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
+    tags = models.ManyToManyField('Tag', related_name='vacancies', blank=True)
+    occupation = models.ManyToManyField(Occupation, related_name='vacancies', blank=True)
 
     def __str__(self):
         return self.title

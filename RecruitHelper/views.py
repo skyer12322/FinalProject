@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from .forms import *
 from django import forms
+from django.contrib.auth.decorators import login_required
 import random
 
 def home(req):
@@ -34,22 +35,15 @@ def login(req):
     context = { }
     return render(req, 'auth/login.html', context)
 
+@login_required
 def profile(req):
     context = { }
     return render(req, 'users/profile.html',context)
 
+@login_required
 def candidate(req):
     context = { }
     return render(req, 'users/candidatepage.html',context)
-
-class VacancyForm(forms.ModelForm):
-    class Meta:
-        model = Vacancy
-        fields = ['title', 'description', 'required_skills', 'required_experience', 'required_education']
-        widgets = {
-            'required_skills': forms.Textarea(attrs={'placeholder': 'Skills (comma-separated)'}),
-        }
-
 
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
@@ -73,6 +67,7 @@ def vacancies(request):
     return render(request, 'vacancies/vacancy_list.html', {'form': form, 'vacancies': vacancies})
 
 
+@login_required
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
@@ -84,6 +79,7 @@ def add_vacancy(request):
 
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
+@login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
