@@ -20,3 +20,4 @@ class CompanyAuthBackend(BaseBackend):
                 return user
         except Company.DoesNotExist:
             return None
+        

@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import *
+from .models import Vacancy, CUser, Company
 from .forms import *
 from django import forms
 from django.contrib.auth.decorators import login_required
+from .decorators import anonymous_required
 import random
 
 def home(req):
@@ -19,10 +20,12 @@ def home(req):
     context = {"vacancies": vacancies_context}
     return render(req, 'main/index.html', context)
 
+@anonymous_required
 def login(req):
     context = { }
     return render(req, 'auth/login.html', context)
 
+@anonymous_required
 def register(req):
     context = { }
     return render(req, 'auth/registration.html', context)
@@ -30,10 +33,6 @@ def register(req):
 def company(req):
     context = { }
     return render(req, 'users/HRpage.html', context)
-
-def login(req):
-    context = { }
-    return render(req, 'auth/login.html', context)
 
 @login_required
 def profile(req):
