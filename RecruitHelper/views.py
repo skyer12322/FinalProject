@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login as auth_login
 from .models import *
 from .forms import *
 from django import forms
@@ -18,9 +19,21 @@ def home(req):
     context = {"vacancies": vacancies_context}
     return render(req, 'main/index.html', context)
 
-def login(req):
-    context = { }
-    return render(req, 'auth/login.html', context)
+
+def login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+            return redirect("home")
+        else:
+            return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
+
+    return render(request, "auth/login.html")
 
 def register(req):
     context = { }
