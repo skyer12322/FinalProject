@@ -27,14 +27,14 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("username")
         password = request.POST.get("password")
-        is_company = 'CompanyLoginCheckbox' in request.POST
+        is_company = request.POST.get("CompanyLoginCheckbox") == "on" 
+
+        backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
 
         if is_company:
-            backend = 'RecruitHelper.backends.CompanyAuthBackend'
+            user = authenticate(request, company_email=email, password=password)
         else:
-            backend = 'RecruitHelper.backends.CUserAuthBackend'
-
-        user = authenticate(request, email=email, password=password, backend=backend)
+            user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
             return redirect("home")

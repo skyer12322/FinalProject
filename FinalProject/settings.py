@@ -141,7 +141,7 @@ AUTH_USER_MODEL = 'RecruitHelper.CUser'
 AUTHENTICATION_BACKENDS = [
     'RecruitHelper.backends.CUserAuthBackend',
     'RecruitHelper.backends.CompanyAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
+
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'

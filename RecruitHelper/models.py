@@ -159,7 +159,7 @@ class Company(AbstractBaseUser, PermissionsMixin):
     objects = CompanyManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['company_name']
+    REQUIRED_FIELDS = ['company_name, password']
 
     def __str__(self):
         return self.company_name
