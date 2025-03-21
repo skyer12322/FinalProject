@@ -1,11 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import login as auth_login, authenticate
 from .models import *
 from .forms import *
 from django import forms
+from .backends import CUserAuthBackend, CompanyAuthBackend
+from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ValidationError
 import random
 
-def home(req):
+def home(request):
+    print("User:", request.user)
+    print("User is authenticated:", request.user.is_authenticated)
+    print("User ID:", request.user.id)
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
     if vacancy_count > 4:
@@ -17,35 +24,39 @@ def home(req):
     else:
         vacancies_context = Vacancy.objects.all()
     context = {"vacancies": vacancies_context}
-    return render(req, 'main/index.html', context)
+    return render(request, 'main/index.html', context)
 
-
-def login(request):
+def login_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("username")
         password = request.POST.get("password")
+        print(email, password)
+        is_company = 'CompanyLoginCheckbox' in request.POST
 
-        user = authenticate(request, email=email, password=password)
+        if is_company:
+            backend = 'RecruitHelper.backends.CompanyAuthBackend'
+        else:
+            backend = 'RecruitHelper.backends.CUserAuthBackend'
 
+        user = authenticate(request, email=email, password=password, backend=backend)
+        print(user)
         if user is not None:
             auth_login(request, user)
+            print("User authenticated:", request.user.is_authenticated)
+            print("Session key:", request.session.session_key)
             return redirect("home")
         else:
             return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
 
     return render(request, "auth/login.html")
 
-def register(req):
-    context = { }
-    return render(req, 'auth/registration.html', context)
+def register(request):
+    
+    return render(request, 'auth/registration.html')
 
 def company(req):
     context = { }
     return render(req, 'users/HRpage.html', context)
-
-def login(req):
-    context = { }
-    return render(req, 'auth/login.html', context)
 
 def profile(req):
     context = { }

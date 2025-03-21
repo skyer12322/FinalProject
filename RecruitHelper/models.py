@@ -18,17 +18,31 @@ class CUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
+    def get_user(self, user_id):
+        try:
+            return CUser.objects.get(pk=user_id)
+        except CUser.DoesNotExist:
+            return None
+    
 class CompanyManager(BaseUserManager):
-    def create_user(self, email, company_name, password=None, **extra_fields):
+    def create_user(self, email, company_name, phone, password=None, **extra_fields):
         if not company_name:
             raise ValueError('The company name field must be set')
         if not email:
             raise ValueError('The email field must be set')
+        if not phone:
+            raise ValueError('The phone field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, company_name=company_name, **extra_fields)
+        user = self.model(email=email, company_name=company_name, phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def get_user(self, user_id):
+        try:
+            return Company.objects.get(pk=user_id)
+        except Company.DoesNotExist:
+            return None
 
 class ChatMessage(models.Model):
     user = models.IntegerField(default=-1)
@@ -73,6 +87,7 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     profile_image = models.FileField(upload_to='profile_images/', null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     user_vacancies = models.ManyToManyField(Vacancy, through='Pendings', related_name='candidates', blank=True)
     chats = models.ManyToManyField(Chat, related_name='users', blank=True)
     
@@ -93,8 +108,8 @@ class CUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='user permissions',
     )
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'username', 'password']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -114,6 +129,7 @@ class Company(AbstractBaseUser, PermissionsMixin):
     date_created = models.DateTimeField(default=timezone.now)
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     vacancies = models.ManyToManyField(Vacancy, related_name='company', blank=True)
     chats = models.ManyToManyField(Chat, through='Vacancy', related_name='company', blank=True)
 
@@ -139,8 +155,8 @@ class Company(AbstractBaseUser, PermissionsMixin):
 
     objects = CompanyManager()
 
-    USERNAME_FIELD = 'company_name'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['company_name']
 
     def __str__(self):
         return self.company_name

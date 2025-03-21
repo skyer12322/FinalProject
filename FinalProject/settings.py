@@ -143,3 +143,8 @@ AUTHENTICATION_BACKENDS = [
     'RecruitHelper.backends.CompanyAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = False  # Установите True, если используете HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # 2 недели в секундах
