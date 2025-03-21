@@ -51,7 +51,43 @@ def login_view(request):
     return render(request, "auth/login.html")
 
 def register(request):
-    
+    if request.method == 'POST':
+        is_company = 'CompanyRegistrationCheckbox' in request.POST
+        try:
+            if is_company:
+                company_name = request.POST.get('company_name')
+                company_email = request.POST.get('company_email')
+                company_phone = request.POST.get("company_phone_prefix") + request.POST.get('company_phone')
+                password = request.POST.get('company_password')
+
+                if Company.objects.filter(company_email=company_email).exists():
+                    raise ValidationError('Компания с таким email уже зарегистрирована')
+
+                Company.objects.create_user(
+                    company_name=company_name,
+                    email=company_email,
+                    phone=company_phone,
+                    password=password
+                )
+            else:
+                username = request.POST.get('username')
+                email = request.POST.get('email')
+                password = request.POST.get('password')
+
+                if CUser.objects.filter(email=email).exists():
+                    raise ValidationError('Пользователь с таким email уже существует')
+
+                CUser.objects.create_user(
+                    first_name=request.POST.get('first_name'),
+                    last_name=request.POST.get('last_name'),
+                    username=username,
+                    email=email,
+                    phone=request.POST.get("phone_prefix") + request.POST.get('phone'),
+                    password=password
+                )
+            return redirect('/')
+        except ValidationError as e:
+            return render(request, 'auth/registration.html', {'error': e.messages})
     return render(request, 'auth/registration.html')
 
 def company(req):

@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 
 class CUserManager(BaseUserManager):
-    def create_user(self, email, username, first_name, last_name, password=None, **extra_fields):
+    def create_user(self, email, phone, username, first_name, last_name, password=None, **extra_fields):
         if not username:
             raise ValueError('The username field must be set')
         if not first_name:
@@ -12,8 +12,10 @@ class CUserManager(BaseUserManager):
             raise ValueError('The last name field must be set')
         if not email:
             raise ValueError('The email field must be set')
+        if not phone:
+            raise ValueError('The phone field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, first_name=first_name, last_name=last_name, **extra_fields)
+        user = self.model(email=email, phone=phone, username=username, first_name=first_name, last_name=last_name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -82,6 +84,7 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, unique=True)
     username = models.CharField(max_length=150, unique=True)
     date_joined = models.DateTimeField(default=timezone.now)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
