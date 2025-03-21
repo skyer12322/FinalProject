@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login as auth_login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from .models import *
 from .forms import *
 from django import forms
@@ -10,9 +10,6 @@ from django.core.exceptions import ValidationError
 import random
 
 def home(request):
-    print("User:", request.user)
-    print("User is authenticated:", request.user.is_authenticated)
-    print("User ID:", request.user.id)
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
     if vacancy_count > 4:
@@ -30,7 +27,6 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("username")
         password = request.POST.get("password")
-        print(email, password)
         is_company = 'CompanyLoginCheckbox' in request.POST
 
         if is_company:
@@ -39,11 +35,8 @@ def login_view(request):
             backend = 'RecruitHelper.backends.CUserAuthBackend'
 
         user = authenticate(request, email=email, password=password, backend=backend)
-        print(user)
         if user is not None:
-            auth_login(request, user)
-            print("User authenticated:", request.user.is_authenticated)
-            print("Session key:", request.session.session_key)
+            login(request, user)
             return redirect("home")
         else:
             return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
@@ -89,6 +82,10 @@ def register(request):
         except ValidationError as e:
             return render(request, 'auth/registration.html', {'error': e.messages})
     return render(request, 'auth/registration.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 def company(req):
     context = { }
