@@ -23,6 +23,7 @@ class CompanyAuthBackend(BaseBackend):
         print("Trying Company auth...")
         try:
             company = Company.objects.get(email=company_email)
+            print(company.password, password)
             if company.check_password(password):
                 return company
         except Company.DoesNotExist:

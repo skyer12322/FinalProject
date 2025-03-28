@@ -46,6 +46,7 @@ def login_view(request):
 def register(request):
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
+        print(is_company)
         try:
             if is_company:
                 company_name = request.POST.get('company_name')
@@ -53,7 +54,7 @@ def register(request):
                 company_phone = request.POST.get("company_phone_prefix") + request.POST.get('company_phone')
                 password = request.POST.get('company_password')
 
-                if Company.objects.filter(company_email=company_email).exists():
+                if Company.objects.filter(email=company_email).exists():
                     raise ValidationError('Компания с таким email уже зарегистрирована')
 
                 Company.objects.create_user(
