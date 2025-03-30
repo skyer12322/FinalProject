@@ -96,8 +96,11 @@ def profile(req):
     context = { }
     return render(req, 'users/profile.html',context)
 
-def candidate(req):
-    context = { }
+def candidate(req, user_id):
+    candidate_user = get_object_or_404(CUser, id=user_id)
+    context = {
+        'candidate': candidate_user
+    }
     return render(req, 'users/candidatepage.html',context)
 
 class VacancyForm(forms.ModelForm):
