@@ -74,7 +74,6 @@ class Vacancy(models.Model):
     geography = models.JSONField(default=None, blank=True, null=True)
     ai_rating = models.PositiveIntegerField()
     chat = models.ForeignKey(Chat, related_name="vacancy", null=True, blank=True, on_delete=models.SET_NULL)
-    user = models.ForeignKey('CUser', related_name='vacancy_user', null=True, blank=True, on_delete=models.CASCADE)
     company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
