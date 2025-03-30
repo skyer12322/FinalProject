@@ -93,7 +93,10 @@ def company(req):
     return render(req, 'users/HRpage.html', context)
 
 def profile(req):
-    context = { }
+    user = req.user
+    context = {
+        'user': user
+    }
     return render(req, 'users/profile.html',context)
 
 def candidate(req):
