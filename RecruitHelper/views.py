@@ -88,8 +88,8 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-def company(req):
-    context = { }
+def company(req, company_id):
+    context = {"company_object": Company.objects.filter(id=company_id)}
     return render(req, 'users/HRpage.html', context)
 
 def profile(req):
