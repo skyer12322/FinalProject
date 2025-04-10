@@ -11,6 +11,7 @@ from .decorators import anonymous_required, company_required, user_required
 from django.contrib.auth.decorators import login_required
 import random
 
+
 def home(request):
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
