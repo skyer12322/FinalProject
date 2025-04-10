@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertsContainer = document.getElementById('form_alerts');
     const alertsContainer2 = document.getElementById('form_alerts_password');
     const alertsContainer3 = document.getElementById('form_alerts_password_company');
-    const isCompanySwitch = document.getElementById('flexSwitchCheckDefault');
+    const isCompanySwitch = document.getElementById('CompanyRegistrationCheckbox');
     
     // Toggle between user and company fields
     isCompanySwitch.addEventListener('change', function () {

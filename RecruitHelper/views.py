@@ -1,12 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Vacancy, CUser, Company
+from django.contrib.auth import login, authenticate, logout
+from .models import *
 from .forms import *
 from django import forms
+from .backends import CUserAuthBackend, CompanyAuthBackend
+from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ValidationError
+from .decorators import anonymous_required, company_required, user_required
 from django.contrib.auth.decorators import login_required
-from .decorators import anonymous_required
 import random
 
-def home(req):
+def home(request):
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
     if vacancy_count > 4:
@@ -18,30 +23,89 @@ def home(req):
     else:
         vacancies_context = Vacancy.objects.all()
     context = {"vacancies": vacancies_context}
-    return render(req, 'main/index.html', context)
+    return render(request, 'main/index.html', context)
 
-@anonymous_required
-def login(req):
-    context = { }
-    return render(req, 'auth/login.html', context)
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("username")
+        password = request.POST.get("password")
+        is_company = request.POST.get("CompanyLoginCheckbox") == "on" 
 
-@anonymous_required
-def register(req):
-    context = { }
-    return render(req, 'auth/registration.html', context)
+        backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
 
-def company(req):
-    context = { }
+        if is_company:
+            user = authenticate(request, company_email=email, password=password)
+        else:
+            user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
+
+    return render(request, "auth/login.html")
+
+def register(request):
+    if request.method == 'POST':
+        is_company = 'CompanyRegistrationCheckbox' in request.POST
+        print(is_company)
+        try:
+            if is_company:
+                company_name = request.POST.get('company_name')
+                company_email = request.POST.get('company_email')
+                company_phone = request.POST.get("company_phone_prefix") + request.POST.get('company_phone')
+                password = request.POST.get('company_password')
+
+                if Company.objects.filter(email=company_email).exists():
+                    raise ValidationError('Компания с таким email уже зарегистрирована')
+
+                Company.objects.create_user(
+                    company_name=company_name,
+                    email=company_email,
+                    phone=company_phone,
+                    password=password
+                )
+            else:
+                username = request.POST.get('username')
+                email = request.POST.get('email')
+                password = request.POST.get('password')
+
+                if CUser.objects.filter(email=email).exists():
+                    raise ValidationError('Пользователь с таким email уже существует')
+
+                CUser.objects.create_user(
+                    first_name=request.POST.get('first_name'),
+                    last_name=request.POST.get('last_name'),
+                    username=username,
+                    email=email,
+                    phone=request.POST.get("phone_prefix") + request.POST.get('phone'),
+                    password=password
+                )
+            return redirect('/')
+        except ValidationError as e:
+            return render(request, 'auth/registration.html', {'error': e.messages})
+    return render(request, 'auth/registration.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+def company(req, company_id):
+    context = {"company_object": Company.objects.filter(id=company_id)}
     return render(req, 'users/HRpage.html', context)
 
-@login_required
 def profile(req):
-    context = { }
+    user = req.user
+    context = {
+        'user': user
+    }
     return render(req, 'users/profile.html',context)
 
-@login_required
-def candidate(req):
-    context = { }
+def candidate(req, user_id):
+    candidate_user = get_object_or_404(CUser, id=user_id)
+    context = {
+        'candidate': candidate_user
+    }
     return render(req, 'users/candidatepage.html',context)
 
 def vacancies(request):

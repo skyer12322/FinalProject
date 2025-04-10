@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils import timezone
 
 class CUserManager(BaseUserManager):
-    def create_user(self, email, username, first_name, last_name, password=None, **extra_fields):
+    def create_user(self, email, phone, username, first_name, last_name, password=None, **extra_fields):
         if not username:
             raise ValueError('The username field must be set')
         if not first_name:
@@ -12,23 +12,39 @@ class CUserManager(BaseUserManager):
             raise ValueError('The last name field must be set')
         if not email:
             raise ValueError('The email field must be set')
+        if not phone:
+            raise ValueError('The phone field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, first_name=first_name, last_name=last_name, **extra_fields)
+        user = self.model(email=email, phone=phone, username=username, first_name=first_name, last_name=last_name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
     
+    def get_user(self, user_id):
+        try:
+            return CUser.objects.get(pk=user_id)
+        except CUser.DoesNotExist:
+            return None
+    
 class CompanyManager(BaseUserManager):
-    def create_user(self, email, company_name, password=None, **extra_fields):
+    def create_user(self, email, company_name, phone, password=None, **extra_fields):
         if not company_name:
             raise ValueError('The company name field must be set')
         if not email:
             raise ValueError('The email field must be set')
+        if not phone:
+            raise ValueError('The phone field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, company_name=company_name, **extra_fields)
+        user = self.model(email=email, company_name=company_name, phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def get_user(self, user_id):
+        try:
+            return Company.objects.get(pk=user_id)
+        except Company.DoesNotExist:
+            return None
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
@@ -64,7 +80,6 @@ class Vacancy(models.Model):
     geography = models.JSONField(default=None, blank=True, null=True)
     ai_rating = models.PositiveIntegerField()
     chat = models.ForeignKey(Chat, related_name="vacancy", null=True, blank=True, on_delete=models.SET_NULL)
-    user = models.ForeignKey('CUser', related_name='vacancy_user', null=True, blank=True, on_delete=models.CASCADE)
     company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
     tags = models.ManyToManyField('Tag', related_name='vacancies', blank=True)
     occupation = models.ManyToManyField(Occupation, related_name='vacancies', blank=True)
@@ -76,11 +91,13 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, unique=True)
     username = models.CharField(max_length=150, unique=True)
     date_joined = models.DateTimeField(default=timezone.now)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     profile_image = models.FileField(upload_to='profile_images/', null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     user_vacancies = models.ManyToManyField(Vacancy, through='Pendings', related_name='candidates', blank=True)
     chats = models.ManyToManyField(Chat, related_name='users', blank=True)
     
@@ -101,8 +118,8 @@ class CUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='user permissions',
     )
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'username', 'password']
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -122,6 +139,7 @@ class Company(AbstractBaseUser, PermissionsMixin):
     date_created = models.DateTimeField(default=timezone.now)
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     vacancies = models.ManyToManyField(Vacancy, related_name='company', blank=True)
     chats = models.ManyToManyField(Chat, through='Vacancy', related_name='company', blank=True)
 
@@ -147,8 +165,8 @@ class Company(AbstractBaseUser, PermissionsMixin):
 
     objects = CompanyManager()
 
-    USERNAME_FIELD = 'company_name'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['company_name, password']
 
     def __str__(self):
         return self.company_name
