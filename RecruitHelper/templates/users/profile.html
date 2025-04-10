@@ -17,7 +17,14 @@
         <h1 class="vacancy-title">Профиль пользователя</h1>
     
         <div class="profile-card">
-            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" 
+            <img src="
+                {% if user.is_company and user.company.avatar %}
+                    {{ user.company.avatar.url }}
+                {% elif user.is_cuser and user.cuser.avatar %}
+                    {{ user.cuser.avatar.url }}
+                {% else %}
+                    {% static 'images/default_avatar.png' %}
+                {% endif %}" 
                  alt="Аватар пользователя" 
                  class="profile-avatar">
             
@@ -25,26 +32,31 @@
             <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
             <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
     
-            {% if user.is_authenticated and user.is_company %}
+            {% if user.is_company %}
                 <div class="company-info">
                     <h3>Информация о компании</h3>
-                    <p><strong>Название компании:</strong> {{ user.company_name }}</p>
-                    <p><strong>Описание:</strong> {{ user.description }}</p>
-                    <p><strong>Сайт:</strong> <a href="{{ user.website }}">{{ user.website }}</a></p>
+                    <p><strong>Название:</strong> {{ user.company.company_name|default:"Название не указано" }}</p>
+                    <p><strong>Описание:</strong> {{ user.company.description|default:"Описание отсутствует" }}</p>
+                    <p><strong>Сайт:</strong> 
+                        {% if user.company.website %}
+                            <a href="{{ user.company.website }}">{{ user.company.website }}</a>
+                        {% else %}
+                            Не указан
+                        {% endif %}
+                    </p>
                 </div>
-            {% endif %}
-    
-            {% if user.is_authenticated and user.is_cuser %}
+            
+            {% elif user.is_cuser %}
                 <div class="cuser-info">
                     <h3>Личная информация</h3>
-                    <p><strong>Имя:</strong> {{ user.first_name }}</p>
-                    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
-                    <p><strong>Телефон:</strong> {{ user.phone }}</p>
+                    <p><strong>Имя:</strong> {{ user.first_name|default:"Не указано" }}</p>
+                    <p><strong>Фамилия:</strong> {{ user.last_name|default:"Не указана" }}</p>
+                    <p><strong>Телефон:</strong> {{ user.cuser.phone|default:"Не указан" }}</p>
                     <p><strong>Резюме:</strong> 
-                        {% if user.resume %}
-                            <a href="{{ user.resume.url }}">Скачать</a>
+                        {% if user.cuser.resume %}
+                            <a href="{{ user.cuser.resume.url }}">Скачать</a>
                         {% else %}
-                            Не загружено
+                            <span class="text-muted">Не загружено</span>
                         {% endif %}
                     </p>
                 </div>
@@ -52,13 +64,19 @@
         </div>
     
         <div class="profile-actions">
-            <button class="voting-list-button" onclick="location.href='edit-profile-url';" type="button">Редактировать профиль</button>
+            {% if user.is_company %}
+                <button class="voting-list-button" onclick="location.href='/edit-company/';" type="button">
+                    Редактировать компанию
+                </button>
+            {% elif user.is_cuser %}
+                <button class="voting-list-button" onclick="location.href='/edit-cuser/';" type="button">
+                    Редактировать профиль
+                </button>
+            {% endif %}
             <button class="voting-list-button" onclick="location.href='logout';" type="button">Выйти</button>
         </div>
     </div>
     
     {% include "../main/footer.html" %}
-    
 </body>
-
 </html>
