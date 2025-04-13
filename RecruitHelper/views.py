@@ -142,8 +142,9 @@ def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            ai = DeepSeekAPI.DeepSeekAPI("API_KEY") # объект ИИ
-            ai_callback = ai.get_job_rankings("""Задача:
+            try:
+                ai = DeepSeekAPI.DeepSeekAPI("API_KEY") # объект ИИ
+                ai_callback = ai.get_job_rankings("""Задача:
 Ранжируй список вакансий по метрике Зарплата / (Позиция + Требуемые навыки + Условия работы).
 
 Требования:
@@ -176,6 +177,9 @@ def add_vacancy(request):
 
 3.[Менеджер проектов] | Зарплата: 150 000 ₽ | Рейтинг: 6.8
 Обоснование: Средние показатели по всем параметрам, кроме условий работы (гибридный формат).""")
+            except Exception as e:
+                print(f"AI бунтует! Произошла ошибка {e}.")
+                ai_callback = "AI error!"
             # Создаем новый объект Vacancy
             vacancy = Vacancy(
                 title=form.cleaned_data['title'],
