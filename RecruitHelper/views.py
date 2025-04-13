@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 import random
+import DeepSeekAPI
+
 
 def home(request):
     vacancies_context = list()
@@ -27,7 +29,7 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("username")
         password = request.POST.get("password")
-        is_company = request.POST.get("CompanyLoginCheckbox") == "on" 
+        is_company = request.POST.get("CompanyLoginCheckbox") == "on"
 
         backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
 
@@ -136,16 +138,59 @@ def vacancies(request):
             vacancies = vacancies.filter(salary__lte=max_salary)
     return render(request, 'vacancies/vacancy_list.html', {'form': form, 'vacancies': vacancies})
 
-
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('vacancies_list')
+            ai = DeepSeekAPI.DeepSeekAPI("API_KEY") # объект ИИ
+            ai_callback = ai.get_job_rankings("""Задача:
+Ранжируй список вакансий по метрике Зарплата / (Позиция + Требуемые навыки + Условия работы).
+
+Требования:
+
+Четко определи вес каждого параметра:
+Зарплата – главный фактор (максимальный вес).
+Позиция (должность) – учитывай престиж и востребованность (средний вес).
+Требуемые навыки – оцени сложность и редкость (средний вес).
+Условия работы (офис/удаленка, график, соцпакет) – минимальный вес.
+Используй числовую шкалу (1–10) для оценки каждого параметра.
+Рассчитай итоговый балл по формуле:
+  Рейтинг = (Зарплата × 0.5) + (Позиция × 0.2) + (Навыки × 0.2) + (Условия × 0.1)  
+Выведи ТОП-5 вакансий с наибольшим рейтингом в формате:
+  [Название] | Зарплата: X | Рейтинг: Y  
+  Обоснование: ...  
+Исключи вакансии с зарплатой ниже рынка или неадекватными требованиями.
+Пример ввода:
+
+1. Backend-разработчик (Python), 200 000 ₽, требования: Django, PostgreSQL, Docker, офис 5/2  
+2. Менеджер проектов, 150 000 ₽, требования: Agile, Jira, английский, гибридный формат  
+3. Data Scientist, 180 000 ₽, требования: Python, SQL, ML, удаленка  
+
+Вывод:
+
+1.[Data Scientist] | Зарплата: 180 000 ₽ | Рейтинг: 8.5
+Обоснование: Высокий балл за престиж позиции, редкие навыки (ML) и удаленный формат.  
+
+2.[Backend-разработчик] | Зарплата: 200 000 ₽ | Рейтинг: 8.2  
+Обоснование: Максимальная зарплата, но офисный формат и менее уникальные навыки снижают рейтинг.  
+
+3.[Менеджер проектов] | Зарплата: 150 000 ₽ | Рейтинг: 6.8
+Обоснование: Средние показатели по всем параметрам, кроме условий работы (гибридный формат).""")
+            # Создаем новый объект Vacancy
+            vacancy = Vacancy(
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data['description'],
+                required_skills=form.cleaned_data['required_skills'],
+                required_education=form.cleaned_data['required_education'],
+                required_experience=form.cleaned_data['required_experience'],
+                geography=form.cleaned_data['geography'],
+                ai_rating=ai_callback, # json format
+                company=request.user.company  # обратить внимание, не совсем понятно что сюда пихать
+            )
+            vacancy.save()
+            return redirect('vacancies_list')  # страницу со списком вакансий
     else:
         form = VacancyForm()
-
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
 def vacancy(request, vacancy_id):
