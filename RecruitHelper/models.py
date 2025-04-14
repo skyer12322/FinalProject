@@ -73,6 +73,7 @@ class Vacancy(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     geography = models.JSONField(default=None, blank=True, null=True)
     ai_rating = models.PositiveIntegerField()
+    tags_ai = models.JSONField(default=list, blank=True)
     chat = models.ForeignKey(Chat, related_name="vacancy", null=True, blank=True, on_delete=models.SET_NULL)
     company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
 
