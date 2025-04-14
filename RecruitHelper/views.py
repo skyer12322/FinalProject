@@ -96,9 +96,9 @@ def company(req, company_id):
     return render(req, 'users/HRpage.html', context)
 
 def profile(req):
-    user = req.user
+    user = req.user 
     context = {
-        'user': user
+        'user': user,
     }
     return render(req, 'users/profile.html',context)
 
@@ -138,6 +138,10 @@ def vacancies(request):
         if max_salary:
             vacancies = vacancies.filter(salary__lte=max_salary)
     return render(request, 'vacancies/vacancy_list.html', {'form': form, 'vacancies': vacancies})
+
+def user_pendings(request):
+    context = {}
+    return render(request, 'user_pendings.html', context)
 
 def add_vacancy(request):
     if request.method == 'POST':

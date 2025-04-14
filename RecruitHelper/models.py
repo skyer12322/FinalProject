@@ -88,6 +88,7 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     profile_image = models.FileField(upload_to='profile_images/', null=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     user_vacancies = models.ManyToManyField(Vacancy, through='Pendings', related_name='candidates', blank=True)

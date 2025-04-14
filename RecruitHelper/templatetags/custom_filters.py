@@ -20,5 +20,4 @@ def is_instance(obj, model_str):
     app_label = "RecruitHelper"
     model_name = model_str.lower()
     obj_type = ContentType.objects.get_for_model(obj)
-    print(obj_type)
     return obj_type.app_label == app_label and obj_type.model == model_name

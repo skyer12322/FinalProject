@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company
-from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view
+from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, user_pendings
 
 
 urlpatterns = [
@@ -12,6 +12,7 @@ urlpatterns = [
     path('vacancies/', vacancies, name='vacancies_list'),
     path('vacancies/add/', add_vacancy, name='add_vacancy'),
     path('vacancies/<int:vacancy_id>/', vacancy, name='vacancy'),
+    path('user/pendings', user_pendings, name='user_pendings'),
     path('profile/', profile, name='profile'),
     path('candidatepage/', candidate, name='candidatepage'),
     path('HR/<int:company_id>/', company, name="HRpage"),
