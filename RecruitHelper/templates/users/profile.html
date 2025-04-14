@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -18,9 +19,9 @@
     
         <div class="profile-card">
             <img src="
-                {% if user.is_company and user.company.avatar %}
+                {% if user|is_instance:'Company' and user.company.avatar %}
                     {{ user.company.avatar.url }}
-                {% elif user.is_cuser and user.cuser.avatar %}
+                {% elif user|is_instance:'CUser' and user.cuser.avatar %}
                     {{ user.cuser.avatar.url }}
                 {% else %}
                     {% static 'images/default_avatar.png' %}
@@ -31,8 +32,9 @@
             <h2 class="profile-name">{{ user.username }}</h2>
             <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
             <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
-    
-            {% if user.is_company %}
+            {{ user|is_instance:'CUser' }}
+            {{ user|is_instance:'Company' }}
+            {% if user|is_instance:'Company' %}
                 <div class="company-info">
                     <h3>Информация о компании</h3>
                     <p><strong>Название:</strong> {{ user.company.company_name|default:"Название не указано" }}</p>
@@ -46,12 +48,12 @@
                     </p>
                 </div>
             
-            {% elif user.is_cuser %}
+            {% elif user|is_instance:'CUser' %}
                 <div class="cuser-info">
                     <h3>Личная информация</h3>
                     <p><strong>Имя:</strong> {{ user.first_name|default:"Не указано" }}</p>
                     <p><strong>Фамилия:</strong> {{ user.last_name|default:"Не указана" }}</p>
-                    <p><strong>Телефон:</strong> {{ user.cuser.phone|default:"Не указан" }}</p>
+                    <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
                     <p><strong>Резюме:</strong> 
                         {% if user.cuser.resume %}
                             <a href="{{ user.cuser.resume.url }}">Скачать</a>
@@ -64,11 +66,11 @@
         </div>
     
         <div class="profile-actions">
-            {% if user.is_company %}
+            {% if user|is_instance:'Company' %}
                 <button class="voting-list-button" onclick="location.href='/edit-company/';" type="button">
                     Редактировать компанию
                 </button>
-            {% elif user.is_cuser %}
+            {% elif user|is_instance:'CUser' %}
                 <button class="voting-list-button" onclick="location.href='/edit-cuser/';" type="button">
                     Редактировать профиль
                 </button>

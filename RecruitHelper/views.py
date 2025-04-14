@@ -51,7 +51,7 @@ def register(request):
             if is_company:
                 company_name = request.POST.get('company_name')
                 company_email = request.POST.get('company_email')
-                company_phone = request.POST.get("company_phone_prefix") + request.POST.get('company_phone')
+                company_phone = request.POST.get("company_phone_prefix") + ' ' + request.POST.get('company_phone')
                 password = request.POST.get('company_password')
 
                 if Company.objects.filter(email=company_email).exists():
