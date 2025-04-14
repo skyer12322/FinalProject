@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 import random
-import DeepSeekAPI
+from .DeepSeekAPI import DeepSeekAPI
+from . import prompts
 
 
 def home(request):
@@ -142,45 +143,12 @@ def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            try:
-                ai = DeepSeekAPI.DeepSeekAPI("API_KEY") # объект ИИ
-                ai_callback = ai.get_job_rankings("""Задача:
-Ранжируй список вакансий по метрике Зарплата / (Позиция + Требуемые навыки + Условия работы).
-
-Требования:
-
-Четко определи вес каждого параметра:
-Зарплата – главный фактор (максимальный вес).
-Позиция (должность) – учитывай престиж и востребованность (средний вес).
-Требуемые навыки – оцени сложность и редкость (средний вес).
-Условия работы (офис/удаленка, график, соцпакет) – минимальный вес.
-Используй числовую шкалу (1–10) для оценки каждого параметра.
-Рассчитай итоговый балл по формуле:
-  Рейтинг = (Зарплата × 0.5) + (Позиция × 0.2) + (Навыки × 0.2) + (Условия × 0.1)  
-Выведи ТОП-5 вакансий с наибольшим рейтингом в формате:
-  [Название] | Зарплата: X | Рейтинг: Y  
-  Обоснование: ...  
-Исключи вакансии с зарплатой ниже рынка или неадекватными требованиями.
-Пример ввода:
-
-1. Backend-разработчик (Python), 200 000 ₽, требования: Django, PostgreSQL, Docker, офис 5/2  
-2. Менеджер проектов, 150 000 ₽, требования: Agile, Jira, английский, гибридный формат  
-3. Data Scientist, 180 000 ₽, требования: Python, SQL, ML, удаленка  
-
-Вывод:
-
-1.[Data Scientist] | Зарплата: 180 000 ₽ | Рейтинг: 8.5
-Обоснование: Высокий балл за престиж позиции, редкие навыки (ML) и удаленный формат.  
-
-2.[Backend-разработчик] | Зарплата: 200 000 ₽ | Рейтинг: 8.2  
-Обоснование: Максимальная зарплата, но офисный формат и менее уникальные навыки снижают рейтинг.  
-
-3.[Менеджер проектов] | Зарплата: 150 000 ₽ | Рейтинг: 6.8
-Обоснование: Средние показатели по всем параметрам, кроме условий работы (гибридный формат).""")
-            except Exception as e:
-                print(f"AI бунтует! Произошла ошибка {e}.")
-                ai_callback = "AI error!"
-            # Создаем новый объект Vacancy
+            # try:
+            #     ai = DeepSeekAPI("API_KEY")
+            #     ai_callback = ai.get_job_rankings(prompts.TAGS_ASSIGN)
+            # except Exception as e:
+            #     print(f"AI бунтует! Произошла ошибка {e}.")
+            #     ai_callback = "AI error!"
             vacancy = Vacancy(
                 title=form.cleaned_data['title'],
                 description=form.cleaned_data['description'],
@@ -188,7 +156,7 @@ def add_vacancy(request):
                 required_education=form.cleaned_data['required_education'],
                 required_experience=form.cleaned_data['required_experience'],
                 geography=form.cleaned_data['geography'],
-                ai_rating=ai_callback, # json format
+                ai_rating=0, #ai_callback
                 company=request.user.company  # обратить внимание, не совсем понятно что сюда пихать
             )
             vacancy.save()
