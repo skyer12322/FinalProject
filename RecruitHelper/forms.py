@@ -8,9 +8,6 @@ class VacancyForm(forms.ModelForm):
         fields = (
             'title',
             'description',
-            'required_skills',
-            'required_experience',
-            'required_education',
         )
 
 class VacancyFilterForm(forms.Form):
