@@ -66,9 +66,6 @@ class Chat(models.Model):
 class Vacancy(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    required_skills = models.JSONField()
-    required_experience = models.PositiveIntegerField()
-    required_education = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     geography = models.JSONField(default=None, blank=True, null=True)

@@ -156,9 +156,6 @@ def add_vacancy(request):
             vacancy = Vacancy(
                 title=form.cleaned_data['title'],
                 description=form.cleaned_data['description'],
-                required_skills=form.cleaned_data['required_skills'],
-                required_education=form.cleaned_data['required_education'],
-                required_experience=form.cleaned_data['required_experience'],
                 geography=form.cleaned_data['geography'],
                 ai_rating=0, #ai_callback
                 company=request.user.company  # обратить внимание, не совсем понятно что сюда пихать
