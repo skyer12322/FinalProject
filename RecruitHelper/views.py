@@ -6,9 +6,11 @@ from django.core.exceptions import ValidationError
 from .decorators import anonymous_required, company_required, user_required
 from django.contrib.auth.decorators import login_required
 import random
-from .DeepSeekAPI import DeepSeekAPI
+from .ChatGPT_API import ChatGPT
 from . import prompts
 import os
+from openai import OpenAI
+import json
 
 
 
@@ -147,16 +149,25 @@ def add_vacancy(request):
                     title=form.cleaned_data['title'],
                     description=form.cleaned_data['description'],
                     geography=form.cleaned_data['geography'],
-                    company=request.user  # обратить внимание, не совсем понятно что сюда пихать
+                    company=request.user
                 )
             try:
-                api_key = os.getenv("DEEPSEEK_API_KEY")
-                ai = DeepSeekAPI(api_key)
-                ai_callback = ai.get_job_rankings(prompts.JOB_RANKING)
-                vacancy.ai_rating = ai_callback
+                api_key = os.getenv("OPENAI_API_KEY")
+                client = ChatGPT(
+                    api_key=api_key,
+                )
+                response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
+                vacancy.ai_rating = int(response_text['rating'])
+                tags_text = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\n{vacancy.description}')
+                if form.cleaned_data['tags_ai']:
+                    for elem in form.cleaned_data['tags_ai'].split():
+                        tags_text['tags'].append(elem)
+                vacancy.tags_ai = tags_text
+                    
             except Exception as e:
                 print(f"AI бунтует! Произошла ошибка {e}.")
                 vacancy.ai_rating = 0
+                
             vacancy.save()
             request.user.vacancies.add(vacancy)
             request.user.save()
@@ -179,12 +190,19 @@ def apply_to_vacancy(request, vacancy_id):
         candidate=request.user
     )
     try:
-        api_key = os.getenv("DEEPSEEK_API_KEY")
-        ai = DeepSeekAPI(api_key)
-        ai_callback = ai.get_job_rankings(prompts.JOB_RANKING_CANDIDATE)
-        pending.ai_rating = ai_callback
-    except:
-        pending.ai_rating = {}
+        api_key = os.getenv("OPENAI_API_KEY")
+        client = ChatGPT(
+            api_key=api_key,
+        )
+        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.resume}"
+        response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
+        print(response_text)
+        response_data = json.loads(response_text)
+        pending.ai_rating = int(response_data['rating'])
+                    
+    except Exception as e:
+        print(f"AI бунтует! Произошла ошибка {e}.")
+        pending.ai_rating = 0
     pending.save()
     return redirect('profile')
 
@@ -197,3 +215,4 @@ def news(request):
 def about_us(req):
     context = { }
     return render(req, 'info/about_us.html', context)
+
