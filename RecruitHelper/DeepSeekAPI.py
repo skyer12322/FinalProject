@@ -3,7 +3,8 @@ import requests
 class DeepSeekAPI:
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = "https://api.deepseek.ai/v1/rankings"
+        print(self.api_key)
+        self.base_url = "https://api.deepseek.com/v1/chat/completions"
 
     def get_job_rankings(self, prompt: str, num_results: int = 5):
         """
@@ -22,7 +23,15 @@ class DeepSeekAPI:
             "prompt": prompt,
             "num_results": num_results
         }
-        response = requests.post(self.base_url, headers=headers, json=data)
+        payload = {
+            "model": "deepseek-chat",  # Уточните название модели
+            "messages": [
+                {"role": "system", "content": prompt}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 100
+        }
+        response = requests.post(self.base_url, headers=headers, json=payload)
         if response.status_code == 200:
             return response.json()  # Возвращаем результаты в формате JSON
         else:

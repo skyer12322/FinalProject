@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 import random
 from .DeepSeekAPI import DeepSeekAPI
 from . import prompts
+import os
 
 
 def home(request):
@@ -109,15 +110,6 @@ def candidate(req, user_id):
     }
     return render(req, 'users/candidatepage.html',context)
 
-class VacancyForm(forms.ModelForm):
-    class Meta:
-        model = Vacancy
-        fields = ['title', 'description', 'required_skills', 'required_experience', 'required_education']
-        widgets = {
-            'required_skills': forms.Textarea(attrs={'placeholder': 'Skills (comma-separated)'}),
-        }
-
-
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
     form = VacancyFilterForm(request.GET or None)
@@ -147,21 +139,22 @@ def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            # try:
-            #     ai = DeepSeekAPI("API_KEY")
-            #     ai_callback = ai.get_job_rankings(prompts.TAGS_ASSIGN)
-            # except Exception as e:
-            #     print(f"AI бунтует! Произошла ошибка {e}.")
-            #     ai_callback = "AI error!"
-            vacancy = Vacancy(
-                title=form.cleaned_data['title'],
-                description=form.cleaned_data['description'],
-                geography=form.cleaned_data['geography'],
-                ai_rating=0, #ai_callback
-                company=request.user.company  # обратить внимание, не совсем понятно что сюда пихать
-            )
-            vacancy.save()
-            return redirect('vacancies_list')  # страницу со списком вакансий
+            try:
+                api_key = os.getenv("DEEPSEEK_API_KEY")
+                print(api_key)
+                ai = DeepSeekAPI(api_key)
+                ai_callback = ai.get_job_rankings(prompts.TAGS_ASSIGN)
+                vacancy = Vacancy(
+                    title=form.cleaned_data['title'],
+                    description=form.cleaned_data['description'],
+                    geography=form.cleaned_data['geography'],
+                    ai_rating=ai_callback,
+                    company=request.user  # обратить внимание, не совсем понятно что сюда пихать
+                )
+                vacancy.save()
+            except Exception as e:
+                print(f"AI бунтует! Произошла ошибка {e}.")
+            return redirect('vacancies_list')
     else:
         form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})

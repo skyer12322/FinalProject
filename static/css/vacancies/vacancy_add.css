@@ -1,0 +1,63 @@
+/* Стили для страницы добавления вакансии */
+
+.vacancies-list-body {
+    background-color: #f9f9f9;
+    padding: 20px;
+}
+
+.vacancies-list-h1 {
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+form input, form textarea, form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+form textarea {
+    min-height: 150px;
+}
+
+form button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+    width: 100%;
+}
+
+form button:hover {
+    background-color: #3e8e41;
+}
+
+.form-error {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
+} 
