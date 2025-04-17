@@ -7,10 +7,13 @@ from .backends import CUserAuthBackend, CompanyAuthBackend
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
+from .decorators import anonymous_required, company_required, user_required
+from django.contrib.auth.decorators import login_required
 import random
 from .DeepSeekAPI import DeepSeekAPI
 from . import prompts
 import os
+
 
 
 def home(request):
@@ -135,6 +138,7 @@ def user_pendings(request):
     context = {}
     return render(request, 'user_pendings.html', context)
 
+@login_required
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
@@ -159,6 +163,7 @@ def add_vacancy(request):
         form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
+@login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
