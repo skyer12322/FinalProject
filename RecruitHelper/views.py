@@ -2,15 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from .models import *
 from .forms import *
-from django import forms
-from .backends import CUserAuthBackend, CompanyAuthBackend
-from django.contrib import messages
-from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
+from .decorators import anonymous_required, company_required, user_required
+from django.contrib.auth.decorators import login_required
 import random
 from .DeepSeekAPI import DeepSeekAPI
 from . import prompts
 import os
+
 
 
 def home(request):
@@ -27,6 +26,7 @@ def home(request):
     context = {"vacancies": vacancies_context}
     return render(request, 'main/index.html', context)
 
+@anonymous_required
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("username")
@@ -47,10 +47,10 @@ def login_view(request):
 
     return render(request, "auth/login.html")
 
+@anonymous_required
 def register(request):
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
-        print(is_company)
         try:
             if is_company:
                 company_name = request.POST.get('company_name')
@@ -88,6 +88,7 @@ def register(request):
             return render(request, 'auth/registration.html', {'error': e.messages})
     return render(request, 'auth/registration.html')
 
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
@@ -96,6 +97,7 @@ def company(req, company_id):
     context = {"company_object": Company.objects.filter(id=company_id)}
     return render(req, 'users/HRpage.html', context)
 
+@login_required
 def profile(req):
     user = req.user 
     context = {
@@ -135,33 +137,56 @@ def user_pendings(request):
     context = {}
     return render(request, 'user_pendings.html', context)
 
+@login_required
+@company_required
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            try:
-                api_key = os.getenv("DEEPSEEK_API_KEY")
-                print(api_key)
-                ai = DeepSeekAPI(api_key)
-                ai_callback = ai.get_job_rankings(prompts.TAGS_ASSIGN)
-                vacancy = Vacancy(
+            vacancy = Vacancy(
                     title=form.cleaned_data['title'],
                     description=form.cleaned_data['description'],
                     geography=form.cleaned_data['geography'],
-                    ai_rating=ai_callback,
                     company=request.user  # обратить внимание, не совсем понятно что сюда пихать
                 )
-                vacancy.save()
+            try:
+                api_key = os.getenv("DEEPSEEK_API_KEY")
+                ai = DeepSeekAPI(api_key)
+                ai_callback = ai.get_job_rankings(prompts.JOB_RANKING)
+                vacancy.ai_rating = ai_callback
             except Exception as e:
                 print(f"AI бунтует! Произошла ошибка {e}.")
+                vacancy.ai_rating = 0
+            vacancy.save()
+            request.user.vacancies.add(vacancy)
+            request.user.save()
             return redirect('vacancies_list')
     else:
         form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
+@login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
+
+@login_required
+@user_required
+def apply_to_vacancy(request, vacancy_id):
+    vacancy = get_object_or_404(Vacancy, id=vacancy_id)
+    pending = Pendings.objects.create(
+        vacancy=vacancy,
+        candidate=request.user
+    )
+    try:
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        ai = DeepSeekAPI(api_key)
+        ai_callback = ai.get_job_rankings(prompts.JOB_RANKING_CANDIDATE)
+        pending.ai_rating = ai_callback
+    except:
+        pending.ai_rating = {}
+    pending.save()
+    return redirect('profile')
 
 def privacy(request):
     return render(request, 'info/privacy_policy.html')

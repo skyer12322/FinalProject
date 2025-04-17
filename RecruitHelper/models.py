@@ -118,7 +118,7 @@ class CUser(AbstractBaseUser, PermissionsMixin):
 class Pendings(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='pendings')
     candidate = models.ForeignKey(CUser, on_delete=models.CASCADE, related_name='pendings')
-    ai_rating = models.PositiveIntegerField(null=True, blank=True)
+    ai_rating = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

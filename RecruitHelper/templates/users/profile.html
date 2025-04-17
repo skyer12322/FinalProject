@@ -17,7 +17,7 @@
     {% include "../main/menu.html" %}
     <div class="row" style="margin:20px">
         <div class="profile-detail-container col-md-8 flex-container">
-            <div style="margin-top: 50px">
+            <div style="margin-top: 10  px">
                 <div class="profile-card row card-box">
                     <div class="col-3">
                         <img src="
@@ -77,17 +77,17 @@
                 </div>
             </div>
         </div>
-        <div class="flex-container options card-box col-md-2">
+        <div class="flex-container options card-box col-md-3">
             {% if user|is_instance:'CUser' %}
             <div class="resume card-box">
                 {% if user.resume %}
-                <a href="{{ user.resume.url }}"><strong>Скачать резюме</strong></a>
+                <a href="{{ user.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
                 {% else %}
-                <span class="text-muted"><strong>Резюме не загружено</strong></span>
+                <p><strong>Резюме не загружено</strong></p>
                 {% endif %}
             </div>
             <a href="{% url 'user_pendings' %}">
-                <div class="vacancies card-box">
+                <div class="pendings card-box">
                     <p><strong>Заявки</strong></p>
                 </div>
             </a>

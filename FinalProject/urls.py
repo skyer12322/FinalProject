@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, user_pendings
+from RecruitHelper.views import apply_to_vacancy
 
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     path('news/', news, name="news"),
     path('about/', about_us, name="about"),
     path('profile/logout/', logout_view, name="logout"),
+    path('atv/<int:vacancy_id>/', apply_to_vacancy, name='apply_to_vacancy'),
 ]
 
 # Добавляем статические файлы только в режиме разработки
