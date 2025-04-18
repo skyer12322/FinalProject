@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
-
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,5 +143,10 @@ AUTH_USER_MODEL = 'RecruitHelper.CUser'
 AUTHENTICATION_BACKENDS = [
     'RecruitHelper.backends.CUserAuthBackend',
     'RecruitHelper.backends.CompanyAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
+
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = False  # Установите True, если используете HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600  # 2 недели в секундах

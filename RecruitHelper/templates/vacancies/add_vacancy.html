@@ -7,10 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить вакансию</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_add.css' %}">
 </head>
 <body class="vacancies-list-body">
     {% include "../main/menu.html" %}
-    <div class="vacancies-list-container">
+    <div class="vacancy-add-card card-box">
         <h1 class="vacancies-list-h1">Добавить вакансию</h1>
         <form method="post">
             {% csrf_token %}
