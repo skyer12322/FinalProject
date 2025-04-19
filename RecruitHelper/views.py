@@ -13,6 +13,11 @@ from openai import OpenAI
 import json
 
 
+def bel():
+    for elem in CUser.objects.all():
+        print(elem, elem['id'])
+    return
+
 
 def home(request):
     vacancies_context = list()
@@ -215,4 +220,6 @@ def news(request):
 def about_us(req):
     context = { }
     return render(req, 'info/about_us.html', context)
+
+
 
