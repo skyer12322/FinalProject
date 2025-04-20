@@ -1,0 +1,24 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "develop"
+      when: always
+    - when: never
+
+stages:
+  - copy
+
+github-copy:
+  stage: copy
+  image: ubuntu:latest
+  before_script:
+    - apt-get update -y && apt-get install -y git
+  script:
+    - git config --global user.email "nikita.stoyanovski@gmail.com"
+    - git config --global user.name "SN"
+    - git remote remove origin2 || true
+    - git remote add origin2 "https://skyer12322:$GH_PAT@github.com/skyer12322/FinalProject.git"
+    - git fetch origin2 develop
+    - rm -rf .git/rebase-merge
+    - git rebase --abort || true
+    - git rebase -Xtheirs origin2/develop
+    - git push --force-with-lease origin2 HEAD:develop
