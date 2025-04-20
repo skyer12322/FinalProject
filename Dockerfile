@@ -8,8 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "manage.py", "makemigrations"]
+RUN chmod +x startup.sh
 
-CMD ["python", "manage.py", "migrate"]
-
-CMD ["python", "manage.py", "runserver", "0.0.0.0:10000"]
+CMD ["./startup.sh"]
