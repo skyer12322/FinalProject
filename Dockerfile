@@ -8,4 +8,8 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["uvicorn", "django_demo_site.asgi:application", "--port", "8000", "--host", "0.0.0.0"]
+CMD ["python", "manage.py", "makemigrations"]
+
+CMD ["python", "manage.py", "migrate"]
+
+CMD ["python", "manage.py", "runserver"]
