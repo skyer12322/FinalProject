@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -8,57 +9,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль пользователя</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="profile-body">
     {% include "../main/menu.html" %}
-    <div class="vacancy-detail-container">
-        <h1 class="vacancy-title">Профиль пользователя</h1>
-    
-        <div class="profile-card">
-            <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" 
-                 alt="Аватар пользователя" 
-                 class="profile-avatar">
-            
-            <h2 class="profile-name">{{ user.username }}</h2>
-            <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
-            <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
-    
-            {% if user.is_authenticated and user.is_company %}
-                <div class="company-info">
-                    <h3>Информация о компании</h3>
-                    <p><strong>Название компании:</strong> {{ user.company_name }}</p>
-                    <p><strong>Описание:</strong> {{ user.description }}</p>
-                    <p><strong>Сайт:</strong> <a href="{{ user.website }}">{{ user.website }}</a></p>
-                </div>
-            {% endif %}
-    
-            {% if user.is_authenticated and user.is_cuser %}
-                <div class="cuser-info">
-                    <h3>Личная информация</h3>
-                    <p><strong>Имя:</strong> {{ user.first_name }}</p>
-                    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
-                    <p><strong>Телефон:</strong> {{ user.phone }}</p>
-                    <p><strong>Резюме:</strong> 
-                        {% if user.resume %}
-                            <a href="{{ user.resume.url }}">Скачать</a>
+    <div class="row" style="margin:20px">
+        <div class="profile-detail-container col-md-8 flex-container">
+            <div style="margin-top: 10  px">
+                <div class="profile-card row card-box">
+                    <div class="col-3">
+                        <img src="
+                            {% if user|is_instance:'Company' and user.company.avatar %}
+                                {{ user.company.avatar.url }}
+                            {% elif user|is_instance:'CUser' and user.cuser.avatar %}
+                                {{ user.cuser.avatar.url }}
+                            {% else %}
+                                {% static 'images/default_avatar.png' %}
+                            {% endif %}" 
+                            alt="Аватар пользователя" 
+                            class="profile-avatar" style="align-content:center">
+                        <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">@{{ user.username }}</p>
+                    </div>
+                    <div class="secondary-info col-5">
+                        {% if user.first_name and user.last_name %}
+                        <p style="font-size: 35px"><strong>{{ user.first_name }} {{ user.last_name }}</strong></p>
                         {% else %}
-                            Не загружено
+                        <p>Имя и фамилия не указаны</p>
                         {% endif %}
-                    </p>
+                        <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
+                        <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                        {% if user|is_instance:'Company' %}
+                            <p><strong>Описание:</strong> {{ user.company.description|default:"Описание отсутствует" }}</p>
+                            <p><strong>Сайт:</strong>
+                                {% if user.company.website %}
+                                <a href="{{ user.company.website }}">{{ user.company.website }}</a>
+                                {% else %}
+                                Не указаны
+                                {% endif %}
+                            </p>
+                        {% elif user|is_instance:'CUser' %}
+                            <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
+
+                <div class="col-12 main-info-card">
+                    {% if user|is_instance:'CUser' %}
+                    <div class="bio card-box">
+                        {{ user.bio }}
+                    </div>
+                    {% elif user|is_instance:'Company' %}
+                    <div class="bio card-box">
+                        {{ user.company.description }}
+                    </div>
+                    {% endif %}
+                </div>
+            
+                <div class="profile-actions">
+                    {% if user|is_instance:'Company' %}
+                        <button class="voting-list-button container" onclick="location.href='/edit-company/';" type="button">
+                            Редактировать компанию
+                        </button>
+                    {% elif user|is_instance:'CUser' %}
+                        <button class="voting-list-button container" onclick="location.href='/edit-cuser/';" type="button">
+                            Редактировать профиль
+                        </button>
+                    {% endif %}
+                    <button class="voting-list-button container" onclick="location.href='logout';" type="button">Выйти</button>
+                </div>
+            </div>
         </div>
-    
-        <div class="profile-actions">
-            <button class="voting-list-button" onclick="location.href='edit-profile-url';" type="button">Редактировать профиль</button>
-            <button class="voting-list-button" onclick="location.href='logout';" type="button">Выйти</button>
+        <div class="flex-container options card-box col-md-3">
+            {% if user|is_instance:'CUser' %}
+            <div class="resume card-box">
+                {% if user.resume %}
+                <a href="{{ user.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
+                {% else %}
+                <p><strong>Резюме не загружено</strong></p>
+                {% endif %}
+            </div>
+            <a href="{% url 'user_pendings' %}">
+                <div class="pendings card-box">
+                    <p><strong>Заявки</strong></p>
+                </div>
+            </a>
+            {% elif user|is_instance:'Company' %}
+            <div class="resume card-box">
+                {% if user.company.resume %}
+                <a href="{{ user.company.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
+                {% else %}
+                <p><strong>описание компании не добавлено</strong></p>
+                {% endif %}
+            </div>
+            <a href="{% url 'company_pendings' %}">
+                <div class="pendings card-box">
+                    <p><strong>Заявки</strong></p>
+                </div>
+            </a>
+            {% endif %}
         </div>
     </div>
-    
     {% include "../main/footer.html" %}
-    
 </body>
-
 </html>
