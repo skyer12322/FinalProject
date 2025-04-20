@@ -17,8 +17,4 @@ github-copy:
     - git config --global user.name "SN"
     - git remote remove origin2 || true
     - git remote add origin2 "https://skyer12322:$GH_PAT@github.com/skyer12322/FinalProject.git"
-    - git fetch origin2 develop
-    - rm -rf .git/rebase-merge
-    - git rebase --abort || true
-    - git rebase -Xtheirs origin2/develop
-    - git push --force-with-lease origin2 HEAD:develop
+    - git push --force origin2 HEAD:develop
