@@ -185,7 +185,7 @@ def vacancy(request, vacancy_id):
 @user_required
 def apply_to_vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-    pending = Pendings.objects.create(
+    application = Application.objects.create(
         vacancy=vacancy,
         candidate=request.user
     )
@@ -198,12 +198,12 @@ def apply_to_vacancy(request, vacancy_id):
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
         print(response_text)
         response_data = json.loads(response_text)
-        pending.ai_rating = int(response_data['rating'])
+        application.ai_rating = int(response_data['rating'])
                     
     except Exception as e:
         print(f"AI бунтует! Произошла ошибка {e}.")
-        pending.ai_rating = 0
-    pending.save()
+        application.ai_rating = 0
+    application.save()
     return redirect('profile')
 
 def privacy(request):

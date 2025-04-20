@@ -71,7 +71,7 @@ class Vacancy(models.Model):
     geography = models.JSONField(default=None, blank=True, null=True)
     ai_rating = models.PositiveIntegerField()
     tags_ai = models.JSONField(default=list, blank=True)
-    chats = models.ManyToManyField(Chat, related_name="vacancy", null=True, blank=True)
+    chats = models.ManyToManyField(Chat, related_name="vacancy", blank=True)
     company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -115,9 +115,9 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-class Pendings(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='pendings')
-    candidate = models.ForeignKey(CUser, on_delete=models.CASCADE, related_name='pendings')
+class Application(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='applications')
+    candidate = models.ForeignKey(CUser, on_delete=models.CASCADE, related_name='applications')
     ai_rating = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
