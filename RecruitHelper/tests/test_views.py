@@ -6,7 +6,6 @@ from RecruitHelper.forms import VacancyForm, VacancyFilterForm
 class ViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
-        # Создаем тестовые данные
         self.vacancy = Vacancy.objects.create(
             title="Developer",
             description="Backend Developer",
@@ -20,7 +19,7 @@ class ViewsTest(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('vacancies', response.context)
-        self.assertLessEqual(len(response.context['vacancies']), 4)  # Проверяем, что не больше 4 вакансий
+        self.assertLessEqual(len(response.context['vacancies']), 4)
 
     # Тест для login view
     def test_login_view(self):
@@ -100,3 +99,23 @@ class ViewsTest(TestCase):
     def test_about_us_view(self):
         response = self.client.get(reverse('about_us'))
         self.assertEqual(response.status_code, 200)
+
+    # Дополнительные тесты
+
+    # Тестирование доступа к защищенному представлению без авторизации
+    def test_protected_view_without_login(self):
+        response = self.client.get(reverse('profile'))  # Предполагаем, что это защищенное представление
+        self.assertRedirects(response, f"{reverse('login')}?next={reverse('profile')}")
+
+    # Проверка валидации формы добавления вакансии (POST с некорректными данными)
+    def test_add_vacancy_invalid_post(self):
+        data = {
+            'title': '',  # Пустое название
+            'description': '',
+            'required_skills': '',
+            'required_experience': '',
+            'required_education': ''
+        }
+        response = self.client.post(reverse('add_vacancy'), data)
+        self.assertEqual(response.status_code, 200)  # Ожидаем рендеринг формы с ошибками
+        self.assertFormError(response, 'form', 'title', 'Это поле обязательно.')  # Проверяем наличие ошибки

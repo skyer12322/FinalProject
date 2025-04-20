@@ -3,48 +3,8 @@ from RecruitHelper.forms import VacancyForm, VacancyFilterForm
 from RecruitHelper.models import Vacancy
 import json
 
-class VacancyFormTest(TestCase):
-    def test_vacancy_form_valid(self):
-        # Корректные данные
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'required_skills': json.dumps(['Python', 'Django']),
-            'required_experience': '2',  # Число в виде строки
-            'required_education': 'Bachelor'
-        }
-        form = VacancyForm(data=form_data)
-        self.assertTrue(form.is_valid())  # Форма должна быть валидной
-
-    def test_vacancy_form_invalid(self):
-        # Некорректные данные (required_experience не число)
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'required_skills': json.dumps(['Python', 'Django']),
-            'required_experience': 'two',  # Не число
-            'required_education': 'Bachelor'
-        }
-        form = VacancyForm(data=form_data)
-        self.assertFalse(form.is_valid())  # Форма должна быть невалидной
-        self.assertIn('required_experience', form.errors)  # Ошибка должна быть в поле required_experience
-
-    def test_clean_required_experience(self):
-        # Проверка метода clean_required_experience
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'required_skills': json.dumps(['Python', 'Django']),
-            'required_experience': '2',  # Число в виде строки
-            'required_education': 'Bachelor'
-        }
-        form = VacancyForm(data=form_data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['required_experience'], 2)  # Значение должно быть преобразовано в int
-
 class VacancyFilterFormTest(TestCase):
     def test_vacancy_filter_form_valid(self):
-        # Корректные данные
         form_data = {
             'category': 'IT',
             'city': 'New York',
@@ -52,20 +12,69 @@ class VacancyFilterFormTest(TestCase):
             'max_salary': 100000
         }
         form = VacancyFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())  # Форма должна быть валидной
+        self.assertTrue(form.is_valid())
 
     def test_vacancy_filter_form_empty(self):
-        # Пустые данные (все поля не обязательны)
         form_data = {}
         form = VacancyFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())  # Форма должна быть валидной
+        self.assertTrue(form.is_valid())
 
     def test_vacancy_filter_form_invalid_salary(self):
-        # Некорректные данные (min_salary > max_salary)
         form_data = {
             'min_salary': 100000,
             'max_salary': 50000
         }
         form = VacancyFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())  # Форма должна быть валидной, так как валидация на min < max не реализована
-        # Если вы добавите такую валидацию, замените на self.assertFalse(form.is_valid())
+        self.assertFalse(form.is_valid())
+        self.assertIn('non_field_errors', form.errors)
+
+
+class VacancyFormTest(TestCase):
+    def test_vacancy_form_valid(self):
+        form_data = {
+            'title': 'Software Engineer',
+            'description': 'Backend Developer',
+            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
+            'ai_rating': 5,
+            'tags_ai': json.dumps(['Python', 'Django']),
+            # Предполагаем, что поле chats не обязательно для создания вакансии
+            # Если у вас есть связанные чаты, добавьте их здесь
+        }
+        form = VacancyForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_vacancy_form_invalid_ai_rating(self):
+        form_data = {
+            'title': 'Software Engineer',
+            'description': 'Backend Developer',
+            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
+            'ai_rating': -1,  # Неверное значение для ai_rating
+            'tags_ai': json.dumps(['Python', 'Django']),
+        }
+        form = VacancyForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('ai_rating', form.errors)  # Проверяем ошибку здесь
+
+    def test_vacancy_form_invalid_tags_ai(self):
+        form_data = {
+            'title': 'Software Engineer',
+            'description': 'Backend Developer',
+            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
+            'ai_rating': 5,
+            'tags_ai': "not a json",  # Некорректный JSON
+        }
+        form = VacancyForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('tags_ai', form.errors)  # Проверяем ошибку здесь
+
+    def test_vacancy_form_missing_required_fields(self):
+        form_data = {
+            # Отсутствуют обязательные поля title и description
+            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
+            'ai_rating': 5,
+            'tags_ai': json.dumps(['Python', 'Django']),
+        }
+        form = VacancyForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('title', form.errors)  # Проверяем ошибку для title
+        self.assertIn('description', form.errors)  # Проверяем ошибку для description

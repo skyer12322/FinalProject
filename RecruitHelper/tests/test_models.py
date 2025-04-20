@@ -1,7 +1,5 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from RecruitHelper.models import ChatMessage, Chat, Vacancy, CUser, Pendings, Company
-from django.core.files.uploadedfile import SimpleUploadedFile
 import json
 
 class ModelTests(TestCase):
@@ -11,25 +9,24 @@ class ModelTests(TestCase):
             username='testuser',
             first_name='John',
             last_name='Doe',
-            password='testpass123'
+            password='testpass123',
+            phone='1234567890'
         )
         self.company = Company.objects.create_user(
             email='company@example.com',
             company_name='Test Company',
-            password='testpass123'
+            password='testpass123',
+            phone='0987654321'
         )
         self.vacancy = Vacancy.objects.create(
             title='Software Engineer',
             description='Backend Developer',
-            required_skills=json.dumps(['Python', 'Django']),
-            required_experience=2,
-            required_education='Bachelor',
             ai_rating=5,
             company=self.company
         )
         self.chat_message = ChatMessage.objects.create(
-            user=self.user.id,
-            company=self.company.id,
+            user=self.user,
+            company=self.company,
             content='Hello, World!'
         )
         self.pending = Pendings.objects.create(
@@ -41,6 +38,7 @@ class ModelTests(TestCase):
     def test_cuser_model(self):
         self.assertEqual(self.user.email, 'user@example.com')
         self.assertEqual(str(self.user), 'John Doe')
+        self.assertTrue(self.user.check_password('testpass123'))
 
     def test_company_model(self):
         self.assertEqual(self.company.company_name, 'Test Company')
@@ -49,6 +47,13 @@ class ModelTests(TestCase):
     def test_vacancy_model(self):
         self.assertEqual(self.vacancy.title, 'Software Engineer')
         self.assertEqual(str(self.vacancy), 'Software Engineer')
+        self.assertEqual(self.vacancy.ai_rating, 5)  # Проверка ai_rating
+
+    def test_chat_message_model(self):
+        self.assertEqual(self.chat_message.content, 'Hello, World!')
+        self.assertEqual(self.chat_message.user, self.user)
+        self.assertEqual(self.chat_message.company, self.company)
 
     def test_pendings_model(self):
         self.assertEqual(str(self.pending), 'John Doe подал заявку на вакансию Software Engineer')
+        self.assertEqual(self.pending.ai_rating, 4)
