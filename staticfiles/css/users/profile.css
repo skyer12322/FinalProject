@@ -1,0 +1,63 @@
+.profile-detail-container{
+    width: 90%;
+    margin: 20px auto;
+    margin-top: 10px !important;
+    padding: 25px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(16, 5, 13, 0.07),
+                0 2px 6px rgba(16, 5, 13, 0.05),
+                0 1px 3px rgba(16, 5, 13, 0.04);
+    transform: translateY(-2px);
+    border: none;
+    color:#000;
+    margin-bottom: 10px;
+}
+.secondary-info{
+    text-align: left
+}
+.profile-card p{
+    font-size: 25px;
+}
+.main-info{
+    font-size:55px;
+    margin-bottom:10px
+}
+.bio{
+    font-size:25px;
+    text-align: left
+}
+.options{
+    background: #ffffff !important;    
+    margin: 20px auto;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 14px rgba(16, 5, 13, 0.07),
+    0 2px 6px rgba(16, 5, 13, 0.05),
+    0 1px 3px rgba(16, 5, 13, 0.04) !important;
+    font-size: 25px;
+    text-align: left;
+    color: #000 !important;
+}
+.options a{
+    color: #000 !important;
+}
+.profile-actions button{
+    margin-top: 10px;
+}
+.pendings:hover,
+.resume:hover{
+    transform: scale(1.05)
+}
+.resume,
+.pendings{
+    height: 100px !important;
+    max-height: 100px !important;
+    display: flex;
+    align-items: left;
+    text-align: left;
+    justify-content:left;
+    flex-direction: column;
+}
+a{
+    text-decoration: none !important;
+}
