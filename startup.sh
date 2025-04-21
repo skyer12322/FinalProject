@@ -1,4 +1,3 @@
-#!/bin/bash
 python manage.py makemigrations RecruitHelper --empty
 python manage.py makemigrations
 python manage.py migrate
