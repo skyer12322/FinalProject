@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from .decorators import anonymous_required, company_required, user_required
 from django.contrib.auth.decorators import login_required
 import random
-from .chatgpt_api import ChatGPT
+from .chatgpt import ChatGPT
 from . import prompts
 import os
 import json
