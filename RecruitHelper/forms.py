@@ -1,5 +1,5 @@
 from django import forms
-from .models import Vacancy, CUser
+from .models import Vacancy
 
 class VacancyForm(forms.ModelForm):
     title = forms.CharField(required=True, label="Название вакансии" , widget=forms.TextInput(attrs={'placeholder': 'Название вакансии',

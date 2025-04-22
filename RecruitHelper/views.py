@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError
 from .decorators import anonymous_required, company_required, user_required
 from django.contrib.auth.decorators import login_required
 import random
-from .ChatGPT_API import ChatGPT
+from .chatgpt_api import ChatGPT
 from . import prompts
 import os
-from openai import OpenAI
 import json
+from collections import defaultdict, Counter
 
 
 
@@ -25,7 +25,28 @@ def home(request):
             vacancies_context.append(vacancy)
     else:
         vacancies_context = Vacancy.objects.all()
-    context = {"vacancies": vacancies_context}
+    
+    tags = set()
+    for vacancy in Vacancy.objects.all():
+        try:
+            ai_tags = vacancy.tags_ai.get("tags", {})
+        except Exception:
+            continue
+        for _, tags_list in ai_tags.items():
+            for tag in tags_list:
+                tags.add(tag)
+    
+    application_counts = Counter()
+    for application in Application.objects.all():
+        try:
+            industries = application.vacancy.tags_ai.get("tags", {}).get("industry", [])
+        except Exception:
+            continue
+        for industry in industries:
+            application_counts[industry] += 1
+    top_categories = [tag for tag, count in application_counts.most_common(3)]
+    
+    context = {"vacancies": vacancies_context, "tags": tags, "top_categories": top_categories}
     return render(request, 'main/index.html', context)
 
 @anonymous_required
@@ -34,7 +55,7 @@ def login_view(request):
         email = request.POST.get("username")
         password = request.POST.get("password")
         is_company = request.POST.get("CompanyLoginCheckbox") == "on"
-
+        
         backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
 
         if is_company:
@@ -54,21 +75,21 @@ def register(request):
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
         try:
+            backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
             if is_company:
                 company_name = request.POST.get('company_name')
                 company_email = request.POST.get('company_email')
-                company_phone = request.POST.get("company_phone_prefix") + ' ' + request.POST.get('company_phone')
                 password = request.POST.get('company_password')
 
                 if Company.objects.filter(email=company_email).exists():
                     raise ValidationError('Компания с таким email уже зарегистрирована')
 
-                Company.objects.create_user(
+                user = Company(
                     company_name=company_name,
                     email=company_email,
-                    phone=company_phone,
                     password=password
                 )
+                user.save()
             else:
                 username = request.POST.get('username')
                 email = request.POST.get('email')
@@ -77,17 +98,18 @@ def register(request):
                 if CUser.objects.filter(email=email).exists():
                     raise ValidationError('Пользователь с таким email уже существует')
 
-                CUser.objects.create_user(
+                user = CUser(
                     first_name=request.POST.get('first_name'),
                     last_name=request.POST.get('last_name'),
                     username=username,
                     email=email,
-                    phone=request.POST.get("phone_prefix") + request.POST.get('phone'),
                     password=password
                 )
+                user.save()
+            login(request, user, backend=backend)
             return redirect('/')
         except ValidationError as e:
-            return render(request, 'auth/registration.html', {'error': e.messages})
+            return render(request, 'auth/registration.html', {'error': e.messages, 'is_company': is_company})
     return render(request, 'auth/registration.html')
 
 @login_required
@@ -117,6 +139,7 @@ def candidate(req, user_id):
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
     form = VacancyFilterForm(request.GET or None)
+    
 
     if form.is_valid():
         category = form.cleaned_data.get('category')
@@ -133,7 +156,30 @@ def vacancies(request):
             vacancies = vacancies.filter(salary__gte=min_salary)
         if max_salary:
             vacancies = vacancies.filter(salary__lte=max_salary)
-    return render(request, 'vacancies/vacancy_list.html', {'form': form, 'vacancies': vacancies})
+    vacancies_list = list(vacancies)
+    
+    tags_by_category = defaultdict(set)
+    for vacancy in vacancies_list:
+        try:
+            ai_tags = vacancy.tags_ai.get("tags", {})
+        except Exception:
+            continue
+        for category, tags_list in ai_tags.items():
+            for tag in tags_list:
+                tags_by_category[category].add(tag)
+    tags_by_category = {cat: list(tags) for cat, tags in tags_by_category.items()}
+    
+    tags = set()
+    for vacancy in vacancies_list:
+        try:
+            ai_tags = vacancy.tags_ai.get("tags", {})
+        except Exception:
+            continue
+        for _, tags_list in ai_tags.items():
+            for tag in tags_list:
+                tags.add(tag)
+    context = {"form": form, "vacancies": vacancies_list, "tags_by_category": tags_by_category, "tags": tags}
+    return render(request, 'vacancies/vacancy_list.html', context)
 
 def user_pendings(request):
     context = {}
@@ -179,6 +225,7 @@ def add_vacancy(request):
 @login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
+    # is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user).exists()
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
 
 @login_required

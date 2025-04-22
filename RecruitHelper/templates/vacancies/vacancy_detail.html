@@ -18,9 +18,6 @@
     <div class="vacancy-detail-container">
         <h1 class="vacancy-title">{{ vacancy.title }}</h1>
         <p>{{ vacancy.description }}</p>
-        <p>{{ vacancy.required_experience }} лет</p>
-        <p>{{ vacancy.required_education }}</p>
-        <p>{{ vacancy.required_skills|join:", " }}</p>
         {% if user|is_instance:'CUser' %}
             <a href="{% url 'apply_to_vacancy' vacancy_id=vacancy.id %}" class="btn btn-primary">Откликнуться</a>
         {% endif %}
