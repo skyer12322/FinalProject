@@ -1,0 +1,21 @@
+.vacancies-title {
+    margin-top: 25px;
+    padding-top: 10px;
+    color: black;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    width: auto !important;
+    transform: translateX(0%);
+}
+
+.filters {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    margin-top: 50px;
+    margin-right: 20px;
+    width: auto !important;
+    height: fit-content !important;
+    padding-left: 20px;
+}
+.vacancies {
+    width: auto !important;
+}
