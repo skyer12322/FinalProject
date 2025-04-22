@@ -89,7 +89,7 @@ class CUser(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    user_vacancies = models.ManyToManyField(Vacancy, through='Pendings', related_name='candidates', blank=True)
+    user_vacancies = models.ManyToManyField(Vacancy, through='Application', related_name='candidates', blank=True)
     chats = models.ManyToManyField(Chat, related_name='users', blank=True)
     
     objects = CUserManager()
