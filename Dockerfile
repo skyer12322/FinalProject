@@ -10,4 +10,4 @@ COPY . .
 
 RUN chmod +x startup.sh
 
-CMD ["./startup.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:10000"]
