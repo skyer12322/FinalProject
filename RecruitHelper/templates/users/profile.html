@@ -30,11 +30,27 @@
                             {% endif %}" 
                             alt="Аватар пользователя" 
                             class="profile-avatar" style="align-content:center">
-                        <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">@{{ user.username }}</p>
+                        {% if user.main_name %}
+                            <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">
+                                {% if user.role == 'company' %}
+                                    {{ user.main_name }}
+                                {% else %}
+                                    @{{ user.main_name }}
+                                {% endif %}
+                            </p>
+                        {% else %}
+                            <p>
+                            {% if user.role == 'company' %}
+                                Нет названия
+                            {% else %}
+                                Нет имени пользователя
+                            {% endif %}
+                        </p>
+                        {% endif %}
                     </div>
                     <div class="secondary-info col-5">
-                        {% if user.first_name and user.last_name %}
-                        <p style="font-size: 35px"><strong>{{ user.first_name }} {{ user.last_name }}</strong></p>
+                        {% if user.cuser.first_name and user.cuser.last_name %}
+                        <p style="font-size: 35px"><strong>{{ user.cuser.first_name }} {{ user.cuser.last_name }}</strong></p>
                         {% else %}
                         <p>Имя и фамилия не указаны</p>
                         {% endif %}
@@ -58,7 +74,7 @@
                 <div class="col-12 main-info-card">
                     {% if user|is_instance:'CUser' %}
                     <div class="bio card-box">
-                        {{ user.bio }}
+                        {{ user.cuser.description }}
                     </div>
                     {% endif %}
                 </div>
@@ -80,8 +96,8 @@
         <div class="flex-container options card-box col-md-3">
             {% if user|is_instance:'CUser' %}
             <div class="resume card-box">
-                {% if user.resume %}
-                <a href="{{ user.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
+                {% if user.cuser.resume %}
+                <a href="{{ user.cuser.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
                 {% else %}
                 <p><strong>Резюме не загружено</strong></p>
                 {% endif %}

@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -20,8 +21,11 @@
     <div class="container mt-5 w-50" 
         style="box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
         <h1>Регистрация</h1>
-        <form id="registrationForm" method="post" action="{% url 'register' %}">
+        <form id="registrationForm" method="post" action="{% url 'register' %}" autocomplete="off">
             {% csrf_token %}
+            <!-- Hidden fields to prevent browser autocomplete -->
+            <input type="text" name="fakeusernameremembered" style="display:none;" autocomplete="username">
+            <input type="password" name="fakepasswordremembered" style="display:none;" autocomplete="new-password">
             <div class="row justify-content-center">
                 <div class="col-md-7">
                     <div class="container mt-5">
@@ -33,50 +37,19 @@
                             </div>
                         </div>
                     </div>
-
-                    <div id="userFields">
+                    {% for field in form %}
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="firstName" name="first_name" placeholder="">
-                            <label for="firstName">Имя</label>
+                            {{ field|add_class:"form-control" }}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="lastName" name="last_name" placeholder="">
-                            <label for="lastName">Фамилия</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="">
-                            <label for="username">Имя пользователя</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="">
-                            <label for="email">Почта</label>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-floating">
-                                <input type="password" class="form-control" id="password" name="password" placeholder="">
-                                <label for="floatingPassword">Пароль</label>
-                            </div>
-                            <div id="form_alerts_password" class="mt-2"></div>
-                        </div>
-                    </div>
-
-                    <div id="companyFields" style="display: none;">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="companyName" name="company_name" placeholder="">
-                            <label for="companyName">Название компании</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="companyEmail" name="company_email" placeholder="">
-                            <label for="companyEmail">Контактная почта</label>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-floating">
-                                <input type="password" class="form-control" id="companyPassword" name="company_password" placeholder="">
-                                <label for="companyPassword">Пароль</label>
-                            </div>
-                            <div id="form_alerts_password_company" class="mt-2"></div>
-                        </div>
-                    </div>
+                    {% endfor %}
                     <div class="form-check form-checkbox" style="text-align:left">
 
                         <div class="d-flex justify-content-center mb-1">
@@ -106,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary mt-3 w-75" id="registerButton" style="padding: 12px; background-color: #00c4a0; border: none; font-size: 1.1rem">Зарегистрироваться</button>
+                    <button type="submit" class="btn btn-primary mt-3 w-75" style="padding: 12px; background-color: #00c4a0; border: none; font-size: 1.1rem">Зарегистрироваться</button>
                 </div>
                 <div id="form_alerts" class="mt-2"></div>
             </div>
@@ -118,7 +91,6 @@
     {% include "../main/footer.html" %}
 
     <script src="{% static 'js/register/validation.js' %}"></script>
-    <script src="{% static 'js/register/phones.js' %}"></script>
 </body>
 
 </html>

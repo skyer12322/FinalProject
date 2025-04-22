@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v6*)c!#ny+6w2p$()r7!##z=-+o4fwqu+yv!&j)fp!a!2s&4&e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 
@@ -97,7 +97,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'verify-full',
-            'sslrootcert': 'app/prod-ca-2021.crt'
+            'sslrootcert': os.path.join(BASE_DIR, 'prod-ca-2021.crt'),
         },
     }
 }
@@ -151,12 +151,10 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'RecruitHelper.CUser'
+AUTH_USER_MODEL = 'RecruitHelper.User'
 
 AUTHENTICATION_BACKENDS = [
-    'RecruitHelper.backends.CUserAuthBackend',
-    'RecruitHelper.backends.CompanyAuthBackend',
-
+    'RecruitHelper.backends.UserAuthBackend',
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'

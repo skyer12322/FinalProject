@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from .models import *
 from .forms import *
 from django.core.exceptions import ValidationError
-from .decorators import anonymous_required, company_required, user_required
+from .decorators import anonymous_required
 from django.contrib.auth.decorators import login_required
 import random
 from .chatgpt import ChatGPT
@@ -57,7 +57,7 @@ def login_view(request):
         is_company = request.POST.get("CompanyLoginCheckbox") == "on"
         print(password)
         
-        backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
+        backend = 'RecruitHelper.backends.UserAuthBackend'
 
         if is_company:
             user = authenticate(request, company_email=email, password=password)
@@ -77,66 +77,53 @@ def register(request):
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
         try:
-            backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
-            if is_company:
-                company_name = request.POST.get('company_name')
-                company_email = request.POST.get('company_email')
-                password = request.POST.get('company_password')
-
-                if Company.objects.filter(email=company_email).exists():
-                    raise ValidationError('Компания с таким email уже зарегистрирована')
-
-                user = Company(
-                    company_name=company_name,
-                    email=company_email,
-                    password=password
+            form = UserRegistrationForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                user = User.objects.create_user(
+                    email=data["email"],
+                    password=data["password"],
+                    main_name=data["main_name"],
+                    role="company" if is_company else "user"
                 )
-                user.save()
-            else:
-                username = request.POST.get('username')
-                email = request.POST.get('email')
-                password = request.POST.get('password')
-
-                if CUser.objects.filter(email=email).exists():
-                    raise ValidationError('Пользователь с таким email уже существует')
-
-                user = CUser(
-                    first_name=request.POST.get('first_name'),
-                    last_name=request.POST.get('last_name'),
-                    username=username,
-                    email=email,
-                    password=password
-                )
-                user.save()
-            login(request, user, backend=backend)
-            return redirect('/')
+                if is_company:
+                    Company.objects.create(user=user)
+                else:
+                    CUser.objects.create(user=user)
+                authenticated_user = authenticate(request, email=data["email"], password=data["password"])
+                if authenticated_user is None:
+                    raise ValidationError('Ошибка аутентификации нового пользователя')
+                login(request, authenticated_user)
+                return redirect('/')
         except ValidationError as e:
-            return render(request, 'auth/registration.html', {'error': e.messages, 'is_company': is_company})
-    return render(request, 'auth/registration.html')
+            context = {'error': e.messages, 'is_company': is_company, 'form': UserRegistrationForm()}
+            return render(request, 'auth/registration.html', context)
+    context = {'form': UserRegistrationForm()}
+    return render(request, 'auth/registration.html', context)
 
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-def company(req, company_id):
+def company(request, company_id):
     context = {"company_object": Company.objects.filter(id=company_id)}
-    return render(req, 'users/HRpage.html', context)
+    return render(request, 'users/HRpage.html', context)
 
 @login_required
-def profile(req):
-    user = req.user 
+def profile(request):
+    user = request.user 
     context = {
         'user': user,
     }
-    return render(req, 'users/profile.html',context)
+    return render(request, 'users/profile.html',context)
 
-def candidate(req, user_id):
+def candidate(request, user_id):
     candidate_user = get_object_or_404(CUser, id=user_id)
     context = {
         'candidate': candidate_user
     }
-    return render(req, 'users/candidatepage.html',context)
+    return render(request, 'users/candidatepage.html',context)
 
 def vacancies(request):
     vacancies = Vacancy.objects.all()  # Получаем все вакансии
@@ -188,7 +175,6 @@ def user_pendings(request):
     return render(request, 'user_pendings.html', context)
 
 @login_required
-@company_required
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
@@ -231,7 +217,6 @@ def vacancy(request, vacancy_id):
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
 
 @login_required
-@user_required
 def apply_to_vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     application = Application.objects.create(
@@ -261,7 +246,7 @@ def privacy(request):
 def news(request):
     return render(request, 'vacancies/news.html')
 
-def about_us(req):
+def about_us(request):
     context = { }
-    return render(req, 'info/about_us.html', context)
+    return render(request, 'info/about_us.html', context)
 
