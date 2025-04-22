@@ -96,7 +96,7 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST'),
         'PORT': os.environ.get('DB_PORT', '5432'),
         'OPTIONS': {
-            'sslmode': 'require',
+            'sslmode': 'verify-full',
             'sslrootcert': 'app/prod-ca-2021.crt'
         },
     }

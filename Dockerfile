@@ -8,6 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod +x startup.sh
-
 CMD ["python", "manage.py", "runserver", "0.0.0.0:10000"]

@@ -55,6 +55,7 @@ def login_view(request):
         email = request.POST.get("username")
         password = request.POST.get("password")
         is_company = request.POST.get("CompanyLoginCheckbox") == "on"
+        print(password)
         
         backend = 'RecruitHelper.backends.CompanyAuthBackend' if is_company else 'RecruitHelper.backends.CUserAuthBackend'
 
@@ -62,6 +63,7 @@ def login_view(request):
             user = authenticate(request, company_email=email, password=password)
         else:
             user = authenticate(request, email=email, password=password)
+        print(user)
         if user is not None:
             login(request, user)
             return redirect("home")
