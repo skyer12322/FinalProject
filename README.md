@@ -8,6 +8,7 @@ Cайт для поиска работы или сотрудников при п
 - Python 3.12
 - Django 5.1.6
 - OpenAI 1.75.0
+- CI/CD GitLab
 - python-dotenv 1.1.0
 - requests 2.32.3
 - whitenoise 6.9.0
