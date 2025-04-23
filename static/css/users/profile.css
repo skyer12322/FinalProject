@@ -44,10 +44,12 @@
 .profile-actions button{
     margin-top: 10px;
 }
-.pendings:hover,
+.applications:hover,
+.vacancies:hover,
 .resume:hover{
     transform: scale(1.05)
 }
+.applications,
 .resume,
 .pendings{
     height: 100px !important;

@@ -65,36 +65,40 @@
                                 Не указаны
                                 {% endif %}
                             </p>
-                        {% elif user|is_instance:'CUser' %}
+                        {% elif user.role == 'user' %}
                             <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="col-12 main-info-card">
-                    {% if user|is_instance:'CUser' %}
+                    {% if user.role == 'user' %}
                     <div class="bio card-box">
                         {{ user.cuser.description }}
                     </div>
+                    {% elif user.role == 'company' %}
+                    <div class="bio card-box">
+                        {{ user.company.description }}
+                    </div>
                     {% endif %}
-                </div>
             
-                <div class="profile-actions">
-                    {% if user|is_instance:'Company' %}
+                    <div class="profile-actions">
+                        {% if user.role == 'company' %}
                         <button class="voting-list-button container" onclick="location.href='/edit-company/';" type="button">
                             Редактировать компанию
                         </button>
-                    {% elif user|is_instance:'CUser' %}
+                        {% elif user.role == 'user' %}
                         <button class="voting-list-button container" onclick="location.href='/edit-cuser/';" type="button">
                             Редактировать профиль
                         </button>
-                    {% endif %}
-                    <button class="voting-list-button container" onclick="location.href='logout';" type="button">Выйти</button>
+                        {% endif %}
+                        <button class="voting-list-button container" onclick="location.href='logout';" type="button">Выйти</button>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="flex-container options card-box col-md-3">
-            {% if user|is_instance:'CUser' %}
+            {% if user.role == 'user' %}
             <div class="resume card-box">
                 {% if user.cuser.resume %}
                 <a href="{{ user.cuser.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
@@ -102,12 +106,19 @@
                 <p><strong>Резюме не загружено</strong></p>
                 {% endif %}
             </div>
-            <a href="{% url 'user_pendings' %}">
-                <div class="pendings card-box">
-                    <p><strong>Заявки</strong></p>
+            {% elif user.role == 'company' %}
+            <a href="{% url 'profile_vacancies' %}">
+                <div class="vacancies card-box">
+                    <p><strong>Вакансии</strong></p>
                 </div>
             </a>
             {% endif %}
+            <a href="{% url 'profile_applications' %}">
+                <div class="applications card-box">
+                    <p><strong>Заявки</strong></p>
+                </div>
+            </a>
+            </div>
         </div>
     </div>
     {% include "../main/footer.html" %}

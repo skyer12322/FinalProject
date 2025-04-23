@@ -118,6 +118,16 @@ def profile(request):
     }
     return render(request, 'users/profile.html',context)
 
+@login_required
+def profile_vacancies(request):
+    context = {}
+    return render(request, 'users/profile_vacancies.html', context)
+
+@login_required
+def profile_applications(request):
+    context = {}
+    return render(request, 'users/profile_applications.html', context)
+
 def candidate(request, user_id):
     candidate_user = get_object_or_404(CUser, id=user_id)
     context = {
