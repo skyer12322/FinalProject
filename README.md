@@ -4,17 +4,18 @@ Cайт для поиска работы или сотрудников при п
 
 ## Технологии
 
-На момент последнего `commit` в ветке `develop` используются следующие технологии:
+На момент последнего `commit` в ветке `develop` используются следующие технологии и библиотеки:
 - Python 3.12
-- Django 5.1.6
-- OpenAI 1.75.0
 - CI/CD GitLab
-- python-dotenv 1.1.0
-- requests 2.32.3
-- whitenoise 6.9.0
-- psycopg2-binary 2.9.0
 - Docker
 - PostgreSQL (by Supabase)
++ Django 5.1.6
++ OpenAI 1.75.0
++ python-dotenv 1.1.0
++ requests 2.32.3
++ whitenoise 6.9.0
++ psycopg2-binary 2.9.0
+
 
 
 ## Установка и запуск проекта
