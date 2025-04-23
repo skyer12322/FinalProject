@@ -180,11 +180,11 @@ def add_vacancy(request):
         form = VacancyForm(request.POST)
         if form.is_valid():
             vacancy = Vacancy(
-                    title=form.cleaned_data['title'],
-                    description=form.cleaned_data['description'],
-                    geography=form.cleaned_data['geography'],
-                    company=request.user
-                )
+                title=form.cleaned_data['title'],
+                description=form.cleaned_data['description'],
+                geography=form.cleaned_data['geography'],
+                company=request.user
+            )
             try:
                 api_key = os.getenv("OPENAI_API_KEY")
                 client = ChatGPT(
@@ -197,14 +197,15 @@ def add_vacancy(request):
                     for elem in form.cleaned_data['tags_ai'].split():
                         tags_text['tags'].append(elem)
                 vacancy.tags_ai = tags_text
-                    
+
             except Exception as e:
                 print(f"AI бунтует! Произошла ошибка {e}.")
                 vacancy.ai_rating = 0
-                
+
             vacancy.save()
             request.user.vacancies.add(vacancy)
             request.user.save()
+
             return redirect('vacancies_list')
     else:
         form = VacancyForm()
@@ -233,11 +234,21 @@ def apply_to_vacancy(request, vacancy_id):
         print(response_text)
         response_data = json.loads(response_text)
         application.ai_rating = int(response_data['rating'])
-                    
+
     except Exception as e:
         print(f"AI бунтует! Произошла ошибка {e}.")
         application.ai_rating = 0
     application.save()
+
+    Notification.objects.create(
+        user=vacancy.company,
+        company=vacancy.company,
+        notification_type='application',
+        title=f'Новая заявка на вакансию: {vacancy.title}',
+        vacancy=vacancy,
+        is_read=False
+    )
+
     return redirect('profile')
 
 def privacy(request):
