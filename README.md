@@ -10,6 +10,10 @@ Cайт для поиска работы или сотрудников при п
 - OpenAI 1.75.0
 - python-dotenv 1.1.0
 - requests 2.32.3
+- whitenoise 6.9.0
+- psycopg2-binary 2.9.0
+- Docker
+- PostgreSQL (by Supabase)
 
 
 ## Установка и запуск проекта
