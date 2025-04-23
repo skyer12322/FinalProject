@@ -13,6 +13,11 @@ import json
 from collections import defaultdict, Counter
 
 
+def bel():
+    for elem in CUser.objects.all():
+        print(elem, elem['id'])
+    return
+
 
 def home(request):
     vacancies_context = list()
@@ -270,4 +275,6 @@ def news(request):
 def about_us(request):
     context = { }
     return render(request, 'info/about_us.html', context)
+
+
 
