@@ -94,3 +94,22 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('application', 'Заявка'),
+        ('message', 'Сообщение'),
+        ('vacancy_update', 'Обновление вакансии'),
+        ('system', 'Системное уведомление'),
+    ]
+
+    user = models.ForeignKey(User , on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=255)
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.get_notification_type_display()}"
