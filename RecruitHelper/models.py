@@ -50,7 +50,7 @@ class Company(models.Model):
     user = models.OneToOneField(User,
                                 on_delete=models.CASCADE,
                                 related_name='company')
-    website = models.URLField(blank=True, null=True)
+    website = models.TextField(blank=True, null=True)
     chats = models.ForeignKey("Chat", related_name='company', blank=True, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):

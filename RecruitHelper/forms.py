@@ -123,10 +123,10 @@ class EditCUserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'resume')
 
 class EditCompanyForm(forms.ModelForm):
-    website = forms.URLField(
+    website = forms.CharField(
         required=False,
         label="Сайт",
-        widget=forms.URLInput(attrs={'placeholder': 'Сайт', 'class': 'form-control'})
+        widget=forms.TextInput(attrs={'placeholder': 'Сайт', 'class': 'form-control'})
     )
     class Meta:
         model = Company
