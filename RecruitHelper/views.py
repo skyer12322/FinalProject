@@ -120,25 +120,31 @@ def profile(request):
 
 @login_required
 def edit_user(request):
-    if request.user.role == 'user':
-        base_form = EditUserForm(request.user)
-        cuser_form = EditCUserForm(request.user.cuser)
-        context = {
-            'base_form': base_form,
-            'cuser_form': cuser_form,
-        }
-    elif request.user.role == 'company':
-        base_form = EditUserForm(request.user)
-        company_form = EditCompanyForm(request.user.company)
-        context = {
-            'base_form': base_form,
-            'company_form': company_form,
-        }
+    context = {}
     if request.method == 'POST':
-        form = EditUserForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        base_form = EditUserForm(request.POST, request.FILES, instance=request.user)
+        if request.user.role == 'user':
+            user_form = EditCUserForm(request.POST, request.FILES, instance=request.user.cuser)
+        else:
+            user_form = EditCompanyForm(request.POST, request.FILES, instance=request.user.company)
+        if base_form.is_valid() and user_form.is_valid():
+            base_form.save()
+            user_form.save()
             return redirect('profile')
+    else:
+        base_form = EditUserForm(instance=request.user)
+        if request.user.role == 'user':
+            cuser_form = EditCUserForm(instance=request.user.cuser)
+            context = {
+                'base_form': base_form,
+                'cuser_form': cuser_form,
+            }
+        elif request.user.role == 'company':
+            company_form = EditCompanyForm(instance=request.user.company)
+            context = {
+                'base_form': base_form,
+                'company_form': company_form,
+            }
     return render(request, 'users/edit-user.html', context)
 
 @login_required
