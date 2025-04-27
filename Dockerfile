@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod +x /usr/local/bin/startup.sh
+RUN chmod +x startup.sh
 
-ENTRYPOINT ["/usr/local/bin/startup.sh"]
+ENTRYPOINT ["startup.sh"]
