@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.13
 
 WORKDIR /app
 
@@ -10,4 +10,4 @@ COPY . .
 
 RUN chmod +x startup.sh
 
-ENTRYPOINT ["startup.sh"]
+ENTRYPOINT ["./startup.sh"]
