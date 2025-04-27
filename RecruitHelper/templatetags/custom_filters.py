@@ -4,8 +4,12 @@ from django.contrib.contenttypes.models import ContentType
 register = template.Library()
 
 @register.filter(name='add_class')
-def add_class(value, arg):
-    return value.as_widget(attrs={'class': arg})
+def add_class(bound_field, css_class):
+    widget = bound_field.field.widget
+    attrs = widget.attrs.copy()
+    existing = attrs.get('class', '')
+    attrs['class'] = f"{existing} {css_class}".strip() if existing else css_class
+    return bound_field.as_widget(attrs=attrs)
 
 
 @register.filter(name='format_skills')

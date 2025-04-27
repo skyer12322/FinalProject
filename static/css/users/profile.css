@@ -42,12 +42,18 @@
     color: #000 !important;
 }
 .profile-actions button{
-    margin-top: 10px;
+    margin-right: 10px;
+    margin-top: 10px !important;
 }
-.pendings:hover,
+.profile-actions button:hover{
+    transform: scale(1.03)
+}
+.applications:hover,
+.vacancies:hover,
 .resume:hover{
     transform: scale(1.05)
 }
+.applications,
 .resume,
 .pendings{
     height: 100px !important;

@@ -2,50 +2,70 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
-class CUserManager(BaseUserManager):
-    def create_user(self, email, phone, username, first_name, last_name, password=None, **extra_fields):
-        if not username:
-            raise ValueError('The username field must be set')
-        if not first_name:
-            raise ValueError('The first name field must be set')
-        if not last_name:
-            raise ValueError('The last name field must be set')
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('The email field must be set')
-        if not phone:
-            raise ValueError('The phone field must be set')
+            raise ValueError("Email is required")
         email = self.normalize_email(email)
-        user = self.model(email=email, phone=phone, username=username, first_name=first_name, last_name=last_name, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)
+        user.save()
         return user
-    
-    def get_user(self, user_id):
-        try:
-            return CUser.objects.get(pk=user_id)
-        except CUser.DoesNotExist:
-            return None
-    
-class CompanyManager(BaseUserManager):
-    def create_user(self, email, company_name, phone, password=None, **extra_fields):
-        if not company_name:
-            raise ValueError('The company name field must be set')
-        if not email:
-            raise ValueError('The email field must be set')
-        if not phone:
-            raise ValueError('The phone field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, company_name=company_name, phone=phone, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-    
-    def get_user(self, user_id):
-        try:
-            return Company.objects.get(pk=user_id)
-        except Company.DoesNotExist:
-            return None
 
+class User(AbstractBaseUser):
+    main_name = models.CharField(max_length=150)
+    email = models.EmailField(unique=True)
+    date_joined = models.DateTimeField(default=timezone.now)
+    profile_image = models.FileField(upload_to='profile_images/', null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    role = models.CharField(
+        max_length=20, 
+        choices=[("user", "User"), ("company", "Company")], 
+        default="user"
+    )
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+
+    def __str__(self):
+        return self.email
+
+class CUser(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                related_name='cuser')
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=150)
+    resume = models.FileField(upload_to='resumes/', null=True, blank=True)
+    user_vacancies = models.ManyToManyField("Vacancy", through='Application', related_name='candidates', blank=True)
+    chats = models.ManyToManyField("Chat", related_name='users', blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+class Company(models.Model):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                related_name='company')
+    website = models.URLField(blank=True, null=True)
+    chats = models.ForeignKey("Chat", related_name='company', blank=True, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.user.main_name
+    
+class Application(models.Model):
+    vacancy = models.ForeignKey('Vacancy', on_delete=models.CASCADE, related_name='applications')
+    candidate = models.ForeignKey("CUser", on_delete=models.CASCADE, related_name='applications')
+    status = models.CharField(max_length=20, choices=[("pending", "Pending"), ("accepted", "Accepted"), ("rejected", "Rejected")], default="pending")
+    ai_rating = models.JSONField(default=list, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+        
+    def __str__(self):
+        return f"{self.candidate} подал заявку на вакансию {self.vacancy}"
+    
 class ChatMessage(models.Model):
     user = models.IntegerField(default=-1)
     company = models.IntegerField(default=-1)
@@ -71,93 +91,27 @@ class Vacancy(models.Model):
     geography = models.JSONField(default=None, blank=True, null=True)
     ai_rating = models.PositiveIntegerField()
     tags_ai = models.JSONField(default=list, blank=True)
-    chats = models.ManyToManyField(Chat, related_name="vacancy", null=True, blank=True)
-    company = models.ForeignKey('Company', related_name='vacancy_company', null=True, blank=True, on_delete=models.CASCADE)
+    company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name='vacancies', null=True, blank=True)
+    chats = models.ForeignKey("Chat", on_delete=models.CASCADE, related_name="vacancy", blank=True)
 
     def __str__(self):
         return self.title
-
-class CUser(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=150)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, unique=True)
-    username = models.CharField(max_length=150, unique=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-    resume = models.FileField(upload_to='resumes/', null=True, blank=True)
-    profile_image = models.FileField(upload_to='profile_images/', null=True, blank=True)
-    bio = models.TextField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    user_vacancies = models.ManyToManyField(Vacancy, through='Pendings', related_name='candidates', blank=True)
-    chats = models.ManyToManyField(Chat, related_name='users', blank=True)
     
-    objects = CUserManager()
-    
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='cuser_groups',
-        blank=True,
-        help_text='The groups this user belongs to.',
-        verbose_name='groups',
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='cuser_permissions',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        verbose_name='user permissions',
-    )
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('application', 'Заявка'),
+        ('message', 'Сообщение'),
+        ('vacancy_update', 'Обновление вакансии'),
+        ('system', 'Системное уведомление'),
+    ]
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'username', 'password']
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
-class Pendings(models.Model):
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='pendings')
-    candidate = models.ForeignKey(CUser, on_delete=models.CASCADE, related_name='pendings')
-    ai_rating = models.JSONField(default=list, blank=True)
+    user = models.ForeignKey(User , on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=255)
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.candidate} подал заявку на вакансию {self.vacancy}"
-    
-class Company(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    company_name = models.CharField(max_length=255)
-    date_created = models.DateTimeField(default=timezone.now)
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    vacancies = models.ManyToManyField(Vacancy, related_name='company', blank=True)
-    chats = models.ManyToManyField(Chat, through='Vacancy', related_name='company', blank=True)
-
-    objects = CompanyManager()
-
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='company_groups',
-        blank=True,
-        help_text='The groups this company belongs to.',
-        verbose_name='groups',
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='company_permissions',
-        blank=True,
-        help_text='Specific permissions for this company.',
-        verbose_name='user permissions',
-    )
-    
-    vacancies = models.ManyToManyField(Vacancy, related_name='vacancy_companies', blank=True)
-    chats = models.ManyToManyField(Chat, related_name='company_chats', blank=True)
-
-    objects = CompanyManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['company_name, password']
 
     def __str__(self):
-        return self.company_name
+        return f"{self.title} - {self.get_notification_type_display()}"

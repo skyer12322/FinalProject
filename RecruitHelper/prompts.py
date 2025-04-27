@@ -21,20 +21,23 @@ TAGS_ASSIGN = """
 5. Исключи субъективные теги (например, КрутаяКоманда).
 6. Все теги должны быть на английском языке.
 
-ПРОЦЕСС ПРОВЕРКИ:
-- После генерации тегов ОБЯЗАТЕЛЬНО пересчитай их количество.
-- Если количество тегов превышает 10, удаляй наименее важные теги до достижения лимита в 10.
+ВАЖНО:
+ - После присваивания тегов, убери повторяющиеся теги.
+ - Пересчитай количство тегов.
+ - Если количество тегов превышает 15, то уменьши количество тегов до 15.
 
 Формат ответа:
-{"tags": ["Tag1", "Tag2", "Tag3", ..., "TagN"]}
-
-Где N ≤ 10. В массиве "tags" должно быть не более 10 элементов.
+{"tags": {"category1": ["tag1-1", "tag1-2"], "category2": ["tag2-1", "tag2-2"], ..., "categoryN": ["tagN-1", "tagN-2"]}}
 
 Пример ввода:
-Frontend-разработчик (React), 170 000 ₽, требования: JavaScript, TypeScript, удаленка  
+Frontend-разработчик (React) в компанию FinTech, 170 000 ₽, требования: JavaScript, HTML, CSS, TypeScript, удаленка  
 
 Пример корректного вывода:
-{"tags": ["IT", "Remote", "Middle", "React", "JavaScript", "TypeScript"]}
+{"tags": {"specialization": ["Senior", "Frontend", 'JavaScript Developer', 'HTML Developer', 'CSS Developer', 'TypeScript Developer'],
+          "occupancy": ["Remote", "On-site", "Hybrid", "Contract"],
+          "position": ["Senior"],
+          "tech": ["JavaScript", "TypeScript"],
+          "industry": ["FinTech"]}}
 """
 
 JOB_RANKING = """

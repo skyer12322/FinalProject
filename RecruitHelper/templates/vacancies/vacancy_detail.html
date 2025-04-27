@@ -10,6 +10,7 @@
     <title>{{ vacancy.title }}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_detail.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 
 <body class="vacancy-detail-body">
@@ -18,11 +19,13 @@
     <div class="vacancy-detail-container">
         <h1 class="vacancy-title">{{ vacancy.title }}</h1>
         <p>{{ vacancy.description }}</p>
-        <p>{{ vacancy.required_experience }} лет</p>
-        <p>{{ vacancy.required_education }}</p>
-        <p>{{ vacancy.required_skills|join:", " }}</p>
-        {% if user|is_instance:'CUser' %}
-            <a href="{% url 'apply_to_vacancy' vacancy_id=vacancy.id %}" class="btn btn-primary">Откликнуться</a>
+        {% if request.user %}
+            {% if request.user.role == 'user' %}
+                {% if not is_applied %}
+                    <button class="btn btn-primary" onclick="location.href='{% url 'apply_to_vacancy' vacancy_id=vacancy.id %}'">Откликнуться</button>
+            {% else %}
+                <p>Вы уже откликнулись на эту вакансию</p>
+            {% endif %}
         {% endif %}
     </div>
 </body>

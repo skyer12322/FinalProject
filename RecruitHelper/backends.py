@@ -1,36 +1,26 @@
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
-from .models import Company, CUser
+from .models import User
 
-class CUserAuthBackend(BaseBackend):
-    def authenticate(self, request, email=None, password=None):
-        print("Trying CUser auth...")
+class UserAuthBackend(BaseBackend):
+    def authenticate(self, request, email=None, password=None, check_company=False):
+        print("Trying User auth...")
         try:
-            user = CUser.objects.get(email=email)
+            user = User.objects.get(email=email)
+            print(user.email)
             if user.check_password(password):
-                return user
-        except CUser.DoesNotExist:
+                if check_company:
+                    if user.role == "company":
+                        return user
+                    else:
+                        return None
+                else:
+                    return user
+        except User.DoesNotExist:
             return None
     
     def get_user(self, user_id):
         try:
-            return CUser.objects.get(pk=user_id)    # Важно для поддержки сессии
-        except CUser.DoesNotExist:
-            return None
-
-class CompanyAuthBackend(BaseBackend):
-    def authenticate(self, request, company_email=None, password=None):
-        print("Trying Company auth...")
-        try:
-            company = Company.objects.get(email=company_email)
-            print(company.password, password)
-            if company.check_password(password):
-                return company
-        except Company.DoesNotExist:
-            return None
-        
-    def get_user(self, user_id):
-        try:
-            return Company.objects.get(pk=user_id)
-        except Company.DoesNotExist:
+            return User.objects.get(pk=user_id)    # Важно для поддержки сессии
+        except User.DoesNotExist:
             return None

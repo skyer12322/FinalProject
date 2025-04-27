@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 
 <body class="profile-body">
@@ -30,11 +32,27 @@
                             {% endif %}" 
                             alt="Аватар пользователя" 
                             class="profile-avatar" style="align-content:center">
-                        <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">@{{ user.username }}</p>
+                        {% if user.main_name %}
+                            <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">
+                                {% if user.role == 'company' %}
+                                    {{ user.main_name }}
+                                {% else %}
+                                    @{{ user.main_name }}
+                                {% endif %}
+                            </p>
+                        {% else %}
+                            <p>
+                            {% if user.role == 'company' %}
+                                Нет названия
+                            {% else %}
+                                Нет имени пользователя
+                            {% endif %}
+                        </p>
+                        {% endif %}
                     </div>
                     <div class="secondary-info col-5">
-                        {% if user.first_name and user.last_name %}
-                        <p style="font-size: 35px"><strong>{{ user.first_name }} {{ user.last_name }}</strong></p>
+                        {% if user.cuser.first_name and user.cuser.last_name %}
+                        <p style="font-size: 35px"><strong>{{ user.cuser.first_name }} {{ user.cuser.last_name }}</strong></p>
                         {% else %}
                         <p>Имя и фамилия не указаны</p>
                         {% endif %}
@@ -49,51 +67,89 @@
                                 Не указаны
                                 {% endif %}
                             </p>
-                        {% elif user|is_instance:'CUser' %}
-                            <p><strong>Телефон:</strong> {{ user.phone|default:"Не указан" }}</p>
                         {% endif %}
                     </div>
                 </div>
 
                 <div class="col-12 main-info-card">
-                    {% if user|is_instance:'CUser' %}
+                    {% if user.role == 'user' %}
+                    <div class="col-12 main-info-card">
+                        <div class="bio card-box">
+                            {{ user.cuser.description|default:"Информация о себе не добавлена" }}
+                        </div>
+                    </div>
+                    {% elif user.role == 'company' %}
                     <div class="bio card-box">
-                        {{ user.bio }}
+                        {{ user.company.description|default:"Описание отсутствует" }}
                     </div>
                     {% endif %}
-                </div>
             
-                <div class="profile-actions">
-                    {% if user|is_instance:'Company' %}
-                        <button class="voting-list-button container" onclick="location.href='/edit-company/';" type="button">
-                            Редактировать компанию
-                        </button>
-                    {% elif user|is_instance:'CUser' %}
-                        <button class="voting-list-button container" onclick="location.href='/edit-cuser/';" type="button">
-                            Редактировать профиль
-                        </button>
-                    {% endif %}
-                    <button class="voting-list-button container" onclick="location.href='logout';" type="button">Выйти</button>
+                    <div class="profile-actions row">
+                        <div class="col-6">
+                            {% if user.role == 'company' %}
+                            <button class="voting-list-button container btn" onclick="location.href='/profile/edit/';" type="button">
+                                Редактировать компанию
+                            </button>
+                            <button class="voting-list-button container btn" onclick="location.href='/vacancies/add/';" type="button">
+                                Добавить вакансию
+                            </button>
+                            {% elif user.role == 'user' %}
+                            <button class="voting-list-button container btn" onclick="location.href='/profile/edit/';" type="button">
+                                Редактировать профиль
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <button class="voting-list-button container btn" onclick="location.href='logout';" type="button">Выйти</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="flex-container options card-box col-md-3">
-            {% if user|is_instance:'CUser' %}
+            {% if user.role == 'user' %}
             <div class="resume card-box">
-                {% if user.resume %}
-                <a href="{{ user.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
+                {% if user.cuser.resume %}
+                <a href="{{ user.cuser.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
                 {% else %}
                 <p><strong>Резюме не загружено</strong></p>
                 {% endif %}
             </div>
-            <a href="{% url 'user_pendings' %}">
-                <div class="pendings card-box">
-                    <p><strong>Заявки</strong></p>
+            {% elif user.role == 'company' %}
+            <a href="{% url 'profile_vacancies' %}">
+                <div class="vacancies card-box">
+                    <p><strong>Вакансии</strong></p>
                 </div>
             </a>
             {% endif %}
+            <a href="{% url 'applications' %}">
+                <div class="applications card-box">
+                    <p><strong>Заявки</strong></p>
+                </div>
+            </a>
+            </div>
         </div>
     </div>
     {% include "../main/footer.html" %}
+    <div class="modal fade" id="uploadResumeModal" tabindex="-1" aria-labelledby="uploadResumeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadResumeModalLabel">Загрузить резюме</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'upload_resume' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="resume" class="form-label">Выберите файл резюме</label>
+                            <input type="file" class="form-control" id="resume" name="resume" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Загрузить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
