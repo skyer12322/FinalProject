@@ -172,8 +172,16 @@ button {
     box-sizing: border-box;
 }
 
-button:hover {
-    background-color: #3C9F40;
+.btn {
+    background-color: #00c4a0;
+    transition: 0.5s;
+    border: none !important;
+}
+
+.btn:hover {
+    background-color: #0091ea !important;
+    transform: scale(1.05);
+    color: white !important;
 }
 
 .vacancies-list-container {

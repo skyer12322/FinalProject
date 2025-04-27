@@ -68,3 +68,6 @@ coverage.xml
 
 # pyenv
 .python-version
+
+resumes/*
+!resumes/.gitkeep

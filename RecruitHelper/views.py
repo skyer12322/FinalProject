@@ -4,7 +4,7 @@ from .models import *
 from .forms import *
 from django.core.exceptions import ValidationError
 from .decorators import anonymous_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 import random
 from .chatgpt import ChatGPT
 from . import prompts
@@ -60,15 +60,10 @@ def login_view(request):
         email = request.POST.get("username")
         password = request.POST.get("password")
         is_company = request.POST.get("CompanyLoginCheckbox") == "on"
-        print(password)
         
         backend = 'RecruitHelper.backends.UserAuthBackend'
-
-        if is_company:
-            user = authenticate(request, company_email=email, password=password)
-        else:
-            user = authenticate(request, email=email, password=password)
-        print(user)
+        
+        user = authenticate(request, email=email, password=password, backend=backend, check_company=is_company)
         if user is not None:
             login(request, user)
             return redirect("home")
@@ -124,17 +119,51 @@ def profile(request):
     return render(request, 'users/profile.html',context)
 
 @login_required
+def edit_user(request):
+    if request.user.role == 'user':
+        base_form = EditUserForm(request.user)
+        cuser_form = EditCUserForm(request.user.cuser)
+        context = {
+            'base_form': base_form,
+            'cuser_form': cuser_form,
+        }
+    elif request.user.role == 'company':
+        base_form = EditUserForm(request.user)
+        company_form = EditCompanyForm(request.user.company)
+        context = {
+            'base_form': base_form,
+            'company_form': company_form,
+        }
+    if request.method == 'POST':
+        form = EditUserForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    return render(request, 'users/edit-user.html', context)
+
+@login_required
 def profile_vacancies(request):
     context = {}
     return render(request, 'users/profile_vacancies.html', context)
 
 @login_required
-def profile_applications(request):
-    context = {}
-    return render(request, 'users/profile_applications.html', context)
+def applications(request):
+    if request.user.role == 'company':
+        company = Company.objects.get(user=request.user)
+        applications = Application.objects.filter(vacancy__company=company)
+        context = {
+            'applications': applications,
+        }
+    else:
+        cuser = CUser.objects.get(user=request.user)
+        applications = Application.objects.filter(candidate=cuser)
+        context = {
+            'applications': applications
+        }
+    return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
-    candidate_user = get_object_or_404(CUser, id=user_id)
+    candidate_user = get_object_or_404(User, id=user_id)
     context = {
         'candidate': candidate_user
     }
@@ -185,66 +214,68 @@ def vacancies(request):
     context = {"form": form, "vacancies": vacancies_list, "tags_by_category": tags_by_category, "tags": tags}
     return render(request, 'vacancies/vacancy_list.html', context)
 
-def user_pendings(request):
-    context = {}
-    return render(request, 'user_pendings.html', context)
-
 @login_required
+@user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
-            vacancy = Vacancy(
-                title=form.cleaned_data['title'],
-                description=form.cleaned_data['description'],
-                geography=form.cleaned_data['geography'],
-                company=request.user
-            )
             try:
-                api_key = os.getenv("OPENAI_API_KEY")
-                client = ChatGPT(
-                    api_key=api_key,
+                company = Company.objects.get(user=request.user)
+                vacancy = Vacancy(
+                    title=form.cleaned_data['title'],
+                    description=form.cleaned_data['description'],
+                    geography=form.cleaned_data['geography'],
+                    company=company
                 )
-                response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
-                vacancy.ai_rating = int(response_text['rating'])
-                tags_text = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\n{vacancy.description}')
-                if form.cleaned_data['tags_ai']:
-                    for elem in form.cleaned_data['tags_ai'].split():
-                        tags_text['tags'].append(elem)
-                vacancy.tags_ai = tags_text
+                try:
+                    api_key = os.getenv("OPENAI_API_KEY")
+                    client = ChatGPT(
+                        api_key=api_key,
+                    )
+                    response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
+                    vacancy.ai_rating = int(response_text['rating'])
+                    tags_text = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\n{vacancy.description}')
+                    if form.cleaned_data['tags_ai']:
+                        for elem in form.cleaned_data['tags_ai'].split():
+                            tags_text['tags'].append(elem)
+                    vacancy.tags_ai = tags_text
 
-            except Exception as e:
-                print(f"AI бунтует! Произошла ошибка {e}.")
-                vacancy.ai_rating = 0
+                except Exception as e:
+                    print(f"AI бунтует! Произошла ошибка {e}.")
+                    vacancy.ai_rating = 0
 
-            vacancy.save()
-            request.user.vacancies.add(vacancy)
-            request.user.save()
+                vacancy.save()
+                request.user.company.vacancies.add(vacancy)
+                request.user.save()
 
-            return redirect('vacancies_list')
-    else:
-        form = VacancyForm()
+                return redirect('vacancies_list')
+            except Company.DoesNotExist:
+                print('Компания не найдена')
+        else:
+            form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
 @login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-    # is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user).exists()
-    return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy})
+    is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
+    return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy, 'is_applied': is_applied})
 
 @login_required
+@user_passes_test(lambda u: u.role == 'user')
 def apply_to_vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     application = Application.objects.create(
         vacancy=vacancy,
-        candidate=request.user
+        candidate=request.user.cuser
     )
     try:
         api_key = os.getenv("OPENAI_API_KEY")
         client = ChatGPT(
             api_key=api_key,
         )
-        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.resume}"
+        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume}"
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
         print(response_text)
         response_data = json.loads(response_text)
@@ -256,8 +287,7 @@ def apply_to_vacancy(request, vacancy_id):
     application.save()
 
     Notification.objects.create(
-        user=vacancy.company,
-        company=vacancy.company,
+        user=vacancy.company.user,
         notification_type='application',
         title=f'Новая заявка на вакансию: {vacancy.title}',
         vacancy=vacancy,
@@ -275,6 +305,18 @@ def news(request):
 def about_us(request):
     context = { }
     return render(request, 'info/about_us.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.role == 'user')
+def upload_resume(request):
+    if request.method == 'POST':
+        resume_file = request.FILES.get('resume')
+        if resume_file:
+            cuser = CUser.objects.get(user=request.user)
+            cuser.resume = resume_file
+            cuser.save()
+            return redirect('profile')
+    return redirect('profile')
 
 
 

@@ -50,14 +50,16 @@ class Company(models.Model):
     user = models.OneToOneField(User,
                                 on_delete=models.CASCADE,
                                 related_name='company')
+    website = models.URLField(blank=True, null=True)
     chats = models.ForeignKey("Chat", related_name='company', blank=True, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.company_name
+        return self.user.main_name
     
 class Application(models.Model):
     vacancy = models.ForeignKey('Vacancy', on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey("CUser", on_delete=models.CASCADE, related_name='applications')
+    status = models.CharField(max_length=20, choices=[("pending", "Pending"), ("accepted", "Accepted"), ("rejected", "Rejected")], default="pending")
     ai_rating = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
         

@@ -69,28 +69,27 @@
                         {% endif %}
                     </div>
                     <div class="secondary-info col-5">
-                        {% if candidate.first_name and candidate.last_name %}
-                        <p style="font-size: 35px"><strong>{{ candidate.first_name }} {{ candidate.last_name }}</strong></p>
+                        {% if candidate.cuser.first_name and candidate.cuser.last_name %}
+                        <p style="font-size: 35px"><strong>{{ candidate.cuser.first_name }} {{ candidate.cuser.last_name }}</strong></p>
                         {% else %}
                         <p>Имя и фамилия не указаны</p>
                         {% endif %}
                         <p class="profile-email"><strong>Email:</strong> {{ candidate.email }}</p>
                         <p class="profile-joined"><strong>Дата регистрации:</strong> {{ candidate.date_joined|date:"d.m.Y" }}</p>
-                        <p><strong>Телефон:</strong> {{ candidate.phone|default:"Не указан" }}</p>
                     </div>
                 </div>
 
                 <div class="col-12 main-info-card">
                     <div class="bio card-box">
-                        {{ candidate.bio|default:"Информация о себе не добавлена" }}
+                        {{ candidate.description|default:"Информация о себе не добавлена" }}
                     </div>
                 </div>
             </div>
         </div>
         <div class="flex-container options card-box col-md-3">
             <div class="resume card-box">
-                {% if candidate.resume %}
-                <a href="{{ candidate.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
+                {% if candidate.cuser.resume %}
+                <a href="{{ candidate.cuser.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
                 {% else %}
                 <p><strong>Резюме не загружено</strong></p>
                 {% endif %}
