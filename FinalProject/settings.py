@@ -157,7 +157,6 @@ AUTH_USER_MODEL = 'RecruitHelper.User'
 
 AUTHENTICATION_BACKENDS = [
     'RecruitHelper.backends.UserAuthBackend',  # Your custom backend
-    'django.contrib.auth.backends.ModelBackend',  # Default backend
 ]
 
 LOGIN_REDIRECT_URL = '/'  # Redirect to home after login

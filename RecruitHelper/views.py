@@ -56,12 +56,12 @@ def login_view(request):
         
         backend = 'RecruitHelper.backends.UserAuthBackend'
         
-        user = authenticate(request, email=email, password=password, backend=backend, check_company=is_company)
+        user = authenticate(request, email=email, password=password, check_company=is_company)
         if user is not None:
             login(request, user)
             return redirect("home")
         else:
-            return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
+            return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
 
     return render(request, "auth/login.html")
 
