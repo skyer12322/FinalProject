@@ -11,7 +11,7 @@ class UserAuthBackend(BaseBackend):
             if user.check_password(password):
                 if check_company:
                     if user.role == "company":
-                        return user
+                        return user 
                     else:
                         return None
                 else:

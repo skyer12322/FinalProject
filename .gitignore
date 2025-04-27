@@ -15,6 +15,7 @@ venv
 local_settings.py
 db.sqlite3-journal
 staticfiles/*
+media/*
 
 # Python
 __pycache__/

@@ -257,7 +257,10 @@ def add_vacancy(request):
 @login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-    is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
+    if request.user.role == 'user':
+        is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
+    else:
+        is_applied = True
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy, 'is_applied': is_applied})
 
 @login_required
@@ -273,7 +276,7 @@ def apply_to_vacancy(request, vacancy_id):
         client = ChatGPT(
             api_key=api_key,
         )
-        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume}"
+        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume + request.user.description}"
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
         print(response_text)
         response_data = json.loads(response_text)
