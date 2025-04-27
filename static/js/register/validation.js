@@ -79,8 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission handler
     registerButton.addEventListener('click', function() {
         alertsContainer.innerHTML = '';
-        alertsContainer2.innerHTML = '';
-        alertsContainer3.innerHTML ='';
         
         // Check terms and privacy checkboxes
         const termsAccepted = document.getElementById('termsCheckbox1').checked;
@@ -103,11 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let passwordValid = false;
         let passwordField;
 
-        if (isCompanySwitch.checked) {
-            passwordField = document.getElementById('companyPassword');
-        } else {
-            passwordField = document.getElementById('password');
-        }
+        passwordField = document.getElementById('id_password');
         
         const passwordValidation = validatePassword(passwordField.value);
 
@@ -136,12 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             alert.innerHTML += '</ul>';
-            if (isCompanySwitch.checked){
-                alertsContainer3.appendChild(alert);
-            }
-            else {
-                alertsContainer2.appendChild(alert);
-            }
+            alertsContainer.appendChild(alert);
             return;
         }
         

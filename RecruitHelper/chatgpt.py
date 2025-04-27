@@ -28,7 +28,7 @@ class ChatGPT:
             )
             return json.loads(response.choices[0].message.content)
         except Exception as e:
-                raise Exception(f"Ошибка при запросе: {e}")
+            raise Exception(f"Ошибка при запросе: {e}")
         
 
 """

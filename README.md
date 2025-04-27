@@ -4,13 +4,21 @@ Cайт для поиска работы или сотрудников при п
 
 ## Технологии
 
-На момент последнего `commit` в ветке `develop` используются следующие технологии:
+На момент последнего `commit` в ветке `develop` используются следующие технологии и библиотеки:
 - Python 3.12
-- библиотека Django
--  API Qwen
-- API Deepseek
+- CI/CD GitLab
+- Docker
+- PostgreSQL (by Supabase)
++ Django 5.1.6
++ OpenAI 1.75.0
++ python-dotenv 1.1.0
++ requests 2.32.3
++ whitenoise 6.9.0
++ psycopg2-binary 2.9.0
 
-## Установка и запуск
+
+
+## Установка и запуск проекта
 
 Что нужно для запуска проекта на момент последнего `commit` в ветке `develop`:
 1. Создать виртуальное окружение `.venv`:
@@ -32,3 +40,12 @@ Cайт для поиска работы или сотрудников при п
 	```bash
 	python manage.py runserver
 	```
+
+
+## Тестирование проекта
+- ```python manage.py test RecruitHelper.tests``` -- для всех тестов
+- ```python manage.py test RecruitHelper.tests.<название_файла>``` -- для конкретного файла тестов
+### Файлы тестов:
+-```test_models.py```\
+-```test_views.py```\
+-```test_forms.py```
