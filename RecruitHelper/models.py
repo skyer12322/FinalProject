@@ -92,7 +92,7 @@ class Vacancy(models.Model):
     ai_rating = models.PositiveIntegerField()
     tags_ai = models.JSONField(default=list, blank=True)
     company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name='vacancies', null=True, blank=True)
-    chats = models.ForeignKey("Chat", on_delete=models.CASCADE, related_name="vacancy", blank=True)
+    chats = models.ForeignKey("Chat", on_delete=models.CASCADE, related_name="vacancy", blank=True, null=True)
 
     def __str__(self):
         return self.title
