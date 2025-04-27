@@ -12,13 +12,6 @@ import os
 import json
 from collections import defaultdict, Counter
 
-
-def bel():
-    for elem in CUser.objects.all():
-        print(elem, elem['id'])
-    return
-
-
 def home(request):
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
@@ -223,6 +216,7 @@ def vacancies(request):
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
+    form = VacancyForm()
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
@@ -258,8 +252,6 @@ def add_vacancy(request):
                 return redirect('vacancies_list')
             except Company.DoesNotExist:
                 print('Компания не найдена')
-        else:
-            form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
 @login_required
