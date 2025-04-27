@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v6*)c!#ny+6w2p$()r7!##z=-+o4fwqu+yv!&j)fp!a!2s&4&e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 MAIN_HOST = os.environ.get('MAIN_HOST')
@@ -159,6 +159,11 @@ AUTHENTICATION_BACKENDS = [
     'RecruitHelper.backends.UserAuthBackend',  # Your custom backend
     'django.contrib.auth.backends.ModelBackend',  # Default backend
 ]
+
+LOGIN_REDIRECT_URL = '/'  # Redirect to home after login
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
+
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_SECURE = False  # Установите True, если используете HTTPS
