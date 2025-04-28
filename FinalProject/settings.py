@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'RecruitHelper',
+    'channels',
+    "daphne",
 ]
 
 MIDDLEWARE = [
@@ -83,7 +85,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'FinalProject.wsgi.application'
+ASGI_APPLICATION = 'FinalProject.asgi.application'
 
 
 # Database
