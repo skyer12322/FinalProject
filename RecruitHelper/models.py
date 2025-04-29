@@ -45,16 +45,23 @@ class CUser(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Chat(models.Model):
+    messages = models.ManyToManyField('ChatMessage', related_name='chat', blank=True)
+
+    def __str__(self):
+        return f"Chat {self.id}"
+
     
 class Company(models.Model):
-    user = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                related_name='company')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='company')
     website = models.TextField(blank=True, null=True)
-    chats = models.ForeignKey("Chat", related_name='company', blank=True, on_delete=models.SET_NULL, null=True)
+    chats = models.ManyToManyField(Chat, related_name='company', blank=True)
 
     def __str__(self):
         return self.user.main_name
+
     
 class Application(models.Model):
     vacancy = models.ForeignKey('Vacancy', on_delete=models.CASCADE, related_name='applications')
@@ -65,23 +72,19 @@ class Application(models.Model):
         
     def __str__(self):
         return f"{self.candidate} подал заявку на вакансию {self.vacancy}"
+
     
 class ChatMessage(models.Model):
-    user = models.IntegerField(default=-1)
-    company = models.IntegerField(default=-1)
+    user = models.ForeignKey(CUser, on_delete=models.SET_NULL, null=True, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
     content = models.TextField()
-    
+
     def __str__(self):
-        if self.user != -1:
+        if self.user:
             return f"User {self.user} : {self.content}"
-        elif self.company != -1:
+        elif self.company:
             return f"Company {self.company} : {self.content}"
-    
-class Chat(models.Model):
-    messages = models.ManyToManyField(ChatMessage, related_name='chat', blank=True)
-    
-    def __str__(self):
-        return f"Chat {self.id}"
+
     
 class Vacancy(models.Model):
     title = models.CharField(max_length=255)

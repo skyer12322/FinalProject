@@ -320,4 +320,15 @@ def upload_resume(request):
     return redirect('profile')
 
 
+def chats(request):
+    if request.user.is_authenticated:
+        profile = request.user.profile
+        if profile.role == 'company':
+            chats = Chat.objects.filter(company=profile)
+        else:
+            chats = Chat.objects.filter(user=profile)
+    else:
+        chats = []
+
+    return render(request, 'users/chats.html', {'chats': chats})
 
