@@ -13,12 +13,10 @@ import os
 import json
 from collections import defaultdict, Counter
 
-
 logger = logging.getLogger(__name__)
 
-
 def home(request):
-    logger.info("Запрос главной страницы")
+    logger.info("Home page request received")
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
     if vacancy_count > 4:
@@ -35,7 +33,7 @@ def home(request):
         try:
             ai_tags = vacancy.tags_ai.get("tags", {})
         except Exception as e:
-            logger.warning(f"Ошибка при получении тегов вакансии {vacancy.id}: {str(e)}")
+            logger.warning(f"Failed to get tags for vacancy {vacancy.id}: {str(e)}")
             continue
         for _, tags_list in ai_tags.items():
             for tag in tags_list:
@@ -46,7 +44,7 @@ def home(request):
         try:
             industries = application.vacancy.tags_ai.get("tags", {}).get("industry", [])
         except Exception as e:
-            logger.warning(f"Ошибка при подсчете заявок по отраслям: {str(e)}")
+            logger.warning(f"Error counting applications by industry: {str(e)}")
             continue
         for industry in industries:
             application_counts[industry] += 1
@@ -55,40 +53,37 @@ def home(request):
     context = {"vacancies": vacancies_context, "tags": tags, "top_categories": top_categories}
     return render(request, 'main/index.html', context)
 
-
 @anonymous_required
 def login_view(request):
-    logger.debug("Начало обработки запроса входа")
+    logger.debug("Processing login request")
     if request.method == "POST":
         email = request.POST.get("username")
         password = request.POST.get("password")
         is_company = request.POST.get("CompanyLoginCheckbox") == "on"
 
-        logger.info(f"Попытка входа пользователя {email}, компания: {is_company}")
+        logger.info(f"Login attempt for user: {email}, company: {is_company}")
 
         user = authenticate(request, email=email, password=password, check_company=is_company)
         if user is not None:
             login(request, user)
-            logger.info(f"Успешный вход пользователя {email}")
+            logger.info(f"Successful login for user: {email}")
             return redirect("home")
         else:
-            logger.warning(f"Неудачная попытка входа для пользователя {email}")
-            return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
+            logger.warning(f"Failed login attempt for user: {email}")
+            return render(request, "auth/login.html", {"messages": "Invalid email or password"})
 
     return render(request, "auth/login.html")
 
-
 @anonymous_required
 def register(request):
-    logger.debug("Начало обработки запроса регистрации")
+    logger.debug("Processing registration request")
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
         try:
             form = UserRegistrationForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
-                logger.info(
-                    f"Регистрация нового пользователя: {data['email']}, роль: {'company' if is_company else 'user'}")
+                logger.info(f"Registering new user: {data['email']}, role: {'company' if is_company else 'user'}")
 
                 user = User.objects.create_user(
                     email=data["email"],
@@ -103,46 +98,40 @@ def register(request):
 
                 authenticated_user = authenticate(request, email=data["email"], password=data["password"])
                 if authenticated_user is None:
-                    logger.error("Ошибка аутентификации нового пользователя")
-                    raise ValidationError('Ошибка аутентификации нового пользователя')
+                    logger.error("New user authentication failed")
+                    raise ValidationError('New user authentication failed')
 
                 login(request, authenticated_user)
-                logger.info(f"Успешная регистрация и вход пользователя {data['email']}")
+                logger.info(f"Successful registration and login for user: {data['email']}")
                 return redirect('/')
         except ValidationError as e:
-            logger.warning(f"Ошибка валидации при регистрации: {str(e)}")
+            logger.warning(f"Registration validation error: {str(e)}")
             context = {'error': e.messages, 'is_company': is_company, 'form': UserRegistrationForm()}
             return render(request, 'auth/registration.html', context)
     context = {'form': UserRegistrationForm()}
     return render(request, 'auth/registration.html', context)
 
-
 @login_required
 def logout_view(request):
-    logger.info(f"Пользователь {request.user.email} выходит из системы")
+    logger.info(f"User logging out: {request.user.email}")
     logout(request)
     return redirect('home')
 
-
 def company(request, company_id):
-    logger.debug(f"Запрос страницы компании с ID {company_id}")
+    logger.debug(f"Requesting company page ID: {company_id}")
     context = {"company_object": Company.objects.filter(id=company_id)}
     return render(request, 'users/HRpage.html', context)
 
-
 @login_required
 def profile(request):
-    logger.debug(f"Запрос профиля пользователя {request.user.email}")
+    logger.debug(f"Profile request for user: {request.user.email}")
     user = request.user
-    context = {
-        'user': user,
-    }
+    context = {'user': user}
     return render(request, 'users/profile.html', context)
-
 
 @login_required
 def edit_user(request):
-    logger.debug(f"Запрос редактирования профиля пользователя {request.user.email}")
+    logger.debug(f"Edit profile request for user: {request.user.email}")
     context = {}
     if request.method == 'POST':
         base_form = EditUserForm(request.POST, request.FILES, instance=request.user)
@@ -153,56 +142,41 @@ def edit_user(request):
         if base_form.is_valid() and user_form.is_valid():
             base_form.save()
             user_form.save()
-            logger.info(f"Профиль пользователя {request.user.email} успешно обновлен")
+            logger.info(f"Profile updated for user: {request.user.email}")
             return redirect('profile')
         else:
-            logger.warning(f"Ошибки валидации при обновлении профиля: {base_form.errors} {user_form.errors}")
+            logger.warning(f"Profile update validation errors: {base_form.errors} {user_form.errors}")
     else:
         base_form = EditUserForm(instance=request.user)
         if request.user.role == 'user':
             cuser_form = EditCUserForm(instance=request.user.cuser)
-            context = {
-                'base_form': base_form,
-                'cuser_form': cuser_form,
-            }
+            context = {'base_form': base_form, 'cuser_form': cuser_form}
         elif request.user.role == 'company':
             company_form = EditCompanyForm(instance=request.user.company)
-            context = {
-                'base_form': base_form,
-                'company_form': company_form,
-            }
+            context = {'base_form': base_form, 'company_form': company_form}
     return render(request, 'users/edit-user.html', context)
-
 
 @login_required
 def applications(request):
-    logger.debug(f"Запрос списка заявок пользователя {request.user.email}")
+    logger.debug(f"Applications request for user: {request.user.email}")
     if request.user.role == 'company':
         company = Company.objects.get(user=request.user)
         applications = Application.objects.filter(vacancy__company=company)
-        context = {
-            'applications': applications,
-        }
+        context = {'applications': applications}
     else:
         cuser = CUser.objects.get(user=request.user)
         applications = Application.objects.filter(candidate=cuser)
-        context = {
-            'applications': applications
-        }
+        context = {'applications': applications}
     return render(request, 'users/applications.html', context)
 
-
 def candidate(request, user_id):
-    logger.debug(f"Запрос страницы кандидата с ID {user_id}")
+    logger.debug(f"Requesting candidate page ID: {user_id}")
     candidate_user = get_object_or_404(User, id=user_id)
-    context = {
-        'candidate': candidate_user
-    }
+    context = {'candidate': candidate_user}
     return render(request, 'users/candidatepage.html', context)
 
-
 def vacancies(request):
-    logger.debug("Запрос списка вакансий")
+    logger.debug("Vacancies list request")
     vacancies = Vacancy.objects.all()
     form = VacancyFilterForm(request.GET or None)
 
@@ -227,7 +201,7 @@ def vacancies(request):
         try:
             ai_tags = vacancy.tags_ai.get("tags", {})
         except Exception as e:
-            logger.warning(f"Ошибка при получении тегов вакансии {vacancy.id}: {str(e)}")
+            logger.warning(f"Failed to get tags for vacancy {vacancy.id}: {str(e)}")
             continue
         for category, tags_list in ai_tags.items():
             for tag in tags_list:
@@ -239,7 +213,7 @@ def vacancies(request):
         try:
             ai_tags = vacancy.tags_ai.get("tags", {})
         except Exception as e:
-            logger.warning(f"Ошибка при получении тегов вакансии {vacancy.id}: {str(e)}")
+            logger.warning(f"Failed to get tags for vacancy {vacancy.id}: {str(e)}")
             continue
         for _, tags_list in ai_tags.items():
             for tag in tags_list:
@@ -247,11 +221,10 @@ def vacancies(request):
     context = {"form": form, "vacancies": vacancies_list, "tags_by_category": tags_by_category, "tags": tags}
     return render(request, 'vacancies/vacancy_list.html', context)
 
-
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
-    logger.debug(f"Запрос добавления вакансии от пользователя {request.user.email}")
+    logger.debug(f"Add vacancy request from user: {request.user.email}")
     form = VacancyForm()
     if request.method == 'POST':
         form = VacancyForm(request.POST)
@@ -266,9 +239,7 @@ def add_vacancy(request):
                 )
                 try:
                     api_key = os.getenv("OPENAI_API_KEY")
-                    client = ChatGPT(
-                        api_key=api_key,
-                    )
+                    client = ChatGPT(api_key=api_key)
                     response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
                     vacancy.ai_rating = int(response_text['rating'])
                     tags_text = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\n{vacancy.description}')
@@ -276,27 +247,25 @@ def add_vacancy(request):
                         for elem in form.cleaned_data['tags_ai'].split():
                             tags_text['tags'].append(elem)
                     vacancy.tags_ai = tags_text
-                    logger.info(f"Успешно получены данные от ChatGPT для вакансии {vacancy.title}")
+                    logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
 
                 except Exception as e:
-                    logger.error(f"Ошибка при работе с ChatGPT: {str(e)}")
+                    logger.error(f"ChatGPT processing error: {str(e)}")
                     vacancy.ai_rating = 0
 
                 vacancy.save()
                 request.user.company.vacancies.add(vacancy)
                 request.user.save()
-                logger.info(f"Создана новая вакансия {vacancy.title}")
+                logger.info(f"New vacancy created: {vacancy.title}")
 
                 return redirect('vacancies_list')
             except Company.DoesNotExist:
-                logger.critical("Попытка создания вакансии без компании")
-                print('Компания не найдена')
+                logger.critical("Attempt to create vacancy without company")
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
-
 
 @login_required
 def vacancy(request, vacancy_id):
-    logger.debug(f"Запрос вакансии с ID {vacancy_id}")
+    logger.debug(f"Requesting vacancy ID: {vacancy_id}")
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     if request.user.role == 'user':
         is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
@@ -304,54 +273,45 @@ def vacancy(request, vacancy_id):
         is_applied = True
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy, 'is_applied': is_applied})
 
-
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
 def apply_to_vacancy(request, vacancy_id):
-    logger.info(f"Пользователь {request.user.email} подает заявку на вакансию {vacancy_id}")
+    logger.info(f"User applying to vacancy: {request.user.email} -> {vacancy_id}")
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-    application = Application.objects.create(
-        vacancy=vacancy,
-        candidate=request.user.cuser
-    )
+    application = Application.objects.create(vacancy=vacancy, candidate=request.user.cuser)
     try:
         api_key = os.getenv("OPENAI_API_KEY")
-        client = ChatGPT(
-            api_key=api_key,
-        )
-        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume + request.user.description}"
+        client = ChatGPT(api_key=api_key)
+        content = f"Vacancy: {vacancy.description}\n\nCandidate resume: {request.user.cuser.resume + request.user.description}"
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
-        logger.debug(f"Ответ от ChatGPT для оценки кандидата: {response_text}")
+        logger.debug(f"ChatGPT response for candidate evaluation: {response_text}")
         response_data = json.loads(response_text)
         application.ai_rating = int(response_data['rating'])
-
     except Exception as e:
-        logger.error(f"Ошибка при работе с ChatGPT для оценки кандидата: {str(e)}")
+        logger.error(f"ChatGPT candidate evaluation error: {str(e)}")
         application.ai_rating = 0
     application.save()
 
     Notification.objects.create(
         user=vacancy.company.user,
         notification_type='application',
-        title=f'Новая заявка на вакансию: {vacancy.title}',
+        title=f'New application for vacancy: {vacancy.title}',
         vacancy=vacancy,
         is_read=False
     )
-    logger.info(f"Создана новая заявка на вакансию {vacancy_id}")
-
+    logger.info(f"New application created for vacancy: {vacancy_id}")
     return redirect('profile')
-
 
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
 def upload_resume(request):
-    logger.debug(f"Пользователь {request.user.email} загружает резюме")
+    logger.debug(f"Resume upload request from user: {request.user.email}")
     if request.method == 'POST':
         resume_file = request.FILES.get('resume')
         if resume_file:
             cuser = CUser.objects.get(user=request.user)
             cuser.resume = resume_file
             cuser.save()
-            logger.info(f"Резюме пользователя {request.user.email} успешно обновлено")
+            logger.info(f"Resume updated for user: {request.user.email}")
             return redirect('profile')
     return redirect('profile')
