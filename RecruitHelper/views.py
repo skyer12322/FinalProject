@@ -130,6 +130,11 @@ def profile(request):
     return render(request, 'users/profile.html', context)
 
 @login_required
+def profile_vacancies(request):
+    context = {}
+    return render(request, 'users/profile_vacancies.html', context)
+
+@login_required
 def edit_user(request):
     logger.debug(f"Edit profile request for user: {request.user.email}")
     context = {}
@@ -315,3 +320,13 @@ def upload_resume(request):
             logger.info(f"Resume updated for user: {request.user.email}")
             return redirect('profile')
     return redirect('profile')
+
+def privacy(request):
+    return render(request, 'info/privacy_policy.html')
+
+def news(request):
+    return render(request, 'vacancies/news.html')
+
+def about_us(request):
+    context = { }
+    return render(request, 'info/about_us.html', context)
