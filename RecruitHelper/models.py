@@ -41,13 +41,14 @@ class CUser(models.Model):
     last_name = models.CharField(max_length=150)
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     user_vacancies = models.ManyToManyField("Vacancy", through='Application', related_name='candidates', blank=True)
-    chats = models.ManyToManyField("Chat", related_name='users', blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
 
 class Chat(models.Model):
+    user = models.ForeignKey('CUser', related_name='chats', on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey('Company', related_name='chats', on_delete=models.SET_NULL, null=True)
     messages = models.ManyToManyField('ChatMessage', related_name='chat', blank=True)
 
     def __str__(self):
@@ -57,7 +58,6 @@ class Chat(models.Model):
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='company')
     website = models.TextField(blank=True, null=True)
-    chats = models.ManyToManyField(Chat, related_name='company', blank=True)
 
     def __str__(self):
         return self.user.main_name
