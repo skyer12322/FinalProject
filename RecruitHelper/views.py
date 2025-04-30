@@ -19,14 +19,17 @@ def home(request):
     logger.info("Home page request received")
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
+    logger.info("Taking 4 vacancies... ")
     if vacancy_count > 4:
         vacancy_ids = list(Vacancy.objects.values_list('id', flat=True))
         random_ids = random.sample(vacancy_ids, 4)
         for vacancy_id in random_ids:
             vacancy = Vacancy.objects.get(id=vacancy_id)
             vacancies_context.append(vacancy)
+        logger.info("Successfully retrieved 4 random vacancies") 
     else:
         vacancies_context = Vacancy.objects.all()
+        logger.info(f"Returned all {vacancy_count} vacancies as count <=4")
 
     tags = set()
     for vacancy in Vacancy.objects.all():
@@ -55,6 +58,7 @@ def home(request):
 
 @anonymous_required
 def login_view(request):
+    logger.info("Login page request received")
     logger.debug("Processing login request")
     if request.method == "POST":
         email = request.POST.get("username")
@@ -69,13 +73,14 @@ def login_view(request):
             logger.info(f"Successful login for user: {email}")
             return redirect("home")
         else:
-            logger.warning(f"Failed login attempt for user: {email}")
+            logger.warning(f"Failed login attempt for user: {email}. Reason: {'Invalid credentials' if user is None else 'Other error'}")
             return render(request, "auth/login.html", {"messages": "Invalid email or password"})
 
     return render(request, "auth/login.html")
 
 @anonymous_required
 def register(request):
+    logger.info("Registration page request received")
     logger.debug("Processing registration request")
     if request.method == 'POST':
         is_company = 'CompanyRegistrationCheckbox' in request.POST
@@ -105,7 +110,7 @@ def register(request):
                 logger.info(f"Successful registration and login for user: {data['email']}")
                 return redirect('/')
         except ValidationError as e:
-            logger.warning(f"Registration validation error: {str(e)}")
+            logger.error(f"Registration validation error: {str(e)}")
             context = {'error': e.messages, 'is_company': is_company, 'form': UserRegistrationForm()}
             return render(request, 'auth/registration.html', context)
     context = {'form': UserRegistrationForm()}
@@ -118,12 +123,16 @@ def logout_view(request):
     return redirect('home')
 
 def company(request, company_id):
+    logger.info("Company page request received")
     logger.debug(f"Requesting company page ID: {company_id}")
-    context = {"company_object": Company.objects.filter(id=company_id)}
+    company_obj = get_object_or_404(Company, id=company_id)
+    context = {"company_object": company_obj}
+    logger.info(f"Company page accessed: {company_obj.name}")
     return render(request, 'users/HRpage.html', context)
 
 @login_required
 def profile(request):
+    logger.info(f"Profile page request received")
     logger.debug(f"Profile request for user: {request.user.email}")
     user = request.user
     context = {'user': user}
@@ -131,11 +140,14 @@ def profile(request):
 
 @login_required
 def profile_vacancies(request):
+    logger.info("Vacancies for current user page request received")
+    logger.debug(f"Profile vacancies request for user: {request.user.email}")
     context = {}
     return render(request, 'users/profile_vacancies.html', context)
 
 @login_required
 def edit_user(request):
+    logger.info("User edit page request received")
     logger.debug(f"Edit profile request for user: {request.user.email}")
     context = {}
     if request.method == 'POST':
@@ -147,7 +159,7 @@ def edit_user(request):
         if base_form.is_valid() and user_form.is_valid():
             base_form.save()
             user_form.save()
-            logger.info(f"Profile updated for user: {request.user.email}")
+            logger.info(f"User profile updated successfully: {request.user.email}")
             return redirect('profile')
         else:
             logger.warning(f"Profile update validation errors: {base_form.errors} {user_form.errors}")
@@ -163,6 +175,7 @@ def edit_user(request):
 
 @login_required
 def applications(request):
+    logger.info("Applications for current user page request received")
     logger.debug(f"Applications request for user: {request.user.email}")
     if request.user.role == 'company':
         company = Company.objects.get(user=request.user)
@@ -175,12 +188,14 @@ def applications(request):
     return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
+    logger.info("Candidate page request received")
     logger.debug(f"Requesting candidate page ID: {user_id}")
     candidate_user = get_object_or_404(User, id=user_id)
     context = {'candidate': candidate_user}
     return render(request, 'users/candidatepage.html', context)
 
 def vacancies(request):
+    logger.info("Vacancies page request received")
     logger.debug("Vacancies list request")
     vacancies = Vacancy.objects.all()
     form = VacancyFilterForm(request.GET or None)
@@ -200,7 +215,7 @@ def vacancies(request):
         if max_salary:
             vacancies = vacancies.filter(salary__lte=max_salary)
     vacancies_list = list(vacancies)
-
+    logger.info(f"Found {len(vacancies_list)} vacancies after filtering")
     tags_by_category = defaultdict(set)
     for vacancy in vacancies_list:
         try:
@@ -229,6 +244,7 @@ def vacancies(request):
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
+    logger.info("Vacancy creation page request received")
     logger.debug(f"Add vacancy request from user: {request.user.email}")
     form = VacancyForm()
     if request.method == 'POST':
@@ -252,6 +268,8 @@ def add_vacancy(request):
                         for elem in form.cleaned_data['tags_ai'].split():
                             tags_text['tags'].append(elem)
                     vacancy.tags_ai = tags_text
+                    logger.debug(f"ChatGPT request for tags: {tags_text}")
+                    logger.debug(f"ChatGPT response for rating: {response_text}")
                     logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
 
                 except Exception as e:
@@ -270,6 +288,7 @@ def add_vacancy(request):
 
 @login_required
 def vacancy(request, vacancy_id):
+    logger.info("Vacancy page request received")
     logger.debug(f"Requesting vacancy ID: {vacancy_id}")
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     if request.user.role == 'user':
@@ -304,6 +323,7 @@ def apply_to_vacancy(request, vacancy_id):
         vacancy=vacancy,
         is_read=False
     )
+    logger.info(f"Notification created for company {vacancy.company.user.email} about new application")
     logger.info(f"New application created for vacancy: {vacancy_id}")
     return redirect('profile')
 
@@ -317,16 +337,19 @@ def upload_resume(request):
             cuser = CUser.objects.get(user=request.user)
             cuser.resume = resume_file
             cuser.save()
-            logger.info(f"Resume updated for user: {request.user.email}")
+            logger.info(f"Resume uploaded successfully for user: {request.user.email}")
             return redirect('profile')
     return redirect('profile')
 
 def privacy(request):
+    logger.info("Privacy policy page requested")
     return render(request, 'info/privacy_policy.html')
 
 def news(request):
+    logger.info("News page requested")
     return render(request, 'vacancies/news.html')
 
 def about_us(request):
+    logger.info("About us page requested")
     context = { }
     return render(request, 'info/about_us.html', context)

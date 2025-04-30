@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'RecruitHelper.middleware.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'FinalProject.urls'
@@ -162,51 +163,45 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_REDIRECT_URL = '/'  # Redirect to home after login
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': False,  # Изменили на False
+    'filters': {
+        'user_id': {
+            '()': 'RecruitHelper.log_filters.UserIDFilter',  # Убедитесь в правильности пути
+        },
+    },
     'formatters': {
         'verbose': {
-            'format': '{asctime} - {levelname} - {module} - {message}',
-            'style': '{',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
+            'format': '%(asctime)s [%(levelname)s] user=%(user_id)s: %(message)s'
         },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'filters': ['user_id'],
             'formatter': 'verbose',
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': 'app.log',
             'formatter': 'verbose',
         },
     },
-
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
     'root': {
         'handlers': ['console', 'file'],
         'level': 'INFO',
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'your_app_name': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'daphne': {  # Отключаем логи Daphne
-            'handlers': [],
-            'level': 'CRITICAL',
-            'propagate': False,
-        },
-    },
+    
 }
-
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
