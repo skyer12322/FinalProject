@@ -322,11 +322,11 @@ def upload_resume(request):
 
 def chats(request):
     if request.user.is_authenticated:
-        profile = request.user.profile
+        profile = request.user
         if profile.role == 'company':
-            chats = Chat.objects.filter(company=profile)
+            chats = Chat.objects.filter(company=profile.company)
         else:
-            chats = Chat.objects.filter(user=profile)
+            chats = Chat.objects.filter(users=profile.cuser)
     else:
         chats = []
 
