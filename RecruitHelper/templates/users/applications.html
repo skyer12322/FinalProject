@@ -35,19 +35,31 @@
                         </div>
                     </a>
                     {% else %}
-                    <a href={% url "candidate" user_id=it.candidate.user.id %} style="text-decoration: none;">
+                    {% if it.status != 'rejected' %}
+                    <form name="{{it.id}}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="application_id" value="{{it.id}}">
                         <div class="application-card card-box application">
                             <div class="application-header">
-                                <h3>{{ it.candidate.user.first_name }} {{ it.candidate.user.last_name }}</h3>
+                                <a href={% url "candidate" user_id=it.candidate.user.id %} style="text-decoration: none;">
+                                    <h3>{{ it.candidate.first_name }} {{ it.candidate.last_name }}</h3>
+                                </a>
                                 <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
                             </div>
                             <div class="application-meta">
                                 <span class="vacancy-application">{{ it.vacancy }}</span>
                                 <span class="status">{{ it.status }}</span>
+                                {% if it.status == 'pending' %}
+                                    <input type="hidden" name="accept" value="True">
+                                    <button class='btn w-25'>Одобрить</button>
+                                {% else %}
+                                    <button class='btn w-25' onclick="window.location.href='{% url 'chat' chat_id=it.id %}'" name="chat{{it.id}}" type="button">Написать</button>
+                                {% endif %}
                             </div>
                         </div>
-                    </a>
+                    </form>
                     {% endif %}
+                {% endif %}
                 </div>
                 {% empty %}
                 <div class="col-md-12">

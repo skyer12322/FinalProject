@@ -56,12 +56,12 @@ def login_view(request):
         
         backend = 'RecruitHelper.backends.UserAuthBackend'
         
-        user = authenticate(request, email=email, password=password, backend=backend, check_company=is_company)
+        user = authenticate(request, email=email, password=password, check_company=is_company)
         if user is not None:
             login(request, user)
             return redirect("home")
         else:
-            return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
+            return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
 
     return render(request, "auth/login.html")
 
@@ -159,6 +159,22 @@ def applications(request):
         context = {
             'applications': applications
         }
+    if request.method == 'POST':
+        application_id = request.POST.get('application_id')
+        if application_id:
+            try:
+                application = Application.objects.get(id=application_id)
+                if request.user.role == 'company' and application.vacancy.company.user == request.user:
+                    application.status = 'accepted'
+                    application.save()
+                    chat = Chat.objects.create(id=application.vacancy.id,
+                                        user=application.candidate,
+                                        company=request.user.company,
+                                        name=application.vacancy.title,
+                                        vacancy=application.vacancy)
+            except Application.DoesNotExist:
+                pass
+        return redirect('applications')
     return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
@@ -244,6 +260,7 @@ def add_vacancy(request):
                 except Exception as e:
                     print(f"AI бунтует! Произошла ошибка {e}.")
                     vacancy.ai_rating = 0
+                    vacancy.tags_ai = {}
 
                 vacancy.save()
                 request.user.company.vacancies.add(vacancy)
@@ -320,4 +337,23 @@ def upload_resume(request):
     return redirect('profile')
 
 
+def chats(request):
+    if request.user.is_authenticated:
+        user = request.user
+        if user.role == 'company':
+            chats = Chat.objects.filter(company=user.company)
+        else:
+            chats = Chat.objects.filter(user=user.cuser)
+    else:
+        chats = []
 
+    return render(request, 'users/chats.html', {'chats': chats})
+
+@login_required
+def chat(request, chat_id):
+    chat = Chat.objects.get(id=chat_id)
+    messages = []
+    for message in chat.messages.all():
+        messages.append(message)
+    context = {'messages': messages}
+    return render(request, 'vacancies/chat.html', context)
