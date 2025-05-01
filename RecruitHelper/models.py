@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
@@ -44,16 +44,6 @@ class CUser(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-
-
-class Chat(models.Model):
-    user = models.ForeignKey('CUser', related_name='chats', on_delete=models.SET_NULL, null=True)
-    company = models.ForeignKey('Company', related_name='chats', on_delete=models.SET_NULL, null=True)
-    messages = models.ManyToManyField('ChatMessage', related_name='chat', blank=True)
-
-    def __str__(self):
-        return f"Chat {self.id}"
-
     
 class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='company')
@@ -73,11 +63,20 @@ class Application(models.Model):
     def __str__(self):
         return f"{self.candidate} подал заявку на вакансию {self.vacancy}"
 
+class Chat(models.Model):
+    name = models.CharField(max_length=100)
+    user = models.ForeignKey('CUser', related_name='chats', on_delete=models.SET_NULL, null=True)
+    company = models.ForeignKey('Company', related_name='chats', on_delete=models.SET_NULL, null=True)
+    messages = models.ManyToManyField('Message', related_name='chat', blank=True)
+    vacancy = models.ForeignKey('Vacancy', on_delete=models.CASCADE, related_name='chats')
+
+    def __str__(self):
+        return f"Chat {self.id}"
     
-class ChatMessage(models.Model):
-    user = models.ForeignKey(CUser, on_delete=models.SET_NULL, null=True, blank=True)
-    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+class Message(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         if self.user:
@@ -95,8 +94,6 @@ class Vacancy(models.Model):
     ai_rating = models.PositiveIntegerField()
     tags_ai = models.JSONField(default=list, blank=True)
     company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name='vacancies', null=True, blank=True)
-    chats = models.ForeignKey("Chat", on_delete=models.CASCADE, related_name="vacancy", blank=True, null=True)
-
     def __str__(self):
         return self.title
     
