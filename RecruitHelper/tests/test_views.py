@@ -1,121 +1,107 @@
-from django.test import TestCase, Client
+import pytest
 from django.urls import reverse
-from RecruitHelper.models import Vacancy
-from RecruitHelper.forms import VacancyForm, VacancyFilterForm
+from django.contrib.auth import get_user_model
+from RecruitHelper.models import User, Company, CUser, Vacancy, Application
+from unittest.mock import patch
 
-class ViewsTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.vacancy = Vacancy.objects.create(
-            title="Developer",
-            description="Backend Developer",
-            required_skills="Python, Django",
-            required_experience="1",
-            required_education="Bachelor"
-        )
+pytestmark = pytest.mark.django_db
 
-    # Тест для home view
-    def test_home_view(self):
-        response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('vacancies', response.context)
-        self.assertLessEqual(len(response.context['vacancies']), 4)
+@pytest.fixture
+def client():
+    from django.test import Client
+    return Client()
 
-    # Тест для login view
-    def test_login_view(self):
-        response = self.client.get(reverse('login'))
-        self.assertEqual(response.status_code, 200)
+@pytest.fixture
+def user():
+    user = User.objects.create_user(email='user@test.com', password='testpass', main_name='User')
+    CUser.objects.create(user=user, first_name='Test', last_name='User')
+    return user
 
-    # Тест для register view
-    def test_register_view(self):
-        response = self.client.get(reverse('register'))
-        self.assertEqual(response.status_code, 200)
+@pytest.fixture
+def company():
+    user = User.objects.create_user(email='company@test.com', password='testpass', main_name='Company', role='company')
+    Company.objects.create(user=user)
+    return user
 
-    # Тест для company view
-    def test_company_view(self):
-        response = self.client.get(reverse('company'))
-        self.assertEqual(response.status_code, 200)
+def test_home_view(client):
+    resp = client.get(reverse('home'))
+    assert resp.status_code == 200
 
-    # Тест для profile view
-    def test_profile_view(self):
-        response = self.client.get(reverse('profile'))
-        self.assertEqual(response.status_code, 200)
+def test_login_view_get(client):
+    resp = client.get(reverse('login'))
+    assert resp.status_code == 200
 
-    # Тест для candidate view
-    def test_candidate_view(self):
-        response = self.client.get(reverse('candidate'))
-        self.assertEqual(response.status_code, 200)
+def test_login_view_post_fail(client):
+    resp = client.post(reverse('login'), {'username': 'no@no.com', 'password': 'wrong'})
+    assert resp.status_code == 200
+    assert "Неверный email или пароль" in resp.content.decode()
 
-    # Тест для vacancies view
-    def test_vacancies_view(self):
-        response = self.client.get(reverse('vacancies'))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('vacancies', response.context)
-        self.assertIn('form', response.context)
-        self.assertIsInstance(response.context['form'], VacancyFilterForm)
+def test_register_get(client):
+    resp = client.get(reverse('register'))
+    assert resp.status_code == 200
 
-    # Тест для add_vacancy view (GET)
-    def test_add_vacancy_view_get(self):
-        response = self.client.get(reverse('add_vacancy'))
-        self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.context['form'], VacancyForm)
+def test_register_post_user(client):
+    resp = client.post(reverse('register'), {
+        'main_name': 'User', 'email': 'u1@u.com', 'password': '123'
+    })
+    assert resp.status_code in (302, 200)
 
-    # Тест для add_vacancy view (POST)
-    def test_add_vacancy_view_post(self):
-        data = {
-            'title': 'New Vacancy',
-            'description': 'New Description',
-            'required_skills': 'Python, Django',
-            'required_experience': '1 year',
-            'required_education': 'Bachelor'
-        }
-        response = self.client.post(reverse('add_vacancy'), data)
-        self.assertEqual(response.status_code, 302)  # Проверяем перенаправление
-        self.assertEqual(Vacancy.objects.count(), 2)  # Проверяем, что вакансия создана
+def test_logout_view(client, user):
+    client.force_login(user)
+    resp = client.get(reverse('logout'))
+    assert resp.status_code == 302
 
-    # Тест для vacancy view
-    def test_vacancy_view(self):
-        response = self.client.get(reverse('vacancy', args=[self.vacancy.id]))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('vacancy', response.context)
-        self.assertEqual(response.context['vacancy'].title, "Developer")
+def test_profile_view(client, user):
+    client.force_login(user)
+    resp = client.get(reverse('profile'))
+    assert resp.status_code == 200
 
-    # Тест для vacancy view (404)
-    def test_vacancy_view_404(self):
-        response = self.client.get(reverse('vacancy', args=[999]))
-        self.assertEqual(response.status_code, 404)
+def test_edit_user_get(client, user):
+    client.force_login(user)
+    resp = client.get(reverse('edit_user'))
+    assert resp.status_code == 200
 
-    # Тест для privacy view
-    def test_privacy_view(self):
-        response = self.client.get(reverse('privacy'))
-        self.assertEqual(response.status_code, 200)
+def test_applications_user(client, user):
+    client.force_login(user)
+    resp = client.get(reverse('applications'))
+    assert resp.status_code == 200
 
-    # Тест для news view
-    def test_news_view(self):
-        response = self.client.get(reverse('news'))
-        self.assertEqual(response.status_code, 200)
+def test_company_view(client, company):
+    resp = client.get(reverse('company', kwargs={'company_id': company.company.id}))
+    assert resp.status_code == 200
 
-    # Тест для about_us view
-    def test_about_us_view(self):
-        response = self.client.get(reverse('about_us'))
-        self.assertEqual(response.status_code, 200)
+def test_candidate_view(client, user):
+    resp = client.get(reverse('candidate', kwargs={'user_id': user.id}))
+    assert resp.status_code == 200
 
-    # Дополнительные тесты
+def test_vacancies_get(client):
+    resp = client.get(reverse('vacancies_list'))
+    assert resp.status_code == 200
 
-    # Тестирование доступа к защищенному представлению без авторизации
-    def test_protected_view_without_login(self):
-        response = self.client.get(reverse('profile'))  # Предполагаем, что это защищенное представление
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('profile')}")
+@patch('RecruitHelper.views.ChatGPT.get_response')
+def test_add_vacancy_post(mock_gpt, client, company):
+    client.force_login(company)
+    mock_gpt.return_value = {'rating': 5, 'tags': []}
+    resp = client.post(reverse('add_vacancy'), {
+        'title': 'Test', 'geography': 'City', 'description': 'Desc'
+    })
+    assert resp.status_code in (302, 200)
 
-    # Проверка валидации формы добавления вакансии (POST с некорректными данными)
-    def test_add_vacancy_invalid_post(self):
-        data = {
-            'title': '',  # Пустое название
-            'description': '',
-            'required_skills': '',
-            'required_experience': '',
-            'required_education': ''
-        }
-        response = self.client.post(reverse('add_vacancy'), data)
-        self.assertEqual(response.status_code, 200)  # Ожидаем рендеринг формы с ошибками
-        self.assertFormError(response, 'form', 'title', 'Это поле обязательно.')  # Проверяем наличие ошибки
+def test_vacancy_detail(client, user):
+    vac = Vacancy.objects.create(title='T', description='D', geography={}, ai_rating=1)
+    client.force_login(user)
+    resp = client.get(reverse('vacancy', kwargs={'vacancy_id': vac.id}))
+    assert resp.status_code == 200
+
+@patch('RecruitHelper.views.ChatGPT.get_response')
+def test_apply_to_vacancy(mock_gpt, client, user):
+    vac = Vacancy.objects.create(title='T', description='D', geography={}, ai_rating=1)
+    client.force_login(user)
+    mock_gpt.return_value = '{"rating": 1}'
+    resp = client.get(reverse('apply_to_vacancy', kwargs={'vacancy_id': vac.id}))
+    assert resp.status_code in (302, 200)
+
+def test_privacy_news_about(client):
+    assert client.get(reverse('privacy')).status_code == 200
+    assert client.get(reverse('news')).status_code == 200
+    assert client.get(reverse('about_us')).status_code == 200

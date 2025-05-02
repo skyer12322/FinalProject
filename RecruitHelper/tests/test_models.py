@@ -1,59 +1,55 @@
-from django.test import TestCase
-from RecruitHelper.models import ChatMessage, Chat, Vacancy, CUser, Pendings, Company
-import json
+import pytest
+from RecruitHelper.models import User, CUser, Company, Vacancy, Application, Chat, ChatMessage, Notification
+from django.utils import timezone
 
-class ModelTests(TestCase):
-    def setUp(self):
-        self.user = CUser.objects.create_user(
-            email='user@example.com',
-            username='testuser',
-            first_name='John',
-            last_name='Doe',
-            password='testpass123',
-            phone='1234567890'
-        )
-        self.company = Company.objects.create_user(
-            email='company@example.com',
-            company_name='Test Company',
-            password='testpass123',
-            phone='0987654321'
-        )
-        self.vacancy = Vacancy.objects.create(
-            title='Software Engineer',
-            description='Backend Developer',
-            ai_rating=5,
-            company=self.company
-        )
-        self.chat_message = ChatMessage.objects.create(
-            user=self.user,
-            company=self.company,
-            content='Hello, World!'
-        )
-        self.pending = Pendings.objects.create(
-            vacancy=self.vacancy,
-            candidate=self.user,
-            ai_rating=4
-        )
+pytestmark = pytest.mark.django_db
 
-    def test_cuser_model(self):
-        self.assertEqual(self.user.email, 'user@example.com')
-        self.assertEqual(str(self.user), 'John Doe')
-        self.assertTrue(self.user.check_password('testpass123'))
+def test_user_manager_and_str():
+    user = User.objects.create_user(email='a@a.com', password='pass', main_name='A')
+    assert user.email == 'a@a.com'
+    assert str(user) == 'a@a.com'
+    assert user.check_password('pass')
 
-    def test_company_model(self):
-        self.assertEqual(self.company.company_name, 'Test Company')
-        self.assertEqual(str(self.company), 'Test Company')
+def test_create_user_no_email():
+    from RecruitHelper.models import CustomUserManager
+    with pytest.raises(ValueError):
+        CustomUserManager().create_user(email=None, password='pass')
 
-    def test_vacancy_model(self):
-        self.assertEqual(self.vacancy.title, 'Software Engineer')
-        self.assertEqual(str(self.vacancy), 'Software Engineer')
-        self.assertEqual(self.vacancy.ai_rating, 5)  # Проверка ai_rating
+def test_cuser_and_company_str():
+    user = User.objects.create_user(email='b@b.com', password='pass', main_name='B')
+    cuser = CUser.objects.create(user=user, first_name='F', last_name='L')
+    assert str(cuser) == 'F L'
+    company = Company.objects.create(user=user)
+    assert str(company) == user.main_name
 
-    def test_chat_message_model(self):
-        self.assertEqual(self.chat_message.content, 'Hello, World!')
-        self.assertEqual(self.chat_message.user, self.user)
-        self.assertEqual(self.chat_message.company, self.company)
+def test_vacancy_and_application_str():
+    user = User.objects.create_user(email='c@c.com', password='pass', main_name='C', role='company')
+    company = Company.objects.create(user=user)
+    chat = Chat.objects.create()
+    vacancy = Vacancy.objects.create(
+        title='V', description='D', geography={'city': 'Test'}, ai_rating=5, company=company, chats=chat
+    )
+    assert str(vacancy) == 'V'
+    cuser = CUser.objects.create(user=User.objects.create_user(email='d@d.com', password='pass', main_name='D'))
+    app = Application.objects.create(vacancy=vacancy, candidate=cuser)
+    assert 'подал заявку' in str(app)
 
-    def test_pendings_model(self):
-        self.assertEqual(str(self.pending), 'John Doe подал заявку на вакансию Software Engineer')
-        self.assertEqual(self.pending.ai_rating, 4)
+def test_chat_and_message_str():
+    chat = Chat.objects.create()
+    msg1 = ChatMessage.objects.create(user=1, company=-1, content='msg')
+    msg2 = ChatMessage.objects.create(user=-1, company=2, content='msg2')
+    chat.messages.add(msg1, msg2)
+    assert 'User' in str(msg1)
+    assert 'Company' in str(msg2)
+    assert f'Chat {chat.id}' == str(chat)
+
+def test_notification_str():
+    user = User.objects.create_user(email='e@e.com', password='pass', main_name='E')
+    vacancy = Vacancy.objects.create(
+        title='V2', description='D2', geography={'city': 'Test'}, ai_rating=4
+    )
+    chat = Chat.objects.create()
+    notif = Notification.objects.create(
+        user=user, notification_type='application', title='T', vacancy=vacancy, chat=chat
+    )
+    assert 'Заявка' in str(notif)

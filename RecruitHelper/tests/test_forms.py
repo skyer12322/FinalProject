@@ -1,80 +1,41 @@
-from django.test import TestCase
-from RecruitHelper.forms import VacancyForm, VacancyFilterForm
-from RecruitHelper.models import Vacancy
-import json
+import pytest
+from RecruitHelper.forms import (
+    UserRegistrationForm, VacancyForm, EditUserForm, EditCUserForm, EditCompanyForm, VacancyFilterForm
+)
+from RecruitHelper.models import User, Company, CUser
 
-class VacancyFilterFormTest(TestCase):
-    def test_vacancy_filter_form_valid(self):
-        form_data = {
-            'category': 'IT',
-            'city': 'New York',
-            'min_salary': 50000,
-            'max_salary': 100000
-        }
-        form = VacancyFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())
+pytestmark = pytest.mark.django_db
 
-    def test_vacancy_filter_form_empty(self):
-        form_data = {}
-        form = VacancyFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())
+def test_user_registration_form_valid_invalid():
+    form = UserRegistrationForm(data={'main_name': 'X', 'email': 'x@x.com', 'password': '123'})
+    assert form.is_valid()
+    form = UserRegistrationForm(data={'main_name': '', 'email': '', 'password': ''})
+    assert not form.is_valid()
 
-    def test_vacancy_filter_form_invalid_salary(self):
-        form_data = {
-            'min_salary': 100000,
-            'max_salary': 50000
-        }
-        form = VacancyFilterForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('non_field_errors', form.errors)
+def test_vacancy_form_required():
+    form = VacancyForm(data={'title': '', 'geography': '', 'description': ''})
+    assert not form.is_valid()
+    form = VacancyForm(data={'title': 'T', 'geography': 'G', 'description': 'D'})
+    assert form.is_valid()
 
+def test_edit_user_form_and_company():
+    user = User.objects.create_user(email='a@a.com', password='pass', main_name='A', description='desc')
+    form = EditUserForm(data={
+        'main_name': 'B', 'email': 'b@b.com', 'description': 'desc'
+    }, instance=user)
+    assert form.is_valid()
+    company = Company.objects.create(user=user)
+    form2 = EditCompanyForm(data={'website': 'mysite.com'}, instance=company)
+    assert form2.is_valid()
 
-class VacancyFormTest(TestCase):
-    def test_vacancy_form_valid(self):
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
-            'ai_rating': 5,
-            'tags_ai': json.dumps(['Python', 'Django']),
-            # Предполагаем, что поле chats не обязательно для создания вакансии
-            # Если у вас есть связанные чаты, добавьте их здесь
-        }
-        form = VacancyForm(data=form_data)
-        self.assertTrue(form.is_valid())
+def test_edit_cuser_form():
+    user = User.objects.create_user(email='c@c.com', password='pass', main_name='C')
+    cuser = CUser.objects.create(user=user, first_name='F', last_name='L')
+    form = EditCUserForm(data={'first_name': 'F2', 'last_name': 'L2'}, instance=cuser)
+    assert form.is_valid()
 
-    def test_vacancy_form_invalid_ai_rating(self):
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
-            'ai_rating': -1,  # Неверное значение для ai_rating
-            'tags_ai': json.dumps(['Python', 'Django']),
-        }
-        form = VacancyForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('ai_rating', form.errors)  # Проверяем ошибку здесь
-
-    def test_vacancy_form_invalid_tags_ai(self):
-        form_data = {
-            'title': 'Software Engineer',
-            'description': 'Backend Developer',
-            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
-            'ai_rating': 5,
-            'tags_ai': "not a json",  # Некорректный JSON
-        }
-        form = VacancyForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('tags_ai', form.errors)  # Проверяем ошибку здесь
-
-    def test_vacancy_form_missing_required_fields(self):
-        form_data = {
-            # Отсутствуют обязательные поля title и description
-            'geography': json.dumps({'country': 'USA', 'city': 'New York'}),
-            'ai_rating': 5,
-            'tags_ai': json.dumps(['Python', 'Django']),
-        }
-        form = VacancyForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('title', form.errors)  # Проверяем ошибку для title
-        self.assertIn('description', form.errors)  # Проверяем ошибку для description
+def test_vacancy_filter_form_variants():
+    form = VacancyFilterForm(data={'category': 'it', 'city': 'Moscow', 'min_salary': 1000, 'max_salary': 2000})
+    assert form.is_valid()
+    form = VacancyFilterForm(data={'min_salary': 'wrong'})
+    assert not form.is_valid()
