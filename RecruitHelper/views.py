@@ -190,7 +190,25 @@ def applications(request):
     else:
         cuser = CUser.objects.get(user=request.user)
         applications = Application.objects.filter(candidate=cuser)
-        context = {'applications': applications}
+        context = {
+            'applications': applications
+        }
+    if request.method == 'POST':
+        application_id = request.POST.get('application_id')
+        if application_id:
+            try:
+                application = Application.objects.get(id=application_id)
+                if request.user.role == 'company' and application.vacancy.company.user == request.user:
+                    application.status = 'accepted'
+                    application.save()
+                    chat = Chat.objects.create(id=application.vacancy.id,
+                                        user=application.candidate,
+                                        company=request.user.company,
+                                        name=application.vacancy.title,
+                                        vacancy=application.vacancy)
+            except Application.DoesNotExist:
+                pass
+        return redirect('applications')
     return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
@@ -281,6 +299,7 @@ def add_vacancy(request):
                 except Exception as e:
                     logger.error(f"ChatGPT processing error: {str(e)}")
                     vacancy.ai_rating = 0
+                    vacancy.tags_ai = {}
 
                 vacancy.save()
                 request.user.company.vacancies.add(vacancy)

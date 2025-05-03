@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v6*)c!#ny+6w2p$()r7!##z=-+o4fwqu+yv!&j)fp!a!2s&4&e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 MAIN_HOST = os.environ.get('MAIN_HOST')
@@ -42,6 +42,8 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    'RecruitHelper',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'RecruitHelper',
     'rest_framework',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -97,8 +100,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'FinalProject.wsgi.application'
 
+ASGI_APPLICATION = 'FinalProject.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
