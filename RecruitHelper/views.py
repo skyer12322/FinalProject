@@ -385,28 +385,18 @@ def about_us(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def download_logs(request):
-    """
-    Функция для скачивания логов сервера
-    Доступ только для администраторов
-    """
     log_path = settings.LOG_FILE_PATH
-    
-    # Проверка существования файла
     if not os.path.exists(log_path):
         return Response(
             {"error": "Файл логов не найден"},
             status=status.HTTP_404_NOT_FOUND
         )
-    
-    # Проверка что это файл, а не директория
     if not os.path.isfile(log_path):
         return Response(
             {"error": "Указанный путь не является файлом"},
             status=status.HTTP_400_BAD_REQUEST
         )
-    
     try:
-        # Отправка файла как attachment
         return FileResponse(
             open(log_path, 'rb'),
             as_attachment=True,
