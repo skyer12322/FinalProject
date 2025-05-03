@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company
+from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company, terms
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, edit_user
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume, chats, chat
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('login/', login_view, name="login"),
     path('register/', register, name="register"),
     path('privacy/', privacy, name="privacy"),
+    path('terms/', terms, name='terms'),
     path('news/', news, name="news"),
     path('about/', about_us, name="about"),
     path('profile/logout/', logout_view, name="logout"),
