@@ -9,52 +9,107 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <style>
+        .card-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chat-item:hover {
+            transform: translateX(5px);
+            transition: all 0.2s ease;
+        }
+    </style>
 </head>
 
-<body class="profile-body">
+<body class="profile-body bg-light">
     {% include "../main/menu.html" %}
 
-    <div class="row" style="margin: 20px;">
-        <div class="col-md-8">
-            <div class="card-box">
-                <h2>Ваши чаты</h2>
-                {% if user.is_authenticated %}
-                    {% if chats %}
-                        <ul class="list-group">
-                            {% for chat in chats %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="{% url 'chat' chat_id=chat.id %}">{{ chat.name }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Чатов пока нет.</p>
-                    {% endif %}
-                {% else %}
-                    <p>Пожалуйста, войдите в систему, чтобы просматривать чаты.</p>
-                {% endif %}
+    <div class="container-lg py-5">
+        <div class="row g-4">
+            <!-- Основной контент -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h3 class="mb-4">
+                            <i class="fas fa-comments me-2 text-primary"></i>Ваши чаты
+                        </h3>
+                        
+                        {% if user.is_authenticated %}
+                            {% if chats %}
+                                <div class="list-group-flush">
+                                    {% for chat in chats %}
+                                        <a href="{% url 'chat' chat_id=chat.id %}" 
+                                           class="list-group-item list-group-item-action d-flex align-items-center py-3 chat-item">
+                                            <i class="fas fa-comment-dots fa-lg me-3 text-muted"></i>
+                                            <div>
+                                                <h5 class="mb-1">{{ chat.name }}</h5>
+                                                <small class="text-muted">Последнее сообщение: 12:30</small>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Чатов пока нет</p>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Пожалуйста, войдите в систему чтобы просматривать чаты
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-3 offset-md-1">
-            <div class="card-box">
-                <h5>Навигация</h5>
-                <ul class="list-group">
-                    <li class="list-group-item"><a href="{% url 'profile' %}">Профиль</a></li>
-                    {% if user.role == 'company' %}
-                        <li class="list-group-item"><a href="{% url 'profile_vacancies' %}">Вакансии</a></li>
-                    {% elif user.role == 'user' %}
-                        <li class="list-group-item"><a href="{% url 'upload_resume' %}">Резюме</a></li>
-                    {% endif %}
-                    <li class="list-group-item"><a href="{% url 'applications' %}">Заявки</a></li>
-                </ul>
+            <!-- Боковая панель -->
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="mb-3">
+                                <i class="fas fa-bars me-2"></i>Навигация
+                            </h5>
+                            <div class="list-group list-group-flush">
+                                <a href="{% url 'profile' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-3 text-primary"></i>
+                                    Профиль
+                                </a>
+                                {% if user.role == 'company' %}
+                                <a href="{% url 'profile_vacancies' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-briefcase me-3 text-success"></i>
+                                    Вакансии
+                                </a>
+                                {% elif user.role == 'user' %}
+                                <a href="{% url 'upload_resume' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-file-pdf me-3 text-danger"></i>
+                                    Резюме
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'applications' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-clipboard-list me-3 text-warning"></i>
+                                    Заявки
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     {% include "../main/footer.html" %}
 </body>
-
 </html>
