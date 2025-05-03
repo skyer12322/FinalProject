@@ -7,5 +7,5 @@ psycopg2-binary>=2.9.0
 channels==4.2.2
 daphne==4.1.2
 Twisted[http2,tls]>=22.10.0
-jangorestframework==3.16.0
+djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
