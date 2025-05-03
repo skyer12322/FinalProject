@@ -1,3 +1,3 @@
 #!/bin/bash
 python manage.py collectstatic --noinput
-daphne FinalProject.asgi:application --port 10000
+daphne -b 0.0.0.0 -p 10000 FinalProject.asgi:application
