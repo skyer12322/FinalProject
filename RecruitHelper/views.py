@@ -1,4 +1,6 @@
 import logging
+from django.http import FileResponse
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from .models import *
@@ -12,6 +14,10 @@ from . import prompts
 import os
 import json
 from collections import defaultdict, Counter
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework import status
 
 logger = logging.getLogger(__name__)
 
@@ -353,3 +359,39 @@ def about_us(request):
     logger.info("About us page requested")
     context = { }
     return render(request, 'info/about_us.html', context)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def download_logs(request):
+    """
+    Функция для скачивания логов сервера
+    Доступ только для администраторов
+    """
+    log_path = settings.LOG_FILE_PATH
+    
+    # Проверка существования файла
+    if not os.path.exists(log_path):
+        return Response(
+            {"error": "Файл логов не найден"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Проверка что это файл, а не директория
+    if not os.path.isfile(log_path):
+        return Response(
+            {"error": "Указанный путь не является файлом"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # Отправка файла как attachment
+        return FileResponse(
+            open(log_path, 'rb'),
+            as_attachment=True,
+            filename='server_logs.log'
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"Ошибка при чтении файла: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

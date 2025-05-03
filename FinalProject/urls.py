@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, edit_user
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
+from RecruitHelper.views import download_logs
 
 
 urlpatterns = [
@@ -27,6 +28,7 @@ urlpatterns = [
     path('profile/applications/', applications, name='applications'),
     path('apply/<int:vacancy_id>/', apply_to_vacancy, name='apply_to_vacancy'),
     path('upload_resume/', upload_resume, name='upload_resume'),
+    path('api/download-logs/', download_logs, name='download-logs'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Добавляем статические файлы только в режиме разработки
