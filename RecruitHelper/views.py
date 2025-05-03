@@ -370,6 +370,9 @@ def privacy(request):
     logger.info("Privacy policy page requested")
     return render(request, 'info/privacy_policy.html')
 
+def terms(request):
+    return render(request, 'info/terms_of_use.html')
+
 def news(request):
     logger.info("News page requested")
     return render(request, 'vacancies/news.html')

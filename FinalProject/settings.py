@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'RecruitHelper',
     'rest_framework',
     'channels',
 ]
@@ -80,6 +79,8 @@ REST_FRAMEWORK = {
 }
 
 ROOT_URLCONF = 'FinalProject.urls'
+
+LOG_FILE_PATH = os.environ.get('LOG_FILE')
 
 TEMPLATES = [
     {
