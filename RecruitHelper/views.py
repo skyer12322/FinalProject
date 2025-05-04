@@ -224,20 +224,20 @@ def vacancies(request):
     vacancies = Vacancy.objects.all()
     form = VacancyFilterForm(request.GET or None)
 
-    if form.is_valid():
-        category = form.cleaned_data.get('category')
-        city = form.cleaned_data.get('city')
-        min_salary = form.cleaned_data.get('min_salary')
-        max_salary = form.cleaned_data.get('max_salary')
+    # if form.is_valid():
+    #     category = form.cleaned_data.get('category')
+    #     city = form.cleaned_data.get('city')
+    #     min_salary = form.cleaned_data.get('min_salary')
+    #     max_salary = form.cleaned_data.get('max_salary')
 
-        if category:
-            vacancies = vacancies.filter(category__icontains=category)
-        if city:
-            vacancies = vacancies.filter(city__icontains=city)
-        if min_salary:
-            vacancies = vacancies.filter(salary__gte=min_salary)
-        if max_salary:
-            vacancies = vacancies.filter(salary__lte=max_salary)
+    #     if category:
+    #         vacancies = vacancies.filter(category__icontains=category)
+    #     if city:
+    #         vacancies = vacancies.filter(city__icontains=city)
+    #     if min_salary:
+    #         vacancies = vacancies.filter(salary__gte=min_salary)
+    #     if max_salary:
+    #         vacancies = vacancies.filter(salary__lte=max_salary)
     vacancies_list = list(vacancies)
     logger.info(f"Found {len(vacancies_list)} vacancies after filtering")
     tags_by_category = defaultdict(set)
