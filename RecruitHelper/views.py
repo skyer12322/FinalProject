@@ -138,7 +138,7 @@ def edit_user(request):
                 'base_form': base_form,
                 'company_form': company_form,
             }
-    return render(request, 'users/edit-user.html', context)
+    return render(request, 'users/profileedit.html', context)
 
 @login_required
 def profile_vacancies(request):
