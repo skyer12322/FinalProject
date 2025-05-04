@@ -8,8 +8,6 @@ class VacancyForm(forms.ModelForm):
                                                                                              'class': 'form-control container',}))
     description = forms.CharField(required=True, label="Описание вакансии" , widget=forms.Textarea(attrs={'placeholder': 'Описание вакансии',
                                                                                                           'class': 'form-control container',}))
-    tags_ai = forms.CharField(required=False, label="Теги" , widget=forms.TextInput(attrs={'placeholder': 'Теги (через пробел)',
-                                                                                           'class': 'form-control container',}))
 
     class Meta:
         model = Vacancy
@@ -17,7 +15,6 @@ class VacancyForm(forms.ModelForm):
             'title',
             'geography',
             'description',
-            'tags_ai',
         )
         
 class UserRegistrationForm(forms.ModelForm):

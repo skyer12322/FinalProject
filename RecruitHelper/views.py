@@ -224,20 +224,20 @@ def vacancies(request):
     vacancies = Vacancy.objects.all()
     form = VacancyFilterForm(request.GET or None)
 
-    if form.is_valid():
-        category = form.cleaned_data.get('category')
-        city = form.cleaned_data.get('city')
-        min_salary = form.cleaned_data.get('min_salary')
-        max_salary = form.cleaned_data.get('max_salary')
+    # if form.is_valid():
+    #     category = form.cleaned_data.get('category')
+    #     city = form.cleaned_data.get('city')
+    #     min_salary = form.cleaned_data.get('min_salary')
+    #     max_salary = form.cleaned_data.get('max_salary')
 
-        if category:
-            vacancies = vacancies.filter(category__icontains=category)
-        if city:
-            vacancies = vacancies.filter(city__icontains=city)
-        if min_salary:
-            vacancies = vacancies.filter(salary__gte=min_salary)
-        if max_salary:
-            vacancies = vacancies.filter(salary__lte=max_salary)
+    #     if category:
+    #         vacancies = vacancies.filter(category__icontains=category)
+    #     if city:
+    #         vacancies = vacancies.filter(city__icontains=city)
+    #     if min_salary:
+    #         vacancies = vacancies.filter(salary__gte=min_salary)
+    #     if max_salary:
+    #         vacancies = vacancies.filter(salary__lte=max_salary)
     vacancies_list = list(vacancies)
     logger.info(f"Found {len(vacancies_list)} vacancies after filtering")
     tags_by_category = defaultdict(set)
@@ -283,16 +283,38 @@ def add_vacancy(request):
                     company=company
                 )
                 try:
-                    api_key = os.getenv("OPENAI_API_KEY")
+                    api_key = os.environ.get("OPENAI_API_KEY")
                     client = ChatGPT(api_key=api_key)
                     response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
                     vacancy.ai_rating = int(response_text['rating'])
-                    tags_text = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\n{vacancy.description}')
-                    if form.cleaned_data['tags_ai']:
-                        for elem in form.cleaned_data['tags_ai'].split():
-                            tags_text['tags'].append(elem)
-                    vacancy.tags_ai = tags_text
-                    logger.debug(f"ChatGPT request for tags: {tags_text}")
+                    tags = {
+                        'specialization': request.POST.get('specialization'),
+                        'occupancy': request.POST.get('occupancy'),
+                        'position': request.POST.get('position'),
+                        'tech': request.POST.get('tech'),
+                        'industry': request.POST.get('industry')
+                    }
+                    empty_fields = [key for key, elem in tags.items() if elem == '']
+                    if empty_fields:
+                        tags_text_raw = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\nОтсутствуют теги {empty_fields}\n{vacancy.description}')
+                        try:
+                            if isinstance(tags_text_raw, str):
+                                tags_text_json = json.loads(tags_text_raw)
+                            elif isinstance(tags_text_raw, dict):
+                                tags_text_json = tags_text_raw
+                            else:
+                                raise ValueError("Unexpected response type from ChatGPT")
+                            tags_ai = tags_text_json
+                        except (json.JSONDecodeError, ValueError, TypeError) as e:
+                            logger.error(f"Error processing TAGS_ASSIGN response: {str(e)}. Falling back to empty tags.")
+                            tags_ai = {}
+                    else:
+                        tags_ai = {}
+                    if tags_ai:
+                        for elem in tags_ai:
+                            tags[elem] = tags_ai.get[elem]
+                    vacancy.tags_ai = tags
+                    logger.debug(f"ChatGPT request for tags: {tags_text_raw if 'tags_text_raw' in locals() else 'N/A'}")
                     logger.debug(f"ChatGPT response for rating: {response_text}")
                     logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
 
