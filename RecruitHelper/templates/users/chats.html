@@ -42,7 +42,7 @@
                         
                         {% if user.is_authenticated %}
                             {% if chats %}
-                                <div class="list-group-flush">
+                                <div class="list-group-flush card-box">
                                     {% for chat in chats %}
                                         <a href="{% url 'chat' chat_id=chat.id %}" 
                                            class="list-group-item list-group-item-action d-flex align-items-center py-3 chat-item">
@@ -52,9 +52,10 @@
                                                     {% if user.role == 'user' %}
                                                         {{ chat.company.name }}
                                                     {% else %}
-                                                        {{ chat.user.get_full_name }}
+                                                        {{ chat.user.first_name }} {{ chat.user.last_name }}
                                                     {% endif %}
                                                 </h5>
+                                                <h6>{{chat.vacancy}}</h6>
                                                 <small class="text-muted">Последнее сообщение: 12:30</small>
                                             </div>
                                         </a>
