@@ -4,20 +4,23 @@ from .models import User
 
 class UserAuthBackend(BaseBackend):
     def authenticate(self, request, email=None, password=None, check_company=False):
-        print("Trying User auth...")
         try:
             user = User.objects.get(email=email)
-            print(user.email)
-            if user.check_password(password):
-                if check_company:
-                    if user.role == "company":
-                        return user
-                    else:
-                        return None
-                else:
-                    return user
         except User.DoesNotExist:
-            return None
+            try:
+                user = User.objects.get(main_name=email)
+            except User.DoesNotExist:
+                return None
+        
+        if user.check_password(password):
+            if check_company:
+                if user.role == "company":
+                    return user
+                else:
+                    return None
+            else:
+                return user
+        return None
     
     def get_user(self, user_id):
         try:

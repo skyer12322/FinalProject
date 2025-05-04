@@ -43,8 +43,8 @@ Cайт для поиска работы или сотрудников при п
 
 
 ## Тестирование проекта
-- ```python manage.py test RecruitHelper.tests``` -- для всех тестов
-- ```python manage.py test RecruitHelper.tests.<название_файла>``` -- для конкретного файла тестов
+- ```pytest --report=html``` -- для всех тестов
+- ```pytest --cov=. --cov-config=.coveragerc --cov-report=html``` -- для проверки покрытия тестирования
 ### Файлы тестов:
 -```test_models.py```\
 -```test_views.py```\

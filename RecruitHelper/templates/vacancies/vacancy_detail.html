@@ -19,15 +19,15 @@
     <div class="vacancy-detail-container">
         <h1 class="vacancy-title">{{ vacancy.title }}</h1>
         <p>{{ vacancy.description }}</p>
-        {% if request.user %}
-            {% if request.user.role == 'user' %}
-                {% if not is_applied %}
-                    <button class="btn btn-primary" onclick="location.href='{% url 'apply_to_vacancy' vacancy_id=vacancy.id %}'">Откликнуться</button>
-            {% else %}
-                <p>Вы уже откликнулись на эту вакансию</p>
+        {% if request.user.role == 'user' %}
+            {% if not is_applied %}
+                <button class="btn btn-primary" onclick="location.href='{% url 'apply_to_vacancy' vacancy_id=vacancy.id %}'">Откликнуться</button>
             {% endif %}
+        {% else %}
+            <p>Вы уже откликнулись на эту вакансию</p>
         {% endif %}
     </div>
+    {% include "../main/footer.html" %}
 </body>
 
 </html>

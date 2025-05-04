@@ -32,34 +32,31 @@
                             {% endif %}" 
                             alt="Аватар пользователя" 
                             class="profile-avatar" style="align-content:center">
-                        {% if user.main_name %}
+                        {% if user.role == 'user' %}
+                        {% if user.main_name%}
                             <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">
-                                {% if user.role == 'company' %}
-                                    {{ user.main_name }}
-                                {% else %}
-                                    @{{ user.main_name }}
-                                {% endif %}
+                                @{{ user.main_name }}
                             </p>
                         {% else %}
                             <p>
-                            {% if user.role == 'company' %}
-                                Нет названия
-                            {% else %}
-                                Нет имени пользователя
-                            {% endif %}
-                        </p>
+                            Нет имени пользователя
+                            </p>
+                        {% endif %}
                         {% endif %}
                     </div>
                     <div class="secondary-info col-5">
-                        {% if user.cuser.first_name and user.cuser.last_name %}
-                        <p style="font-size: 35px"><strong>{{ user.cuser.first_name }} {{ user.cuser.last_name }}</strong></p>
+                        {% if user.role == 'user' %}
+                            {% if user.cuser.first_name and user.cuser.last_name %}
+                            <p style="font-size: 35px"><strong>{{ user.cuser.first_name }} {{ user.cuser.last_name }}</strong></p>
+                            {% else %}
+                            <p>Имя и фамилия не указаны</p>
+                            {% endif %}
                         {% else %}
-                        <p>Имя и фамилия не указаны</p>
+                            <p style="font-size: 35px">{{user.main_name}}</p>
                         {% endif %}
                         <p class="profile-email"><strong>Email:</strong> {{ user.email }}</p>
                         <p class="profile-joined"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
-                        {% if user|is_instance:'Company' %}
-                            <p><strong>Описание:</strong> {{ user.company.description|default:"Описание отсутствует" }}</p>
+                        {% if user.role == 'company' %}
                             <p><strong>Сайт:</strong>
                                 {% if user.company.website %}
                                 <a href="{{ user.company.website }}">{{ user.company.website }}</a>
@@ -75,12 +72,13 @@
                     {% if user.role == 'user' %}
                     <div class="col-12 main-info-card">
                         <div class="bio card-box">
-                            {{ user.cuser.description|default:"Информация о себе не добавлена" }}
+                            {{ user.description|default:"Информация о себе не добавлена" }}
                         </div>
                     </div>
                     {% elif user.role == 'company' %}
                     <div class="bio card-box">
-                        {{ user.company.description|default:"Описание отсутствует" }}
+                        <p><strong>Описание:</strong></p>
+                        {{ user.description|default:"Описание отсутствует" }}
                     </div>
                     {% endif %}
             

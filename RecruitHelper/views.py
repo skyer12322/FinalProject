@@ -12,13 +12,6 @@ import os
 import json
 from collections import defaultdict, Counter
 
-
-def bel():
-    for elem in CUser.objects.all():
-        print(elem, elem['id'])
-    return
-
-
 def home(request):
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
@@ -63,12 +56,12 @@ def login_view(request):
         
         backend = 'RecruitHelper.backends.UserAuthBackend'
         
-        user = authenticate(request, email=email, password=password, backend=backend, check_company=is_company)
+        user = authenticate(request, email=email, password=password, check_company=is_company)
         if user is not None:
             login(request, user)
             return redirect("home")
         else:
-            return render(request, "auth/login.html", {"error": "Неверный email или пароль"})
+            return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
 
     return render(request, "auth/login.html")
 
@@ -166,6 +159,22 @@ def applications(request):
         context = {
             'applications': applications
         }
+    if request.method == 'POST':
+        application_id = request.POST.get('application_id')
+        if application_id:
+            try:
+                application = Application.objects.get(id=application_id)
+                if request.user.role == 'company' and application.vacancy.company.user == request.user:
+                    application.status = 'accepted'
+                    application.save()
+                    chat = Chat.objects.create(id=application.vacancy.id,
+                                        user=application.candidate,
+                                        company=request.user.company,
+                                        name=application.vacancy.title,
+                                        vacancy=application.vacancy)
+            except Application.DoesNotExist:
+                pass
+        return redirect('applications')
     return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
@@ -223,6 +232,7 @@ def vacancies(request):
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
+    form = VacancyForm()
     if request.method == 'POST':
         form = VacancyForm(request.POST)
         if form.is_valid():
@@ -250,6 +260,7 @@ def add_vacancy(request):
                 except Exception as e:
                     print(f"AI бунтует! Произошла ошибка {e}.")
                     vacancy.ai_rating = 0
+                    vacancy.tags_ai = {}
 
                 vacancy.save()
                 request.user.company.vacancies.add(vacancy)
@@ -258,14 +269,15 @@ def add_vacancy(request):
                 return redirect('vacancies_list')
             except Company.DoesNotExist:
                 print('Компания не найдена')
-        else:
-            form = VacancyForm()
     return render(request, 'vacancies/add_vacancy.html', {'form': form})
 
 @login_required
 def vacancy(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
-    is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
+    if request.user.role == 'user':
+        is_applied = Application.objects.filter(vacancy=vacancy, candidate=request.user.cuser).exists()
+    else:
+        is_applied = True
     return render(request, 'vacancies/vacancy_detail.html', {'vacancy': vacancy, 'is_applied': is_applied})
 
 @login_required
@@ -281,7 +293,7 @@ def apply_to_vacancy(request, vacancy_id):
         client = ChatGPT(
             api_key=api_key,
         )
-        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume}"
+        content = f"Вакансия: {vacancy.description}\n\nРезюме кандидата: {request.user.cuser.resume + request.user.description}"
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
         print(response_text)
         response_data = json.loads(response_text)
@@ -325,4 +337,23 @@ def upload_resume(request):
     return redirect('profile')
 
 
+def chats(request):
+    if request.user.is_authenticated:
+        user = request.user
+        if user.role == 'company':
+            chats = Chat.objects.filter(company=user.company)
+        else:
+            chats = Chat.objects.filter(user=user.cuser)
+    else:
+        chats = []
 
+    return render(request, 'users/chats.html', {'chats': chats})
+
+@login_required
+def chat(request, chat_id):
+    chat = Chat.objects.get(id=chat_id)
+    messages = []
+    for message in chat.messages.all():
+        messages.append(message)
+    context = {'messages': messages}
+    return render(request, 'vacancies/chat.html', context)

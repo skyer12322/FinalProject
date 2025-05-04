@@ -29,22 +29,3 @@ class ChatGPT:
             return json.loads(response.choices[0].message.content)
         except Exception as e:
             raise Exception(f"Ошибка при запросе: {e}")
-        
-
-"""
-Пример использования:
-
-if __name__ == "__main__":
-    api_key = "API_KEY"  # Укажите ваш API ключ
-    deepseek = DeepSeekAPI(api_key)
-
-    try:
-        prompt = "Сам промпт"
-        rankings = deepseek.get_job_rankings(prompt)
-        print(rankings)
-    except Exception as e:
-        print(f"Произошла ошибка: {e}")
-
-"""
-
-
