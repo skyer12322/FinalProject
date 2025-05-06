@@ -22,6 +22,12 @@ from rest_framework import status
 logger = logging.getLogger(__name__)
 
 def home(request):
+    """
+    Отображает главную страницу с вакансиями, тегами и популярными категориями.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Home page request received")
     vacancies_context = list()
     vacancy_count = Vacancy.objects.count()
@@ -64,6 +70,12 @@ def home(request):
 
 @anonymous_required
 def login_view(request):
+    """
+    Обрабатывает вход пользователей в систему.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей (перенаправление или страница логина с ошибкой).
+    """
     logger.info("Login page request received")
     logger.debug("Processing login request")
     if request.method == "POST":
@@ -86,6 +98,12 @@ def login_view(request):
 
 @anonymous_required
 def register(request):
+    """
+    Обрабатывает регистрацию новых пользователей (соискателей или компаний).
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей (перенаправление или страница регистрации с ошибкой).
+    """
     logger.info("Registration page request received")
     logger.debug("Processing registration request")
     if request.method == 'POST':
@@ -124,20 +142,38 @@ def register(request):
 
 @login_required
 def logout_view(request):
+    """
+    Выполняет выход текущего пользователя из системы.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse (перенаправление на главную страницу).
+    """
     logger.info(f"User logging out: {request.user.email}")
     logout(request)
     return redirect('home')
 
 def company(request, company_id):
+    """
+    Отображает страницу компании по её ID.
+
+    :param request: Объект запроса Django.
+    :param company_id: ID компании.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Company page request received")
     logger.debug(f"Requesting company page ID: {company_id}")
     company_obj = get_object_or_404(Company, id=company_id)
     context = {"company_object": company_obj}
-    logger.info(f"Company page accessed: {company_obj.name}")
     return render(request, 'users/HRpage.html', context)
 
 @login_required
 def profile(request):
+    """
+    Отображает страницу профиля текущего пользователя.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info(f"Profile page request received")
     logger.debug(f"Profile request for user: {request.user.email}")
     user = request.user
@@ -146,6 +182,12 @@ def profile(request):
 
 @login_required
 def profile_vacancies(request):
+    """
+    Отображает вакансии, созданные текущим пользователем (для компаний).
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Vacancies for current user page request received")
     logger.debug(f"Profile vacancies request for user: {request.user.email}")
     context = {}
@@ -153,6 +195,12 @@ def profile_vacancies(request):
 
 @login_required
 def edit_user(request):
+    """
+    Обрабатывает редактирование профиля текущего пользователя.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей (перенаправление или страница редактирования с ошибками).
+    """
     logger.info("User edit page request received")
     logger.debug(f"Edit profile request for user: {request.user.email}")
     context = {}
@@ -181,6 +229,12 @@ def edit_user(request):
 
 @login_required
 def applications(request):
+    """
+    Отображает список заявок на вакансии для текущего пользователя (соискателя или компании).
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Applications for current user page request received")
     logger.debug(f"Applications request for user: {request.user.email}")
     if request.user.role == 'company':
@@ -212,6 +266,13 @@ def applications(request):
     return render(request, 'users/applications.html', context)
 
 def candidate(request, user_id):
+    """
+    Отображает страницу кандидата по ID пользователя.
+
+    :param request: Объект запроса Django.
+    :param user_id: ID пользователя-кандидата.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Candidate page request received")
     logger.debug(f"Requesting candidate page ID: {user_id}")
     candidate_user = get_object_or_404(User, id=user_id)
@@ -219,6 +280,12 @@ def candidate(request, user_id):
     return render(request, 'users/candidatepage.html', context)
 
 def vacancies(request):
+    """
+    Отображает список всех вакансий с возможностью фильтрации.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Vacancies page request received")
     logger.debug("Vacancies list request")
     vacancies = Vacancy.objects.all()
@@ -268,6 +335,12 @@ def vacancies(request):
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
 def add_vacancy(request):
+    """
+    Обрабатывает создание новой вакансии пользователем-компанией.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей (перенаправление или страница добавления вакансии с ошибками).
+    """
     logger.info("Vacancy creation page request received")
     logger.debug(f"Add vacancy request from user: {request.user.email}")
     form = VacancyForm()
@@ -313,6 +386,13 @@ def add_vacancy(request):
 
 @login_required
 def vacancy(request, vacancy_id):
+    """
+    Отображает подробную страницу вакансии по её ID.
+
+    :param request: Объект запроса Django.
+    :param vacancy_id: ID вакансии.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Vacancy page request received")
     logger.debug(f"Requesting vacancy ID: {vacancy_id}")
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
@@ -325,6 +405,13 @@ def vacancy(request, vacancy_id):
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
 def apply_to_vacancy(request, vacancy_id):
+    """
+    Обрабатывает подачу заявки пользователем на вакансию.
+
+    :param request: Объект запроса Django.
+    :param vacancy_id: ID вакансии.
+    :return: Объект HttpResponse (перенаправление на страницу профиля).
+    """
     logger.info(f"User applying to vacancy: {request.user.email} -> {vacancy_id}")
     vacancy = get_object_or_404(Vacancy, id=vacancy_id)
     application = Application.objects.create(vacancy=vacancy, candidate=request.user.cuser)
@@ -355,6 +442,12 @@ def apply_to_vacancy(request, vacancy_id):
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
 def upload_resume(request):
+    """
+    Обрабатывает загрузку резюме текущим пользователем.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse (перенаправление на страницу профиля).
+    """
     logger.debug(f"Resume upload request from user: {request.user.email}")
     if request.method == 'POST':
         resume_file = request.FILES.get('resume')
@@ -367,17 +460,41 @@ def upload_resume(request):
     return redirect('profile')
 
 def privacy(request):
+    """
+    Отображает страницу политики конфиденциальности.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("Privacy policy page requested")
     return render(request, 'info/privacy_policy.html')
 
 def terms(request):
+    """
+    Отображает страницу условий использования.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     return render(request, 'info/terms_of_use.html')
 
 def news(request):
+    """
+    Отображает страницу новостей.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("News page requested")
     return render(request, 'vacancies/news.html')
 
 def about_us(request):
+    """
+    Отображает страницу "О нас".
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     logger.info("About us page requested")
     context = { }
     return render(request, 'info/about_us.html', context)
@@ -385,6 +502,12 @@ def about_us(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def download_logs(request):
+    """
+    API endpoint для скачивания логов сервера (доступно только администраторам).
+
+    :param request: Объект запроса Django.
+    :return: Объект FileResponse с файлом логов или объект Response с ошибкой.
+    """
     log_path = settings.LOG_FILE_PATH
     if not os.path.exists(log_path):
         return Response(
@@ -409,6 +532,12 @@ def download_logs(request):
         )
 
 def chats(request):
+    """
+    Отображает список чатов для текущего пользователя (соискателя или компании).
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     if request.user.is_authenticated:
         user = request.user
         if user.role == 'company':
@@ -422,6 +551,13 @@ def chats(request):
 
 @login_required
 def chat(request, chat_id):
+    """
+    Отображает конкретный чат по его ID.
+
+    :param request: Объект запроса Django.
+    :param chat_id: ID чата.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
     chat = Chat.objects.get(id=chat_id)
     messages = []
     for message in chat.messages.all():
