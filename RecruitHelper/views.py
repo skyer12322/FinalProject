@@ -311,23 +311,21 @@ def add_vacancy(request):
                     else:
                         tags_ai = {}
                     if tags_ai:
-                        for elem in tags_ai:
-                            tags[elem] = tags_ai.get[elem]
+                        for elem in tags_ai['tags']:
+                            tags[elem] = tags_ai['tags'][elem]
                     vacancy.tags_ai = tags
-                    logger.debug(f"ChatGPT request for tags: {tags_text_raw if 'tags_text_raw' in locals() else 'N/A'}")
-                    logger.debug(f"ChatGPT response for rating: {response_text}")
+                    logger.debug(f"ChatGPT request for tags: {tags_text if 'tags_text' in locals() else 'N/A'}")
+                    logger.debug(f"ChatGPT response for rating: {response_text if 'response_text' in locals() else 'N/A'}")
                     logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
 
                 except Exception as e:
                     logger.error(f"ChatGPT processing error: {str(e)}")
                     vacancy.ai_rating = 0
                     vacancy.tags_ai = {}
-
                 vacancy.save()
                 request.user.company.vacancies.add(vacancy)
                 request.user.save()
                 logger.info(f"New vacancy created: {vacancy.title}")
-
                 return redirect('vacancies_list')
             except Company.DoesNotExist:
                 logger.critical("Attempt to create vacancy without company")
