@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои вакансии</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <style>
+        .card-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .vacancy-item:hover {
+            transform: translateX(5px);
+            transition: all 0.2s ease;
+        }
+        .salary-badge {
+            background: #e9f5ff;
+            color: #1e88e5;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body class="profile-body bg-light">
+    {% include "../main/menu.html" %}
+
+    <div class="container-lg py-5">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">
+                                <i class="fas fa-briefcase me-2 text-primary"></i>Мои вакансии
+                            </h3>
+                            <a href="/vacancies/add/" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Новая вакансия
+                            </a>
+                        </div>
+                        
+                        {% if vacancies %}
+                            <div class="list-group-flush">
+                                {% for vacancy in vacancies %}
+                                    <div class="list-group-item d-flex align-items-center py-3 vacancy-item">
+                                        <i class="fas fa-file-alt fa-lg me-3 text-muted"></i>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-1">{{ vacancy.title }}</h5>
+                                                <span class="salary-badge">{{ vacancy.salary }} ₽</span>
+                                            </div>
+                                            <div class="d-flex gap-3 text-muted">
+                                                <small>
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    {{ vacancy.location }}
+                                                </small>
+                                                <small>
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ vacancy.employment_type }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-file-circle-exclamation fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">У вас пока нет активных вакансий</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="mb-3">
+                                <i class="fas fa-bars me-2"></i>Навигация
+                            </h5>
+                            <div class="list-group list-group-flush">
+                                <a href="{% url 'profile' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-3 text-primary"></i>
+                                    Профиль
+                                </a>
+                                <a href="{% url 'profile_vacancies' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center active">
+                                    <i class="fas fa-briefcase me-3 text-white"></i>
+                                    Вакансии
+                                </a>
+                                <a href="{% url 'applications' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-clipboard-list me-3 text-warning"></i>
+                                    Заявки
+                                </a>
+                                <a href="{% url 'chats' %}" 
+                                   class="list-group-item list-group-item-action d-flex align-items-center">
+                                    <i class="fas fa-comments me-3 text-info"></i>
+                                    Чаты
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "../main/footer.html" %}
+</body>
+</html>
