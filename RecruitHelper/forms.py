@@ -8,13 +8,24 @@ class VacancyForm(forms.ModelForm):
                                                                                              'class': 'form-control container',}))
     description = forms.CharField(required=True, label="Описание вакансии" , widget=forms.Textarea(attrs={'placeholder': 'Описание вакансии',
                                                                                                           'class': 'form-control container',}))
-
+    min_salary = forms.IntegerField(required=True, label="Минимальная зарплата",
+                                    min_value=0,
+                                    widget=forms.NumberInput(attrs={'placeholder': 'Минимальная зарплата',
+                                                                    'class': 'form-control container'}))
+    max_salary = forms.IntegerField(required=False, label='Максимальная зарплата',
+                                    min_value=0,
+                                    widget=forms.NumberInput(attrs={'placeholder': 'Максимальная зарплата',
+                                                                    'class': 'form-control container'}))
+    currency = forms.ChoiceField(label='Валюта зарплаты', choices=Vacancy.CURRENCY_CHOICES, initial='RUB', widget=forms.Select(attrs={'placeholder': 'Валюта зарплаты', 'class': 'form-control container'}))
     class Meta:
         model = Vacancy
         fields = (
             'title',
             'geography',
             'description',
+            'min_salary',
+            'max_salary',
+            'currency',
         )
         
 class UserRegistrationForm(forms.ModelForm):
