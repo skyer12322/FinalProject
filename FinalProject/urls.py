@@ -35,8 +35,9 @@ urlpatterns = [
     path('api/download-logs/', download_logs, name='download-logs'),
     path('profile/chats/', chats, name='chats'),
     path('profile/chat/<int:chat_id>', chat, name='chat'),
-    path('docs/', TemplateView.as_view(template_name='build/html/index.html'), name='docs'),
-    re_path(r'^docs/_static/(?P<path>.*)$', serve, {'document_root': 'docs/build/html/_static/'}),
+    re_path(r'^docs/(?P<path>.*)$', serve, {
+        'document_root': settings.STATIC_ROOT + '/docs/',
+    }),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Добавляем статические файлы только в режиме разработки

@@ -74,4 +74,5 @@ coverage.xml
 resumes/*
 !resumes/.gitkeep
 
-*/build/*
+/static/docs/*
+*/public/*
