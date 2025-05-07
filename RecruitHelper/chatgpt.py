@@ -12,7 +12,16 @@ logging.basicConfig(
 
 
 class ChatGPT:
+    """
+    Класс клиента для взаимодействия с OpenAI API.
+    """
     def __init__(self, api_key: str):
+        """
+        Инициализирует клиент ChatGPT.
+
+        :param api_key: API ключ для доступа к OpenAI API.
+        :raises ValueError: Если API ключ не предоставлен.
+        """
         logger.debug("Initializing ChatGPT client")
         if not api_key:
             logger.critical("Missing OpenAI API key")
@@ -26,6 +35,14 @@ class ChatGPT:
             raise
 
     def get_response(self, prompt: str, target: str) -> dict:
+        """
+        Отправляет запрос к OpenAI API и возвращает обработанный ответ.
+
+        :param prompt: Системный промпт для модели.
+        :param target: Входные данные пользователя для модели.
+        :return: Словарь с ответом от модели.
+        :raises Exception: В случае различных ошибок API или обработки ответа.
+        """
         logger.debug(f"Processing request. Prompt: {prompt[:50]}...")
         logger.debug(f"Input data: {target[:100]}...")
 

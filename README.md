@@ -117,3 +117,7 @@ Cайт для поиска работы или сотрудников при п
 - Априамов Богдан (Backend)
 - Васильев Матвей (Backend)
 - Кирюшин Роман (Backend)
+
+
+pip install sphinxcontrib-spelling
+pip install sphinx sphinx-rtd-theme sphinx-autodoc-annotation

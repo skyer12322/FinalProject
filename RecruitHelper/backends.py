@@ -7,7 +7,23 @@ logger = logging.getLogger(__name__)
 
 
 class UserAuthBackend(BaseBackend):
+    """
+    Пользовательский backend аутентификации Django.
+
+    Аутентифицирует пользователей по email или main_name.
+    """
     def authenticate(self, request, email=None, password=None, check_company=False):
+        """
+        Аутентифицирует пользователя.
+
+        Ищет пользователя по email или main_name и проверяет пароль.
+
+        :param request: Объект запроса Django.
+        :param email: Email или main_name пользователя.
+        :param password: Пароль пользователя.
+        :param check_company: Флаг, указывающий, требуется ли аутентификация как компания.
+        :return: Объект пользователя, если аутентификация успешна, иначе None.
+        """
         logger.debug(f"Authentication attempt - email: {email}, check_company: {check_company}")
 
         try:
@@ -34,6 +50,14 @@ class UserAuthBackend(BaseBackend):
         return user
 
     def get_user(self, user_id):
+        """
+        Извлекает пользователя по его ID.
+
+        Используется системой аутентификации Django.
+
+        :param user_id: ID пользователя.
+        :return: Объект пользователя, если найден, иначе None.
+        """
         logger.debug(f"Fetching user by ID: {user_id}")
         try:
             user = User.objects.get(pk=user_id)

@@ -2,7 +2,17 @@ import logging
 from .storage import local_storage  # Импорт из общего модуля
 
 class UserIDFilter(logging.Filter):
+    """
+    Фильтр логирования для добавления ID пользователя к каждой записи лога.
+    """
     def filter(self, record):
+        """
+        Добавляет атрибут user_id к записи лога.
+
+        Определяет ID пользователя из объекта запроса, если доступно.
+        :param record: Объект записи лога.
+        :return: True, чтобы запись была обработана дальше.
+        """
         request = getattr(local_storage, 'request', None)
         
         user_id = 'anonymous'

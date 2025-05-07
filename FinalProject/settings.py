@@ -86,7 +86,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'RecruitHelper/templates/'
+            'RecruitHelper/templates/',
+            os.path.join(BASE_DIR, 'docs'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

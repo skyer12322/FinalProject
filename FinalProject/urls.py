@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic.base import TemplateView
 from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company, terms
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, edit_user
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
@@ -32,7 +33,8 @@ urlpatterns = [
     path('upload_resume/', upload_resume, name='upload_resume'),
     path('api/download-logs/', download_logs, name='download-logs'),
     path('profile/chats/', chats, name='chats'),
-    path('profile/chat/<int:chat_id>', chat, name='chat')
+    path('profile/chat/<int:chat_id>', chat, name='chat'),
+    path('docs/', TemplateView.as_view(template_name='build/html/index.html'), name='docs'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Добавляем статические файлы только в режиме разработки

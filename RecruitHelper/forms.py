@@ -2,6 +2,9 @@ from django import forms
 from .models import Vacancy, User, Company, CUser
 
 class VacancyForm(forms.ModelForm):
+    """
+    Форма для создания и редактирования вакансий.
+    """
     title = forms.CharField(required=True, label="Название вакансии" , widget=forms.TextInput(attrs={'placeholder': 'Название вакансии',
                                                                                                      'class': 'form-control container',}))
     geography = forms.CharField(required=True, label="Город" , widget=forms.TextInput(attrs={'placeholder': 'Город',
@@ -12,6 +15,9 @@ class VacancyForm(forms.ModelForm):
                                                                                            'class': 'form-control container',}))
 
     class Meta:
+        """
+        Мета-опции формы VacancyForm.
+        """
         model = Vacancy
         fields = (
             'title',
@@ -21,6 +27,9 @@ class VacancyForm(forms.ModelForm):
         )
         
 class UserRegistrationForm(forms.ModelForm):
+    """
+    Форма для регистрации новых пользователей (соискателей или компаний).
+    """
     main_name = forms.CharField(
         required=True,
         label="Имя пользователя / компании",
@@ -49,10 +58,16 @@ class UserRegistrationForm(forms.ModelForm):
         })
     )
     class Meta:
+        """
+        Мета-опции формы UserRegistrationForm.
+        """
         model = User
         fields = ('main_name', 'email', 'password')
 
 class EditUserForm(forms.ModelForm):
+    """
+    Базовая форма для редактирования профиля пользователя.
+    """
     profile_image = forms.FileField(
         required=False,
         label="Аватар",
@@ -89,10 +104,16 @@ class EditUserForm(forms.ModelForm):
     )
 
     class Meta:
+        """
+        Мета-опции формы EditUserForm.
+        """
         model = User
         fields = ('main_name', 'email', 'description', 'profile_image')
         
 class EditCUserForm(forms.ModelForm):
+    """
+    Форма для редактирования профиля рядового пользователя.
+    """
     first_name = forms.CharField(
         required=True,
         label="Имя",
@@ -119,20 +140,32 @@ class EditCUserForm(forms.ModelForm):
         })
     )
     class Meta:
+        """
+        Мета-опции формы EditCUserForm.
+        """
         model = CUser
         fields = ('first_name', 'last_name', 'resume')
 
 class EditCompanyForm(forms.ModelForm):
+    """
+    Форма для редактирования профиля компании.
+    """
     website = forms.CharField(
         required=False,
         label="Сайт",
         widget=forms.TextInput(attrs={'placeholder': 'Сайт', 'class': 'form-control'})
     )
     class Meta:
+        """
+        Мета-опции формы EditCompanyForm.
+        """
         model = Company
         fields = ('website',)
 
 class VacancyFilterForm(forms.Form):
+    """
+    Форма для фильтрации вакансий.
+    """
     category = forms.CharField(required=False, label="Категория")
     city = forms.CharField(required=False, label="Город")
     min_salary = forms.DecimalField(required=False, label="Минимальная зарплата")
