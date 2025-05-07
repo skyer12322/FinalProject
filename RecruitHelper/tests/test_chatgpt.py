@@ -1,8 +1,14 @@
-import pytest
+"""
+Модуль с тестами для функционала ChatGPT.
+"""
 from unittest.mock import Mock, patch
+import pytest
 from RecruitHelper.chatgpt import ChatGPT
 
 def test_get_response_success():
+    """
+    Тест на успешный ответ ChatGPT
+    """
     with patch('RecruitHelper.chatgpt.OpenAI') as mock_openai:
         mock_client = Mock()
         mock_openai.return_value = mock_client
@@ -15,6 +21,9 @@ def test_get_response_success():
         assert result == {"rating": 5, "tags": ["a"]}
 
 def test_get_response_exception():
+    """
+    Тест на неудачный ответ ChatGPT
+    """
     with patch('RecruitHelper.chatgpt.OpenAI') as mock_openai:
         mock_client = Mock()
         mock_openai.return_value = mock_client

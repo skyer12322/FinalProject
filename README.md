@@ -111,6 +111,22 @@ Cайт для поиска работы или сотрудников при п
 *   `test_models.py`
 *   `test_views.py`
 
+## 📑 Запуск Pylint
+
+Чтобы запустить pylint, и проверить, на сколько чистый код:
+
+* Обязательно выполните команду в виртуальном окружении:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+* Выполните команду
+
+    ```bash
+    pylint --load-plugins pylint_django --django-settings-module=RecruitHelper RecruitHelper/ --ignore=migrations
+    ```
+
 ## 🤝 Вклад в проект
 
 Над проектом работали:

@@ -1,6 +1,8 @@
+"""
+Модуль, содержащий бэкенды аутентификации для приложения.
+"""
 import logging
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth import get_user_model
 from .models import User
 
 logger = logging.getLogger(__name__)

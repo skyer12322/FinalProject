@@ -1,8 +1,11 @@
+"""
+Модуль для взаимодействия с API ChatGPT.
+"""
+
 import logging
 import json
 from openai import OpenAI
 from openai import APIConnectionError, RateLimitError, APIError
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -89,3 +92,9 @@ class ChatGPT:
         except Exception as e:
             logger.critical(f"Unexpected ChatGPT error: {str(e)}")
             raise Exception(f"Ошибка при запросе: {str(e)}")
+
+    def additinal_method(self):
+        """
+        Дополнительная функция
+        """
+        return 0

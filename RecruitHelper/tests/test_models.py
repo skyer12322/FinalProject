@@ -1,21 +1,25 @@
+"""Тесты для Django Models."""
+
 import pytest
-from RecruitHelper.models import User, CUser, Company, Vacancy, Application, Chat, Message, Notification
-from django.utils import timezone
+from RecruitHelper.models import User, CUser, Company, Vacancy, Application, Chat, Message
+from RecruitHelper.models import CustomUserManager, Notification
 
 pytestmark = pytest.mark.django_db
 
 def test_user_manager_and_str():
+    """Тест менеджера пользователей и строкового представления пользователя."""
     user = User.objects.create_user(email='a@a.com', password='pass', main_name='A')
     assert user.email == 'a@a.com'
     assert str(user) == 'a@a.com'
     assert user.check_password('pass')
 
 def test_create_user_no_email():
-    from RecruitHelper.models import CustomUserManager
+    """Тест создания пользователя без email."""
     with pytest.raises(ValueError):
         CustomUserManager().create_user(email=None, password='pass')
 
 def test_cuser_and_company_str():
+    """Тест строкового представления обычного пользователя и компании."""
     user = User.objects.create_user(email='b@b.com', password='pass', main_name='B')
     cuser = CUser.objects.create(user=user, first_name='F', last_name='L')
     assert str(cuser) == 'F L'
@@ -23,18 +27,25 @@ def test_cuser_and_company_str():
     assert str(company) == user.main_name
 
 def test_vacancy_and_application_str():
+    """Тест строкового представления вакансии и заявки."""
     user = User.objects.create_user(email='c@c.com', password='pass', main_name='C', role='company')
     company = Company.objects.create(user=user)
     vacancy = Vacancy.objects.create(
         title='V', description='D', geography={'city': 'Test'}, ai_rating=5, company=company
     )
     assert str(vacancy) == 'V'
-    cuser = CUser.objects.create(user=User.objects.create_user(email='d@d.com', password='pass', main_name='D'))
+    cuser = CUser.objects.create(user=User.objects.create_user(email='d@d.com',
+                                                               password='pass',
+                                                               main_name='D'))
     app = Application.objects.create(vacancy=vacancy, candidate=cuser)
     assert 'подал заявку' in str(app)
 
 def test_chat_and_message_str():
-    user1 = User.objects.create_user(email='c@c.com', password='pass', main_name='C', role='company')
+    """Тест строкового представления чата и сообщения."""
+    user1 = User.objects.create_user(email='c@c.com',
+                                     password='pass',
+                                     main_name='C',
+                                     role='company')
     company = Company.objects.create(user=user1)
     user2 = User.objects.create_user(email='d@d.com', password='pass', main_name='D')
     cuser = CUser.objects.create(user=user2)
@@ -50,8 +61,8 @@ def test_chat_and_message_str():
     assert f'Chat {chat.id}' in str(chat)
 
 def test_notification_str():
+    """Тест строкового представления уведомления."""
     user = User.objects.create_user(email='e@e.com', password='pass', main_name='E')
-    user2 = User.objects.create_user(email='e2@e.com', password='pass2', main_name='B')
     company = Company.objects.create(user=user)
     vacancy = Vacancy.objects.create(
         title='V2', description='D2', geography={'city': 'Test'}, ai_rating=4, company=company

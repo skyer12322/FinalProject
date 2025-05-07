@@ -1,5 +1,8 @@
+"""
+Модуль с фильтрами для логирования.
+"""
 import logging
-from .storage import local_storage  # Импорт из общего модуля
+from .storage import local_storage
 
 class UserIDFilter(logging.Filter):
     """
@@ -14,7 +17,6 @@ class UserIDFilter(logging.Filter):
         :return: True, чтобы запись была обработана дальше.
         """
         request = getattr(local_storage, 'request', None)
-        
         user_id = 'anonymous'
         if request:
             try:
@@ -24,6 +26,11 @@ class UserIDFilter(logging.Filter):
                     user_id = 'none'
             except AttributeError:
                 user_id = 'no-user-model'
-        
         record.user_id = user_id
         return True
+
+    def additional_method(self):
+        """
+        Дополнительная функция
+        """
+        return 0
