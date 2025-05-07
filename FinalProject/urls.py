@@ -1,8 +1,9 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
+from django.views.static import serve
 from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, candidate, company, terms
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, edit_user
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
@@ -35,6 +36,7 @@ urlpatterns = [
     path('profile/chats/', chats, name='chats'),
     path('profile/chat/<int:chat_id>', chat, name='chat'),
     path('docs/', TemplateView.as_view(template_name='build/html/index.html'), name='docs'),
+    re_path(r'^docs/_static/(?P<path>.*)$', serve, {'document_root': 'docs/build/html/_static/'}),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Добавляем статические файлы только в режиме разработки

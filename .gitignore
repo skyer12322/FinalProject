@@ -73,3 +73,5 @@ coverage.xml
 
 resumes/*
 !resumes/.gitkeep
+
+*/build/*
