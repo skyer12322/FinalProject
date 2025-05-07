@@ -88,4 +88,4 @@ class ChatGPT:
 
         except Exception as e:
             logger.critical(f"Unexpected ChatGPT error: {str(e)}")
-            raise Exception(f"Unexpected error occurred: {str(e)}")
+            raise Exception(f"Ошибка при запросе: {str(e)}")

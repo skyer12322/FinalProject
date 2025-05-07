@@ -94,8 +94,8 @@ def test_vacancy_detail(client, user):
     assert resp.status_code == 200
 
 @patch('RecruitHelper.views.ChatGPT.get_response')
-def test_apply_to_vacancy(mock_gpt, client, user):
-    vac = Vacancy.objects.create(title='T', description='D', geography={}, ai_rating=1)
+def test_apply_to_vacancy(mock_gpt, client, user, company):
+    vac = Vacancy.objects.create(title='T', description='D', geography={}, ai_rating=1, company=company.company)
     client.force_login(user)
     mock_gpt.return_value = '{"rating": 1}'
     resp = client.get(reverse('apply_to_vacancy', kwargs={'vacancy_id': vac.id}))

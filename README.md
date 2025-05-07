@@ -92,20 +92,24 @@ Cайт для поиска работы или сотрудников при п
 *   Запуск всех тестов:
 
     ```bash
-    pytest --report=html
+    pytest --reuse-db --report=html
     ```
 
 *   Запуск тестов для проверки покрытия тестирования:
 
     ```bash
-    pytest --cov=. --cov-config=.coveragerc --cov-report=html
+    pytest --reuse-db --cov=. --cov-config=.coveragerc --cov-report=html
     ```
 
 ### Файлы тестов
 
-*   ``test_models.py``
-*   `test_views.py`
+*   `test_backends.py`
+*   `test_chatgpt.py`
+*   `test_consumers.py`
+*   `test_decorator.py`
 *   `test_forms.py`
+*   `test_models.py`
+*   `test_views.py`
 
 ## 🤝 Вклад в проект
 
@@ -117,7 +121,3 @@ Cайт для поиска работы или сотрудников при п
 - Априамов Богдан (Backend)
 - Васильев Матвей (Backend)
 - Кирюшин Роман (Backend)
-
-
-pip install sphinxcontrib-spelling
-pip install sphinx sphinx-rtd-theme sphinx-autodoc-annotation

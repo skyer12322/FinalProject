@@ -1,5 +1,5 @@
 import pytest
-from RecruitHelper.models import User, CUser, Company, Vacancy, Application, Chat, ChatMessage, Notification
+from RecruitHelper.models import User, CUser, Company, Vacancy, Application, Chat, Message, Notification
 from django.utils import timezone
 
 pytestmark = pytest.mark.django_db
@@ -25,9 +25,8 @@ def test_cuser_and_company_str():
 def test_vacancy_and_application_str():
     user = User.objects.create_user(email='c@c.com', password='pass', main_name='C', role='company')
     company = Company.objects.create(user=user)
-    chat = Chat.objects.create()
     vacancy = Vacancy.objects.create(
-        title='V', description='D', geography={'city': 'Test'}, ai_rating=5, company=company, chats=chat
+        title='V', description='D', geography={'city': 'Test'}, ai_rating=5, company=company
     )
     assert str(vacancy) == 'V'
     cuser = CUser.objects.create(user=User.objects.create_user(email='d@d.com', password='pass', main_name='D'))
@@ -35,20 +34,29 @@ def test_vacancy_and_application_str():
     assert 'подал заявку' in str(app)
 
 def test_chat_and_message_str():
-    chat = Chat.objects.create()
-    msg1 = ChatMessage.objects.create(user=1, company=-1, content='msg')
-    msg2 = ChatMessage.objects.create(user=-1, company=2, content='msg2')
+    user1 = User.objects.create_user(email='c@c.com', password='pass', main_name='C', role='company')
+    company = Company.objects.create(user=user1)
+    user2 = User.objects.create_user(email='d@d.com', password='pass', main_name='D')
+    cuser = CUser.objects.create(user=user2)
+    vacancy = Vacancy.objects.create(
+        title='V', description='D', geography={'city': 'Test'}, ai_rating=5, company=company
+    )
+    chat = Chat.objects.create(user=cuser, company=company, vacancy=vacancy, name='chat')
+    msg1 = Message.objects.create(user=user1, content='msg')
+    msg2 = Message.objects.create(user=user2, content='msg2')
     chat.messages.add(msg1, msg2)
-    assert 'User' in str(msg1)
-    assert 'Company' in str(msg2)
-    assert f'Chat {chat.id}' == str(chat)
+    assert str(msg1.user) in str(msg1)
+    assert str(msg2.user) in str(msg2)
+    assert f'Chat {chat.id}' in str(chat)
 
 def test_notification_str():
     user = User.objects.create_user(email='e@e.com', password='pass', main_name='E')
+    user2 = User.objects.create_user(email='e2@e.com', password='pass2', main_name='B')
+    company = Company.objects.create(user=user)
     vacancy = Vacancy.objects.create(
-        title='V2', description='D2', geography={'city': 'Test'}, ai_rating=4
+        title='V2', description='D2', geography={'city': 'Test'}, ai_rating=4, company=company
     )
-    chat = Chat.objects.create()
+    chat = Chat.objects.create(vacancy=vacancy)
     notif = Notification.objects.create(
         user=user, notification_type='application', title='T', vacancy=vacancy, chat=chat
     )

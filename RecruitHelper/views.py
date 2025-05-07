@@ -92,7 +92,7 @@ def login_view(request):
             return redirect("home")
         else:
             logger.warning(f"Failed login attempt for user: {email}. Reason: {'Invalid credentials' if user is None else 'Other error'}")
-            return render(request, "auth/login.html", {"messages": "Invalid email or password"})
+            return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
 
     return render(request, "auth/login.html")
 
@@ -486,7 +486,7 @@ def news(request):
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
     logger.info("News page requested")
-    return render(request, 'vacancies/news.html')
+    return render(request, 'info/news.html')
 
 def about_us(request):
     """

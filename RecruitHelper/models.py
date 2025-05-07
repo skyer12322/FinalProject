@@ -141,10 +141,7 @@ class Message(models.Model):
 
         :return: Строковое представление сообщения с указанием отправителя.
         """
-        if self.user:
-            return f"User {self.user} : {self.content}"
-        elif self.company:
-            return f"Company {self.company} : {self.content}"
+        return f"User {self.user} : {self.content}"
 
     
 class Vacancy(models.Model):

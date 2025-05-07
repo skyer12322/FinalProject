@@ -2,8 +2,8 @@ import pytest
 import json
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
-from RecruitHelper.models import Chat, CUser, Company, ChatMessage
-from RecruitHelper.consumers import ChatConsumer
+from RecruitHelper.models import Chat, CUser, Company, Message, Vacancy
+from FinalProject.consumers import ChatConsumer
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -25,9 +25,9 @@ def company(django_user_model):
 
 @pytest.fixture
 def chat(user, company):
-    chat = Chat.objects.create()
-    chat.users.add(user.cuser)
-    chat.company = company.company
+    from RecruitHelper.models import Vacancy
+    vacancy = Vacancy.objects.create(title='Test Vacancy', description='Test Description', company=company.company, geography={}, ai_rating=1)
+    chat = Chat.objects.create(vacancy=vacancy, user=user.cuser, company=company.company)
     chat.save()
     return chat
 
@@ -39,7 +39,7 @@ async def test_connect_user_access(user, chat):
     communicator = WebsocketCommunicator(application, f"/ws/chat/{chat.id}/")
     communicator.scope['user'] = user
     communicator.scope['url_route'] = {'kwargs': {'chat_id': chat.id}}
-    connected, _ = await communicator.connect()
+    connected, _ = await communicator.connect(timeout=5)
     assert connected
     await communicator.disconnect()
 
@@ -51,7 +51,7 @@ async def test_connect_no_access(user):
     communicator = WebsocketCommunicator(application, f"/ws/chat/9999/")
     communicator.scope['user'] = user
     communicator.scope['url_route'] = {'kwargs': {'chat_id': 9999}}
-    connected, _ = await communicator.connect()
+    connected, _ = await communicator.connect(timeout=5)
     assert not connected
     await communicator.disconnect()
 
