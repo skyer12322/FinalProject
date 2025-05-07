@@ -126,6 +126,21 @@ Cайт для поиска работы или сотрудников при п
     ```bash
     pylint --load-plugins pylint_django --django-settings-module=RecruitHelper RecruitHelper/ --ignore=migrations
     ```
+## 📄 Создание документации
+
+* Обязательно выполните команду в виртуальном окружении:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+* Выполните команду генерации документации:
+
+    ```bash
+    sphinx-build -b html docs/source static/docs
+    ```
+
+* Готово! Ваша документация в static/docs
 
 ## 🤝 Вклад в проект
 
