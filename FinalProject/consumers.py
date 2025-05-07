@@ -4,7 +4,15 @@ from RecruitHelper.models import Chat, Message, CUser
 import json
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    """
+    WebSocket Consumer для обработки чатов.
+    """
     async def connect(self):
+        """
+        Устанавливает WebSocket соединение.
+
+        Проверяет доступ пользователя к чату и принимает соединение.
+        """
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
         self.user = self.scope['user']
 
@@ -19,10 +27,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @property
     def room_group_name(self):
+        """
+        Формирует имя группы канала для чата.
+
+        :return: Имя группы канала.
+        """
         return f'chat_{self.chat_id}'
 
     @database_sync_to_async
     def validate_access(self):
+        """
+        Проверяет право доступа текущего пользователя к чату.
+
+        :return: True, если доступ разрешен, False в противном случае.
+        """
         if self.user.role == 'company':
             print(self.user.company, 'company')
             validated = Chat.objects.filter(
@@ -41,12 +59,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return validated
 
     async def disconnect(self, close_code):
+        """
+        Отключает WebSocket соединение.
+
+        Удаляет канал из группы канала чата.
+        :param close_code: Код закрытия соединения.
+        """
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
     async def receive(self, text_data):
+        """
+        Обрабатывает полученные по WebSocket данные.
+
+        Создает новое сообщение и отправляет его в группу канала чата.
+        :param text_data: Полученные данные в текстовом формате (ожидается JSON).
+        """
         data = json.loads(text_data)
         message = await self.create_message(data['content'])
         
@@ -60,6 +90,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def create_message(self, content):
+        """
+        Создает новое сообщение в базе данных и связывает его с текущим чатом.
+
+        :param content: Содержимое сообщения.
+        :return: Словарь с данными созданного сообщения для отправки клиентам.
+        """
         chat = Chat.objects.get(id=self.chat_id)
         message = Message.objects.create(
             user=self.user,
@@ -75,4 +111,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }
 
     async def chat_message(self, event):
+        """
+        Отправляет сообщение клиенту через WebSocket.
+
+        :param event: Словарь с данными сообщения (ожидается ключ 'message').
+        """
         await self.send(text_data=json.dumps(event['message']))

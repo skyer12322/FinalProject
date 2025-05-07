@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'channels',
 ]
 
@@ -62,15 +63,31 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'RecruitHelper.middleware.RequestMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
+
 ROOT_URLCONF = 'FinalProject.urls'
+
+LOG_FILE_PATH = os.environ.get('LOG_FILE')
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'RecruitHelper/templates/'
+            'RecruitHelper/templates/',
+            os.path.join(BASE_DIR, 'docs'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -170,6 +187,45 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_REDIRECT_URL = '/'  # Redirect to home after login
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # Изменили на False
+    'filters': {
+        'user_id': {
+            '()': 'RecruitHelper.log_filters.UserIDFilter',  # Убедитесь в правильности пути
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s [%(levelname)s] user=%(user_id)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['user_id'],
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'app.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    
+}
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
