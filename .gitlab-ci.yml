@@ -15,8 +15,10 @@ testing-project:
   variables: 
     GIT_DEPTH: 0
   before_script:
-    - apt-get update -y && apt-get install -y python3 python3-pip
+    - apt-get update -y && apt-get install -y python3 python3-pip python3-venv
   script:
+    - python3 -m venv venv
+    - source venv/bin/activate
     - pip3 install pytest pytest-django==4.1.0 pytest-asyncio==0.26.0
     - pytest --reuse-db
   
