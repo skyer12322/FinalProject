@@ -7,3 +7,15 @@ psycopg2-binary>=2.9.0
 channels==4.2.2
 daphne==4.1.2
 Twisted[http2,tls]>=22.10.0
+pytest
+pytest-django==4.1.0
+pytest-html==4.1.1
+pytest-asyncio==0.26.0
+pytest-cov==6.1.1
+djangorestframework==3.16.0
+djangorestframework_simplejwt==5.5.0
+sphinx==8.2.3
+sphinx_rtd_theme==3.0.2
+sphinx-autodoc-annotation==1.0-1
+pylint==3.3.7
+pylint-django==2.6.1

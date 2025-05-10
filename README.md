@@ -92,20 +92,61 @@ Cайт для поиска работы или сотрудников при п
 *   Запуск всех тестов:
 
     ```bash
-    python manage.py test RecruitHelper.tests
+    pytest --reuse-db --report=html
     ```
 
-*   Запуск тестов для конкретного файла (замените `<test_file_name>` на имя файла):
+*   Запуск тестов для проверки покрытия тестирования:
 
     ```bash
-    python manage.py test RecruitHelper.tests.<test_file_name>
+    pytest --reuse-db --cov=. --cov-config=.coveragerc --cov-report=html
     ```
 
 ### Файлы тестов
 
-*   ``test_models.py``
-*   `test_views.py`
+*   `test_backends.py`
+*   `test_chatgpt.py`
+*   `test_consumers.py`
+*   `test_decorator.py`
 *   `test_forms.py`
+*   `test_models.py`
+*   `test_views.py`
+
+## 📑 Запуск Pylint
+
+Чтобы запустить pylint, и проверить, на сколько чистый код:
+
+* Обязательно выполните команду в виртуальном окружении:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+* Выполните команду
+
+    ```bash
+    pylint --load-plugins pylint_django --django-settings-module=RecruitHelper RecruitHelper/ --ignore=migrations
+    ```
+
+## 📄 Создание документации
+
+* Обязательно выполните команду в виртуальном окружении:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+* Выполните команду генерации документации:
+
+    ```bash
+    sphinx-build -b html docs/source static/docs
+    ```
+
+* Готово! Ваша документация в static/docs
+
+  При запуске локального сервера вы сможете увидеть её по ссылке:
+  ```
+  http://localhost:8000/docs/index.html
+  ```
 
 ## 🤝 Вклад в проект
 
@@ -117,3 +158,5 @@ Cайт для поиска работы или сотрудников при п
 - Априамов Богдан (Backend)
 - Васильев Матвей (Backend)
 - Кирюшин Роман (Backend)
+
+Какие паттерны проектирования есть в моём проекте, не учитывая паттерны ЯП и фреймворк Django
