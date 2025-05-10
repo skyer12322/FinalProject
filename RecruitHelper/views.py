@@ -352,18 +352,39 @@ def add_vacancy(request):
                     geography=form.cleaned_data['geography'],
                     company=company)
                 try:
-                    api_key = os.getenv("OPENAI_API_KEY")
+                    api_key = os.environ.get("OPENAI_API_KEY")
                     client = ChatGPT(api_key=api_key)
                     response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
                     vacancy.ai_rating = int(response_text['rating'])
-                    tags_text = client.get_response(prompts.TAGS_ASSIGN,
-                                                    f'{vacancy.title}\n{vacancy.description}')
-                    if form.cleaned_data['tags_ai']:
-                        for elem in form.cleaned_data['tags_ai'].split():
-                            tags_text['tags'].append(elem)
-                    vacancy.tags_ai = tags_text
-                    logger.debug(f"ChatGPT request for tags: {tags_text}")
-                    logger.debug(f"ChatGPT response for rating: {response_text}")
+                    tags = {
+                        'specialization': request.POST.get('specialization'),
+                        'occupancy': request.POST.get('occupancy'),
+                        'position': request.POST.get('position'),
+                        'tech': request.POST.get('tech'),
+                        'industry': request.POST.get('industry')
+                    }
+                    empty_fields = [key for key, elem in tags.items() if elem == '']
+                    if empty_fields:
+                        tags_text_raw = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\nОтсутствуют теги {empty_fields}\n{vacancy.description}')
+                        try:
+                            if isinstance(tags_text_raw, str):
+                                tags_text_json = json.loads(tags_text_raw)
+                            elif isinstance(tags_text_raw, dict):
+                                tags_text_json = tags_text_raw
+                            else:
+                                raise ValueError("Unexpected response type from ChatGPT")
+                            tags_ai = tags_text_json
+                        except (json.JSONDecodeError, ValueError, TypeError) as e:
+                            logger.error(f"Error processing TAGS_ASSIGN response: {str(e)}. Falling back to empty tags.")
+                            tags_ai = {}
+                    else:
+                        tags_ai = {}
+                    if tags_ai:
+                        for elem in tags_ai['tags']:
+                            tags[elem] = tags_ai['tags'][elem]
+                    vacancy.tags_ai = tags
+                    logger.debug(f"ChatGPT request for tags: {tags_text if 'tags_text' in locals() else 'N/A'}")
+                    logger.debug(f"ChatGPT response for rating: {response_text if 'response_text' in locals() else 'N/A'}")
                     logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
                 except Exception as e:
                     logger.error(f"ChatGPT processing error: {str(e)}")

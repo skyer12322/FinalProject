@@ -19,11 +19,15 @@ class VacancyForm(forms.ModelForm):
                                   label="Описание вакансии" ,
                                   widget=forms.Textarea(attrs={'placeholder': 'Описание вакансии',
                                                                'class': 'form-control container',}))
-    tags_ai = forms.CharField(required=False,
-                              label="Теги",
-                              widget=forms.TextInput(attrs={'placeholder': 'Теги (через пробел)',
-                                                            'class': 'form-control container',}))
-
+    min_salary = forms.IntegerField(required=True, label="Минимальная зарплата",
+                                    min_value=0,
+                                    widget=forms.NumberInput(attrs={'placeholder': 'Минимальная зарплата',
+                                                                    'class': 'form-control container'}))
+    max_salary = forms.IntegerField(required=False, label='Максимальная зарплата',
+                                    min_value=0,
+                                    widget=forms.NumberInput(attrs={'placeholder': 'Максимальная зарплата',
+                                                                    'class': 'form-control container'}))
+    currency = forms.ChoiceField(label='Валюта зарплаты', choices=Vacancy.CURRENCY_CHOICES, initial='RUB', widget=forms.Select(attrs={'placeholder': 'Валюта зарплаты', 'class': 'form-control container'}))
     class Meta:
         """
         Мета-опции формы VacancyForm.
@@ -33,7 +37,9 @@ class VacancyForm(forms.ModelForm):
             'title',
             'geography',
             'description',
-            'tags_ai',
+            'min_salary',
+            'max_salary',
+            'currency',
         )
 
 class UserRegistrationForm(forms.ModelForm):

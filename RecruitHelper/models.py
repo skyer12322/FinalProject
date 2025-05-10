@@ -175,8 +175,17 @@ class Vacancy(models.Model):
     """
     Модель вакансии.
     """
+    CURRENCY_CHOICES = [
+        ('USD', '$'),
+        ('RUB', '₽'),
+        ('EUR', '€'),
+    ]
+    
     title = models.CharField(max_length=255)
     description = models.TextField()
+    min_salary = models.IntegerField()
+    max_salary = models.IntegerField()
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='RUB')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     geography = models.JSONField(default=None,
