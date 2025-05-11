@@ -137,3 +137,4 @@ Cайт для поиска работы или сотрудников при п
 - Априамов Богдан (Backend)
 - Васильев Матвей (Backend)
 - Кирюшин Роман (Backend)
+![Pylint Score](https://img.shields.io/badge/pylint-8.42-blue) 
