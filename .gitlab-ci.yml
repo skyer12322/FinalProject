@@ -5,42 +5,67 @@ workflow:
     - when: never
 
 stages:
-  # - test
+  - test
+  - coverage
   - documentation
   - copy
 
-# testing-project:
-#   stage: test
-#   image: ubuntu:latest
-#   variables: 
-#     GIT_DEPTH: 0
-#   before_script:
-#     - apt-get update -y && apt-get install -y python3 python3-pip python3-venv
-#   script:
-#     - python3 -m venv venv
-#     - source venv/bin/activate
-#     - pip3 install -r requirements.txt
-#     - pytest --reuse-db
-  
+testing-project:
+  stage: test
+  image: python:3.13
+  before_script:
+    - pip3 install -r requirements.txt
+  script:
+    - pytest --html=results/result.html
+  artifacts:
+    paths:
+      - results
+
+coverage-test:
+  stage: coverage
+  image: python:3.13
+  before_script:
+    - pip3 install -r requirements.txt
+  script:
+    - pytest --cov=. --cov-config=.coveragerc --cov-report=html
+    - COVERAGE_FLOAT=$(python -c "import coverage; c = coverage.Coverage(); c.load(); print(c.report())" | tail -1 | awk '{print $NF}' | sed 's/%//')
+    - COVERAGE_SCORE=$(printf "%.0f" "$COVERAGE_FLOAT")
+    - anybadge -l "Code Coverage" -v ${COVERAGE_SCORE}% -f coverage-badge.svg -c red
+  artifacts:
+    paths:
+      - htmlcov
+      - coverage-badge.svg
+
+pylint-test:
+  stage: pylint
+  image: python:3.13
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - pylint --load-plugins pylint_django --django-settings-module=RecruitHelper RecruitHelper/ > pylint-result.txt || true
+    - PYLINT_SCORE=$(grep -oP 'rated at \K[\d.]+' pylint-result.txt || echo "0.0")
+    - anybadge -l "Pylint Score" -v ${PYLINT_SCORE} -f pylint-badge.svg -c blue
+  artifacts:
+    paths:
+      - pylint-result.txt
+      - pylint-badge.svg
 
 sphinx-documentation:
   stage: documentation
-  image: ubuntu:latest
-  variables:
-    GIT_DEPTH: 0
+  image: python:3.13
   before_script:
-    - apt-get update -y && apt-get install -y python3 python3-pip python3-venv
-  script:
-    - python3 -m venv venv
-    - source venv/bin/activate
     - pip3 install -r requirements.txt
-    - sphinx-build -b html docs/source static/docs
-  
+  script:
+    - sphinx-build -b html docs/source documentation/
+  artifacts:
+    paths:
+      - documentation
+      
 github-copy:
   stage: copy
   image: ubuntu:latest
   variables:
-    GIT_DEPTH: 0  # Disable shallow cloning
+    GIT_DEPTH: 0
   before_script:
     - apt-get update -y && apt-get install -y git
   script:
