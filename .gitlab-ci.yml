@@ -26,6 +26,7 @@ coverage-test:
   image: python:3.13
   before_script:
     - pip3 install -r requirements.txt
+    - pip install anybadge
   script:
     - pytest --cov=. --cov-config=.coveragerc --cov-report=html
     - COVERAGE_FLOAT=$(python -c "import coverage; c = coverage.Coverage(); c.load(); print(c.report())" | tail -1 | awk '{print $NF}' | sed 's/%//')
@@ -41,6 +42,7 @@ pylint-test:
   image: python:3.13
   before_script:
     - pip install -r requirements.txt
+    - pip install anybadge
   script:
     - pylint --load-plugins pylint_django --django-settings-module=RecruitHelper RecruitHelper/ > pylint-result.txt || true
     - PYLINT_SCORE=$(grep -oP 'rated at \K[\d.]+' pylint-result.txt || echo "0.0")
