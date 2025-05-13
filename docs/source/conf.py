@@ -44,5 +44,5 @@ sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../FinalProject'))
 
 import django
-os.environ['DJANGO_SETTINGS_MODULE'] = 'FinalProject.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'FinalProject.settings.prod'
 django.setup()
