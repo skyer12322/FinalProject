@@ -19,7 +19,7 @@ class VacancyForm(forms.ModelForm):
                                   label="Описание вакансии" ,
                                   widget=forms.Textarea(attrs={'placeholder': 'Описание вакансии',
                                                                'class': 'form-control container',}))
-    min_salary = forms.IntegerField(required=True, label="Минимальная зарплата",
+    min_salary = forms.IntegerField(required=False, label="Минимальная зарплата",
                                     min_value=0,
                                     widget=forms.NumberInput(attrs={'placeholder': 'Минимальная зарплата',
                                                                     'class': 'form-control container'}))

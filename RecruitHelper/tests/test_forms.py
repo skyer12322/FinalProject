@@ -18,9 +18,9 @@ def test_user_registration_form_valid_invalid():
 
 def test_vacancy_form_required():
     """Тест обязательных полей формы вакансии."""
-    form = VacancyForm(data={'title': '', 'geography': '', 'description': ''})
+    form = VacancyForm(data={'title': '', 'geography': '', 'description': '', 'currency': ''})
     assert not form.is_valid()
-    form = VacancyForm(data={'title': 'T', 'geography': 'G', 'description': 'D'})
+    form = VacancyForm(data={'title': 'T', 'geography': 'G', 'description': 'D', 'currency': 'RUB'})
     assert form.is_valid()
 
 def test_edit_user_form_and_company():

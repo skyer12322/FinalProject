@@ -57,10 +57,12 @@
                             <div class="mb-4">
                                 <label class="form-label">Аватар</label>
                                 <div class="d-flex align-items-center gap-3">
+                                    {% if request.user.profile_image %}
                                     <div class="avatar-preview">
                                         <img src="{{ request.user.profile_image.url|default:'/static/images/default_avatar.png' }}" 
                                              class="w-100 h-100 object-fit-cover">
                                     </div>
+                                    {% endif %}
                                     {{ base_form.profile_image }}
                                 </div>
                                 {% if base_form.profile_image.errors %}
