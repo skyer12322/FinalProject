@@ -69,7 +69,7 @@ github-copy:
   variables:
     GIT_DEPTH: 0
   before_script:
-    - apk update -y && apk add --no-cache git
+    - apk update && apk add --no-cache git
   script:
     - git config --global user.email "nikita.stoyanovski@gmail.com"
     - git config --global user.name "SN"
