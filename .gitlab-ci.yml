@@ -1,6 +1,6 @@
 workflow:
   rules:
-    - if: $CI_COMMIT_REF_NAME == "stable"
+    - if: $CI_COMMIT_REF_NAME == "stable" || $CI_COMMIT_REF_NAME == "develop"
       when: always
     - when: never
 
@@ -76,3 +76,7 @@ github-copy:
     - git remote remove origin2 || true
     - git remote add origin2 "https://skyer12322:$GH_PAT@github.com/skyer12322/FinalProject.git"
     - git push --force origin2 HEAD:develop
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "stable"
+      when: always
+    - when: never
