@@ -65,7 +65,7 @@ sphinx-documentation:
       
 github-copy:
   stage: copy
-  image: ubuntu:latest
+  image: alpine:latest
   variables:
     GIT_DEPTH: 0
   before_script:
