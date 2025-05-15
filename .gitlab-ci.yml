@@ -28,7 +28,7 @@ coverage-test:
     - pip3 install -r requirements.txt
     - pip install anybadge
   script:
-    - pytest --cov=. --cov-config=.coveragerc --cov-report=html
+    - pytest --cov=. --cov-confi=${COVERAGE_CONF} --cov-report=html
     - COVERAGE_FLOAT=$(python -c "import coverage; c = coverage.Coverage(); c.load(); print(c.report())" | tail -1 | awk '{print $NF}' | sed 's/%//')
     - COVERAGE_SCORE=$(printf "%.0f" "$COVERAGE_FLOAT")
     - anybadge -l "Code Coverage" -v ${COVERAGE_SCORE}% -f coverage-badge.svg -c red
