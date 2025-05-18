@@ -162,3 +162,6 @@ Cайт для поиска работы или сотрудников при п
 ![Pylint Score](https://img.shields.io/badge/pylint-8.42-blue) 
 ![pipeline](https://gitlab.informatics.ru/2024-2025/korolev/s103/final-project-wdk-team/badges/develop/pipeline.svg)
 ![coverage](https://gitlab.informatics.ru/2024-2025/korolev/s103/final-project-wdk-team/badges/develop/coverage.svg)
+
+
+https://www.careerai.ru/
