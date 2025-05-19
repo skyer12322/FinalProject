@@ -56,6 +56,7 @@ Thumbs.db
 htmlcov/
 .coverage
 .coverage.*
+.coveragerc
 coverage.xml
 *.cover
 
