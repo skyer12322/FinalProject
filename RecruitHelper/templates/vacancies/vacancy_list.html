@@ -22,58 +22,68 @@
     </div>
     
     <div class="row justify-content-center" style="margin-top: 40px">
-        <div class="col-md-4 column filters">
-            <h2>Фильтры</h2>
-            <form method="get" class="mb-3">
+        <div class="col-md-4 filters" style="box-shadow: none !important">
+            <div class="col-md-4 column filters" style="padding: 10px">
+                <h2>Поиск</h2>
                 <div class="mb-3">
-                    <label for="category" class="form-label"><strong>Категория</strong></label>
-                    <select class="form-select" name="category" id="category">
-                        <option value="">Все категории</option>
-                        <option value="IT">IT</option>
-                        <option value="Маркетинг">Маркетинг</option>
-                        <option value="Финансы">Финансы</option>
-                        <option value="Продажи">Продажи</option>
-                    </select>
+                    <input type="text" id="searchInput" placeholder="Начните вводить...">
                 </div>
-        
+                <button type="button" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
+            </div>
+            <div class="col-md-4 column filters" style="padding: 10px">
+                <h2>Фильтры</h2>
                 <div class="mb-3">
-                    <label for="city" class="form-label"><strong>Город</strong></label>
-                    <input type="text" class="form-control" name="city" id="city" placeholder="Введите город">
+                    <label class="form-label"><strong>Отрасль</strong></label>
+                    <input class="form-control" list="industryListOptions" id="industryList" placeholder="Начните вводить...">
+                    <datalist id="industryListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
-
+                <div class="mb-3">
+                    <label class="form-label"><strong>Используемые технологии</strong></label>
+                    <input class="form-control" list="techListOptions" id="techList" placeholder="Начните вводить...">
+                    <datalist id="techListOptions">
+                        <option value="Нет">
+                    </datalist>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Тип занятости</strong></label>
+                    <input class="form-control" list="occupancyListOptions" id="occupancyList" placeholder="Начните вводить...">
+                    <datalist id="occupancyListOptions">
+                        <option value="Нет">
+                    </datalist>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Специализация</strong></label>
+                    <input class="form-control" list="specializationListOptions" id="specializationList" placeholder="Начните вводить...">
+                    <datalist id="specializationListOptions">
+                        <option value="Нет">
+                    </datalist>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Дополнительные условия работы</strong></label>
+                    <input class="form-control" list="conditionsListOptions" id="conditionsList" placeholder="Начните вводить...">
+                    <datalist id="conditionsListOptions">
+                        <option value="Нет">
+                    </datalist>
+                </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Зарплата</strong></label>
                     <div class="d-flex align-items-center gap-2 form-floating mb-3">
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="min_salary" id="floatingInput" placeholder="" style="width: 100%;" min="0">
-                            <label for="floatingInput" style="font-size:15px">Минимальная зарплата</label>
+                        <div class="form-floating">
+                            <input type="number" class="form-control" name="min_salary" id="min_salary_input" placeholder="" style="width: 100%;" min="0">
+                            <label for="min_salary_input" style="font-size:15px">Минимальная зарплата</label>
                         </div>
                         <span>-</span>
-                        <div class="form-floating mb-3">
-                            <input type="number" class="form-control" name="max_salary" id="floatingInput" placeholder="" style="width: 100%;" min="0">
-                            <label for="floatingInput" style="font-size:15px">Максимальная зарплата</label>
+                        <div class="form-floating">
+                            <input type="number" class="form-control" name="max_salary" id="max_salary_input" placeholder="" style="width: 100%;" min="0">
+                            <label for="max_salary_input" style="font-size:15px">Максимальная зарплата</label>
                         </div>
                     </div>
                 </div>
-        
-                <div class="mb-3">
-                    <label class="form-label"><strong>Тип занятости</strong></label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="employment_type" value="Полная занятость" id="full-time">
-                        <label class="form-check-label" for="full-time">Полная занятость</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="employment_type" value="Частичная занятость" id="part-time">
-                        <label class="form-check-label" for="part-time">Частичная занятость</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="employment_type" value="Удаленная работа" id="remote">
-                        <label class="form-check-label" for="remote">Удаленная работа</label>
-                    </div>
-                </div>
-        
-                <button type="submit" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Применить фильтр</button>
-            </form>
+            
+                <button type="button" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Применить фильтр</button>
+            </div>
         </div>
         <div class="col-6 col-md-6 col-lg-6">
             <div class="container mt-5">
