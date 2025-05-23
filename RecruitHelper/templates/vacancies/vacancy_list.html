@@ -1,67 +1,24 @@
 {% load static %}
 
 <!DOCTYPE html>
+
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список вакансий</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/vacancies/vacancies_list.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    
-    <style>
-        .salary-range { padding: 0 15px; }
-        .slider-value { 
-            display: inline-block; 
-            margin-left: 12px; 
-            font-weight: 500; 
-            color: #00c4a0; 
-        }
-        .form-range { 
-            width: 100%; 
-            height: 8px; 
-            cursor: pointer; 
-            background-color: #e9ecef; 
-        }
-        .form-range:focus { box-shadow: none; }
-        .form-range::-webkit-slider-thumb { 
-            background-color: #00c4a0; 
-            border: none; 
-            height: 20px; 
-            width: 20px; 
-            margin-top: -8px; 
-        }
-        .form-range::-moz-range-thumb { 
-            background-color: #00c4a0; 
-            border: none; 
-            height: 20px; 
-            width: 20px; 
-        }
-        .form-range::-webkit-slider-runnable-track {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            border: none;
-        }
-        .form-range::-moz-range-track {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            border: none;
-        }
-        @media (max-width: 768px) {
-            .filters { margin-bottom: 30px; }
-            .vacancies-title h1 { font-size: 1.8rem; }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="vacancies-list-body">
     {% include "../main/menu.html" %}
     <div class="md-3 vacancies-title justify-content-center">
-        <h1>Список вакансий</h1>
+        <h1>Список вакансий</h2>
     </div>
     
     <div class="row justify-content-center" style="margin-top: 40px">
@@ -69,7 +26,7 @@
             <div class="col-md-4 column filters" style="padding: 10px">
                 <h2>Поиск</h2>
                 <div class="mb-3">
-                    <input type="text" id="searchInput" placeholder="Начните вводить..." class="form-control">
+                    <input type="text" id="searchInput" placeholder="Начните вводить...">
                 </div>
                 <button type="button" onclick="search()" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
             </div>
@@ -78,43 +35,64 @@
                 <div class="mb-3">
                     <label class="form-label"><strong>Отрасль</strong></label>
                     <input class="form-control" list="industryListOptions" id="industryList" placeholder="Начните вводить...">
-                    <datalist id="industryListOptions"><option value="Нет"></datalist>
+                    <datalist id="industryListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Используемые технологии</strong></label>
                     <input class="form-control" list="techListOptions" id="techList" placeholder="Начните вводить...">
-                    <datalist id="techListOptions"><option value="Нет"></datalist>
+                    <datalist id="techListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Тип занятости</strong></label>
                     <input class="form-control" list="occupancyListOptions" id="occupancyList" placeholder="Начните вводить...">
-                    <datalist id="occupancyListOptions"><option value="Нет"></datalist>
+                    <datalist id="occupancyListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Специализация</strong></label>
                     <input class="form-control" list="specializationListOptions" id="specializationList" placeholder="Начните вводить...">
-                    <datalist id="specializationListOptions"><option value="Нет"></datalist>
+                    <datalist id="specializationListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Дополнительные условия работы</strong></label>
                     <input class="form-control" list="conditionsListOptions" id="conditionsList" placeholder="Начните вводить...">
-                    <datalist id="conditionsListOptions"><option value="Нет"></datalist>
+                    <datalist id="conditionsListOptions">
+                        <option value="Нет">
+                    </datalist>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label"><strong>Зарплата</strong></label>
-                    <div class="salary-range">
-                        <div class="mb-3">
-                            <label for="min_salary_input" class="form-label">Минимальная зарплата</label>
-                            <input type="range" class="form-range" id="min_salary_input" name="min_salary" min="0" max="1000000" step="1000" value="0">
-                            <span id="minSalaryValue" class="slider-value">0</span>
-                        </div>
-                        <div class="mb-3">
-                            <label for="max_salary_input" class="form-label">Максимальная зарплата</label>
-                            <input type="range" class="form-range" id="max_salary_input" name="max_salary" min="0" max="1000000" step="1000" value="0">
-                            <span id="maxSalaryValue" class="slider-value">0</span>
-                        </div>
-                    </div>
-                </div>
+    <label class="form-label"><strong>Зарплата</strong></label>
+    <div class="salary-range">
+        <div class="mb-3">
+            <label for="min_salary_input" class="form-label">Минимальная зарплата</label>
+            <div class="d-flex align-items-center gap-2">
+                <input type="range" class="form-range" id="min_salary_input" name="min_salary" 
+                       min="0" max="1000000" step="1000" value="0">
+                <input type="number" class="form-control salary-input" id="minSalaryInput" 
+                       min="0" max="1000000" step="1000" value="0">
+                <span id="minSalaryValue" class="slider-value">0</span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="max_salary_input" class="form-label">Максимальная зарплата</label>
+            <div class="d-flex align-items-center gap-2">
+                <input type="range" class="form-range" id="max_salary_input" name="max_salary" 
+                       min="0" max="1000000" step="1000" value="0">
+                <input type="number" class="form-control salary-input" id="maxSalaryInput" 
+                       min="0" max="1000000" step="1000" value="0">
+                <span id="maxSalaryValue" class="slider-value">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+            
                 <button type="button" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Применить фильтр</button>
             </div>
         </div>
@@ -152,51 +130,79 @@
     </div>
 
     {% include "../main/footer.html" %}
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const minSlider = document.getElementById('min_salary_input');
-            const maxSlider = document.getElementById('max_salary_input');
-            const minValue = document.getElementById('minSalaryValue');
-            const maxValue = document.getElementById('maxSalaryValue');
+    document.addEventListener('DOMContentLoaded', function() {
+    const minSlider = document.getElementById('min_salary_input');
+    const maxSlider = document.getElementById('max_salary_input');
+    const minInput = document.getElementById('minSalaryInput');
+    const maxInput = document.getElementById('maxSalaryInput');
+    const minValue = document.getElementById('minSalaryValue');
+    const maxValue = document.getElementById('maxSalaryValue');
 
-            function updateSlider(slider) {
-                const value = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
-                slider.style.background = `linear-gradient(to right, #00c4a0 ${value}%, #e9ecef ${value}%)`;
+    function formatNumber(num) {
+        return new Intl.NumberFormat('ru-RU').format(num);
+    }
+
+    function updateSlider(slider, value) {
+        value = Math.max(slider.min, Math.min(slider.max, value));
+        slider.value = value;
+        const percent = (value - slider.min) / (slider.max - slider.min) * 100;
+        slider.style.setProperty('--progress', `${percent}%`);
+        return value;
+    }
+
+    function syncValues(source, targetSlider, targetInput, targetValue) {
+        const value = parseInt(source.value);
+        if (isNaN(value)) return;
+
+        const cleanedValue = updateSlider(targetSlider, value);
+        targetInput.value = cleanedValue;
+        targetValue.textContent = formatNumber(cleanedValue);
+    }
+
+    // Обработчики для ползунков
+    [minSlider, maxSlider].forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const isMin = e.target === minSlider;
+            const otherSlider = isMin ? maxSlider : minSlider;
+            
+            syncValues(e.target, e.target, 
+                isMin ? minInput : maxInput, 
+                isMin ? minValue : maxValue);
+
+            if (isMin && parseInt(minSlider.value) > parseInt(maxSlider.value)) {
+                syncValues(minSlider, maxSlider, maxInput, maxValue);
+            } else if (!isMin && parseInt(maxSlider.value) < parseInt(minSlider.value)) {
+                syncValues(maxSlider, minSlider, minInput, minValue);
             }
-
-            function formatNumber(value) {
-                return new Intl.NumberFormat('ru-RU').format(value) + ' ₽';
-            }
-
-            function updateMinValue() {
-                minValue.textContent = formatNumber(minSlider.value);
-                if (parseInt(minSlider.value) > parseInt(maxSlider.value)) {
-                    maxSlider.value = minSlider.value;
-                    updateSlider(maxSlider);
-                    maxValue.textContent = formatNumber(minSlider.value);
-                }
-                updateSlider(minSlider);
-            }
-
-            function updateMaxValue() {
-                maxValue.textContent = formatNumber(maxSlider.value);
-                if (parseInt(maxSlider.value) < parseInt(minSlider.value)) {
-                    minSlider.value = maxSlider.value;
-                    updateSlider(minSlider);
-                    minValue.textContent = formatNumber(maxSlider.value);
-                }
-                updateSlider(maxSlider);
-            }
-
-            minSlider.addEventListener('input', updateMinValue);
-            maxSlider.addEventListener('input', updateMaxValue);
-            updateSlider(minSlider);
-            updateSlider(maxSlider);
-            updateMinValue();
-            updateMaxValue();
         });
-    </script>
+    });
+
+    // Обработчики для текстовых полей
+    [minInput, maxInput].forEach(input => {
+        input.addEventListener('input', (e) => {
+            const isMin = e.target === minInput;
+            const slider = isMin ? minSlider : maxSlider;
+            const otherInput = isMin ? maxInput : minInput;
+            
+            syncValues(e.target, slider, e.target, 
+                isMin ? minValue : maxValue);
+
+            if (isMin && parseInt(minInput.value) > parseInt(maxInput.value)) {
+                syncValues(minInput, maxSlider, maxInput, maxValue);
+            } else if (!isMin && parseInt(maxInput.value) < parseInt(minInput.value)) {
+                syncValues(maxInput, minSlider, minInput, minValue);
+            }
+        });
+    });
+
+    // Инициализация
+    [minSlider, maxSlider].forEach(slider => {
+        updateSlider(slider, slider.value);
+    });
+});
+</script>
     <script src="{% static 'js/vacancies/search.js' %}"></script>
 </body>
 </html>
+
