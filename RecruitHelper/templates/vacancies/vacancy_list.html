@@ -8,102 +8,60 @@
     <title>Список вакансий</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/vacancies/vacancies_list.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .salary-range {
-            padding: 0 15px;
-            margin: 25px 0;
-        }
-
-        .dual-range-container {
-            position: relative;
-            height: 50px;
-            margin: 0 10px;
-        }
-
-        .track {
+        .salary-range { padding: 0 15px; }
+        .slider-container { position: relative; margin: 20px 0; }
+        .slider-track {
+            height: 4px;
+            background: #e9ecef;
             position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
             width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            top: 50%;
-            transform: translateY(-50%);
-            border-radius: 2px;
-        }
-
-        .fill {
-            position: absolute;
-            height: 4px;
-            background: #00c4a0;
-            top: 50%;
-            transform: translateY(-50%);
             z-index: 1;
         }
-
-        .dual-range {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            width: 100%;
+        .slider-progress {
             height: 4px;
+            background: #00c4a0;
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: transparent;
-            pointer-events: none;
             z-index: 2;
         }
-
-        .dual-range::-webkit-slider-thumb {
+        .form-range {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            z-index: 3;
+            background: transparent;
+            -webkit-appearance: none;
+        }
+        .form-range::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 20px;
             height: 20px;
-            background: #fff;
-            border: 2px solid #00c4a0;
+            background: #00c4a0;
             border-radius: 50%;
             cursor: pointer;
-            pointer-events: auto;
-            margin-top: -8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            position: relative;
         }
-
-        .dual-range::-moz-range-thumb {
+        .form-range::-moz-range-thumb {
             width: 20px;
             height: 20px;
-            background: #fff;
-            border: 2px solid #00c4a0;
+            background: #00c4a0;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
         }
-
         .slider-values {
             display: flex;
             justify-content: space-between;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .slider-value {
-            background: #f5f5f5;
-            padding: 5px 12px;
-            border-radius: 15px;
-            min-width: 100px;
-            text-align: center;
+            margin-top: 10px;
+            color: #00c4a0;
             font-weight: 500;
-        }
-
-        @media (max-width: 768px) {
-            .filters {
-                margin-bottom: 30px;
-            }
-            .vacancies-title h1 {
-                font-size: 1.8rem;
-            }
         }
     </style>
 </head>
@@ -119,7 +77,7 @@
             <div class="col-md-4 column filters" style="padding: 10px">
                 <h2>Поиск</h2>
                 <div class="mb-3">
-                    <input type="text" id="searchInput" placeholder="Начните вводить..." class="form-control">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Начните вводить...">
                 </div>
                 <button type="button" onclick="search()" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
             </div>
@@ -152,17 +110,15 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label"><strong>Зарплата</strong></label>
-                    <div class="salary-range">
-                        <div class="dual-range-container">
-                            <div class="track"></div>
-                            <div class="fill"></div>
-                            <input type="range" class="dual-range" id="minInput" min="0" max="1000000" step="1000" value="0">
-                            <input type="range" class="dual-range" id="maxInput" min="0" max="1000000" step="1000" value="1000000">
-                        </div>
-                        <div class="slider-values">
-                            <span id="minValue" class="slider-value">0 ₽</span>
-                            <span id="maxValue" class="slider-value">1 000 000 ₽</span>
-                        </div>
+                    <div class="slider-container">
+                        <div class="slider-track"></div>
+                        <div class="slider-progress" id="slider-progress"></div>
+                        <input type="range" class="form-range" id="min_salary_input" min="0" max="1000000" step="1000" value="0">
+                        <input type="range" class="form-range" id="max_salary_input" min="0" max="1000000" step="1000" value="1000000">
+                    </div>
+                    <div class="slider-values">
+                        <span id="minValue">0 ₽</span>
+                        <span id="maxValue">1 000 000 ₽</span>
                     </div>
                 </div>
                 <button type="button" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Применить фильтр</button>
@@ -202,58 +158,48 @@
     </div>
 
     {% include "../main/footer.html" %}
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const minInput = document.getElementById('minInput');
-            const maxInput = document.getElementById('maxInput');
-            const fill = document.querySelector('.fill');
-            const minValue = document.getElementById('minValue');
-            const maxValue = document.getElementById('maxValue');
-            let isDragging = false;
+        const minSlider = document.getElementById('min_salary_input');
+        const maxSlider = document.getElementById('max_salary_input');
+        const progress = document.getElementById('slider-progress');
+        const minValue = document.getElementById('minValue');
+        const maxValue = document.getElementById('maxValue');
 
-            function updateValues() {
-                let min = parseInt(minInput.value);
-                let max = parseInt(maxInput.value);
+        function updateProgress() {
+            const min = parseInt(minSlider.value);
+            const max = parseInt(maxSlider.value);
+            const minPercent = (min / 1000000) * 100;
+            const maxPercent = (max / 1000000) * 100;
+            progress.style.left = minPercent + '%';
+            progress.style.width = (maxPercent - minPercent) + '%';
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('ru-RU').format(value) + ' ₽';
+        }
+
+        [minSlider, maxSlider].forEach(slider => {
+            slider.addEventListener('input', () => {
+                let minVal = parseInt(minSlider.value);
+                let maxVal = parseInt(maxSlider.value);
                 
-                if (min > max) {
-                    [min, max] = [max, min];
-                    minInput.value = min;
-                    maxInput.value = max;
+                if (minVal > maxVal) {
+                    if (slider === minSlider) {
+                        minSlider.value = maxVal;
+                        minVal = maxVal;
+                    } else {
+                        maxSlider.value = minVal;
+                        maxVal = minVal;
+                    }
                 }
                 
-                const minPercent = (min / 1000000) * 100;
-                const maxPercent = (max / 1000000) * 100;
-                
-                fill.style.left = minPercent + '%';
-                fill.style.width = (maxPercent - minPercent) + '%';
-                
-                minValue.textContent = new Intl.NumberFormat('ru-RU').format(min) + ' ₽';
-                maxValue.textContent = new Intl.NumberFormat('ru-RU').format(max) + ' ₽';
-            }
-
-            function handleInput() {
-                if (!isDragging) requestAnimationFrame(updateValues);
-            }
-
-            minInput.addEventListener('input', handleInput);
-            maxInput.addEventListener('input', handleInput);
-
-            [minInput, maxInput].forEach(input => {
-                input.addEventListener('mousedown', () => isDragging = true);
-                input.addEventListener('mouseup', () => {
-                    isDragging = false;
-                    updateValues();
-                });
-                input.addEventListener('touchstart', () => isDragging = true);
-                input.addEventListener('touchend', () => {
-                    isDragging = false;
-                    updateValues();
-                });
+                minValue.textContent = formatNumber(minVal);
+                maxValue.textContent = formatNumber(maxVal);
+                updateProgress();
             });
-
-            updateValues();
         });
+
+        updateProgress();
     </script>
     <script src="{% static 'js/vacancies/search.js' %}"></script>
 </body>
