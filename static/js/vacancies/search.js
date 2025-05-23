@@ -16,7 +16,7 @@ function search() {
                     data.data.vacancies.forEach((item, index) => {
                         let vacancyHtml = `
                             <div class="col-12">
-                                <a href="/vacancy/${item.id}" style="text-decoration: none;">
+                                <a href="/vacancies/${item.id}" style="text-decoration: none;">
                                     <div class="job-card vacancy">
                                         <div class="job-header">
                                             <h3>${item.title}</h3>
