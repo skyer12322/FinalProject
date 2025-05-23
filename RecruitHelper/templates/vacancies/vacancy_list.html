@@ -28,7 +28,7 @@
                 <div class="mb-3">
                     <input type="text" id="searchInput" placeholder="Начните вводить...">
                 </div>
-                <button type="button" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
+                <button type="button" onclick="search()" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
             </div>
             <div class="col-md-4 column filters" style="padding: 10px">
                 <h2>Фильтры</h2>
@@ -87,7 +87,7 @@
         </div>
         <div class="col-6 col-md-6 col-lg-6">
             <div class="container mt-5">
-                <section class="featured-jobs mb-5">
+                <section class="featured-jobs mb-5" id="vacanciesList">
                     {% if vacancies|length == 0 %}
                     <div class="row g-4">
                         <h1 class="no-vacancies">Пока что нет доступных вакансий</h1>
@@ -119,7 +119,7 @@
     </div>
 
     {% include "../main/footer.html" %}
-
+    <script src="{% static 'js/vacancies/search.js' %}"></script>
 </body>
 </html>
 

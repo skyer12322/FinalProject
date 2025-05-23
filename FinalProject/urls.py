@@ -9,7 +9,7 @@ from RecruitHelper.views import login_view, register, privacy, news, about_us, l
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
 from RecruitHelper.views import download_logs
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume, chats, chat
-from RecruitHelper.ajax_handlers import filters_handler
+from RecruitHelper.ajax_handlers import filters_handler, search_handler
 
 
 urlpatterns = [
@@ -35,6 +35,7 @@ urlpatterns = [
     path('upload_resume/', upload_resume, name='upload_resume'),
     path('api/download-logs/', download_logs, name='download-logs'),
     path('api/filters', filters_handler),
+    path('vacancies/search', search_handler),
     path('profile/chats/', chats, name='chats'),
     path('profile/chat/<int:chat_id>', chat, name='chat'),
     re_path(r'^docs/(?P<path>.*)$', serve, {
