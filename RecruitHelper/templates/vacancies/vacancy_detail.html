@@ -54,8 +54,8 @@
                             <h4 class="mb-3">
                                 <i class="fas fa-align-left me-2 text-secondary"></i>Описание
                             </h4>
-                            <div class="text-muted line-height-2">
-                                {{ vacancy.description|linebreaks }}
+                            <div class="text-muted line-height-2" style="text-align: justify;">
+                                <h4>{{ vacancy.description|linebreaks }}</h4>
                             </div>
                         </div>
 
@@ -63,7 +63,7 @@
                         {% if vacancy.company %}
                         <div class="mb-4">
                             <h4 class="mb-3">
-                                <i class="fas fa-building me-2 text-info"></i>О компании
+                                <i class="fas fa-building me-2 text-info"></i>Компания
                             </h4>
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar-upload position-relative">
@@ -73,9 +73,10 @@
                                          height="60"
                                          alt="Логотип компании">
                                 </div>
-                                <div>
-                                    <h5 class="mb-0">{{ vacancy.company.name }}</h5>
-                                    {% if vacancy.company.website %}
+                                <a href={% url "company" company_id=vacancy.company.id %}>
+                                    <div>
+                                        <h5 class="mb-0">{{ vacancy.company.user.main_name }}</h5>
+                                        {% if vacancy.company.website %}
                                     <a href="{{ vacancy.company.website }}" class="text-muted small">
                                         {{ vacancy.company.website|truncatechars:25 }}
                                     </a>

@@ -8,6 +8,7 @@
     <title>Мои вакансии</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -52,25 +53,23 @@
                         
                         {% if vacancies %}
                             <div class="list-group-flush">
-                                {% for vacancy in vacancies %}
-                                    <div class="list-group-item d-flex align-items-center py-3 vacancy-item">
-                                        <i class="fas fa-file-alt fa-lg me-3 text-muted"></i>
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h5 class="mb-1">{{ vacancy.title }}</h5>
-                                                <span class="salary-badge">{{ vacancy.salary }} ₽</span>
+                                {% for it in vacancies %}
+                                    <div class="col-12" style="margin-bottom: 10px;">
+                                        <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
+                                            <div class="job-card vacancy" style="background-color: #f8f9fa;">
+                                                <div class="job-header">
+                                                    <h3>{{ it.title }}</h3>
+                                                    <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
+                                                </div>
+                                                <div class="job-meta">
+                                                    <span class="company">{{ it.company }}</span>
+                                                    <span class="location">{{ it.location }}</span>
+                                                    <span class="salary">{{ it.min_salary }} - {{it.max_salary}} 
+                                                        <!-- <span class="currency-badge">{{ it.get_currency_display }}</span> -->
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div class="d-flex gap-3 text-muted">
-                                                <small>
-                                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                                    {{ vacancy.location }}
-                                                </small>
-                                                <small>
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    {{ vacancy.employment_type }}
-                                                </small>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
                                 {% endfor %}
                             </div>

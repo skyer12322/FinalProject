@@ -198,8 +198,9 @@ def profile_vacancies(request):
     """
     logger.info("Vacancies for current user page request received")
     logger.debug(f"Profile vacancies request for user: {request.user.email}")
-    context = {}
-    return render(request, 'users/profile_vacancies.html', context)
+    vacancies = Vacancy.objects.filter(company=request.user.company)
+    context = {'vacancies': vacancies}
+    return render(request, 'users/vacancies.html', context)
 
 @login_required
 def edit_user(request):
