@@ -302,30 +302,32 @@ def vacancies(request):
     vacancies = Vacancy.objects.all()
     vacancies_list = list(vacancies)
     logger.info(f"Found {len(vacancies_list)} vacancies after filtering")
-    tags_by_category = defaultdict(set)
+    tags_by_category = {
+        'specialization': set(),
+        'occupancy': set(),
+        'position': set(),
+        'tech': set(),
+        'industry': set()
+    }
     for vacancy in vacancies_list:
         try:
-            ai_tags = vacancy.tags_ai.get("tags", {})
+            if isinstance(vacancy.tags_ai, dict):
+                for category, tags in vacancy.tags_ai.items():
+                    if category in tags_by_category and isinstance(tags, list):
+                        tags_by_category[category].update(tags)
         except Exception as e:
-            logger.warning(f"Failed to get tags for vacancy {vacancy.id}: {str(e)}")
+            logger.warning(f"Failed to process tags for vacancy {vacancy.id}: {str(e)}")
             continue
-        for category, tags_list in ai_tags.items():
-            for tag in tags_list:
-                tags_by_category[category].add(tag)
-    tags_by_category = {cat: list(tags) for cat, tags in tags_by_category.items()}
-    tags = set()
-    for vacancy in vacancies_list:
-        try:
-            ai_tags = vacancy.tags_ai.get("tags", {})
-        except Exception as e:
-            logger.warning(f"Failed to get tags for vacancy {vacancy.id}: {str(e)}")
-            continue
-        for _, tags_list in ai_tags.items():
-            for tag in tags_list:
-                tags.add(tag)
-    context = {"vacancies": vacancies_list,
-               "tags_by_category": tags_by_category,
-               "tags": tags}
+    tags_by_category = {k: sorted(list(v)) for k, v in tags_by_category.items()}
+    max_salary = max((v.max_salary for v in vacancies_list if v.max_salary is not None), default=0)
+    min_salary = min((v.min_salary for v in vacancies_list if v.min_salary is not None), default=0)
+    
+    context = {
+        "vacancies": vacancies_list,
+        "tags_by_category": tags_by_category,
+        "max_salary": max_salary,
+        "min_salary": min_salary
+    }
     return render(request, 'vacancies/vacancy_list.html', context)
 
 @login_required

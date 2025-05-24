@@ -26,7 +26,7 @@ function search() {
                                             <span class="company">${item.company}</span>
                                             <span class="location">${item.geography}</span>
                                             <span class="salary">${item.min_salary} - ${item.max_salary} 
-                                                <span class="currency-badge">${item.currency}</span>
+                                                <!-- <span class="currency-badge">${item.currency}</span> -->
                                             </span>
                                         </div>
                                     </div>
