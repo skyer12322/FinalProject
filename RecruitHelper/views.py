@@ -171,7 +171,7 @@ def company(request, company_id):
     logger.info("Company page request received")
     logger.debug(f"Requesting company page ID: {company_id}")
     company_obj = get_object_or_404(Company, id=company_id)
-    context = {"company_object": company_obj}
+    context = {"company": company_obj}
     return render(request, 'users/HRpage.html', context)
 
 @login_required
