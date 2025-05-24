@@ -73,21 +73,19 @@
         <div class="mb-3">
             <label for="min_salary_input" class="form-label">Минимальная зарплата</label>
             <div class="d-flex align-items-center gap-2">
-                <input type="range" class="form-range" id="min_salary_input" name="min_salary" 
+                <input type="range" class="custom-slider" id="min_salary_input" name="min_salary" 
                        min="0" max="1000000" step="1000" value="0">
                 <input type="number" class="form-control salary-input" id="minSalaryInput" 
                        min="0" max="1000000" step="1000" value="0">
-                <span id="minSalaryValue" class="slider-value">0</span>
             </div>
         </div>
         <div class="mb-3">
             <label for="max_salary_input" class="form-label">Максимальная зарплата</label>
             <div class="d-flex align-items-center gap-2">
-                <input type="range" class="form-range" id="max_salary_input" name="max_salary" 
+                <input type="range" class="custom-slider" id="max_salary_input" name="max_salary" 
                        min="0" max="1000000" step="1000" value="0">
                 <input type="number" class="form-control salary-input" id="maxSalaryInput" 
                        min="0" max="1000000" step="1000" value="0">
-                <span id="maxSalaryValue" class="slider-value">0</span>
             </div>
         </div>
     </div>
@@ -136,8 +134,8 @@
     const maxSlider = document.getElementById('max_salary_input');
     const minInput = document.getElementById('minSalaryInput');
     const maxInput = document.getElementById('maxSalaryInput');
-    const minValue = document.getElementById('minSalaryValue');
-    const maxValue = document.getElementById('maxSalaryValue');
+    const minValue = document.getElementById('minSalaryInput');
+    const maxValue = document.getElementById('maxSalaryInput');
 
     function formatNumber(num) {
         return new Intl.NumberFormat('ru-RU').format(num);
@@ -193,6 +191,9 @@
             } else if (!isMin && parseInt(maxInput.value) < parseInt(minInput.value)) {
                 syncValues(maxInput, minSlider, minInput, minValue);
             }
+            [minSlider, maxSlider].forEach(slider => {
+        updateSlider(slider, slider.value);
+    });
         });
     });
 
