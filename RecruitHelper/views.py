@@ -353,20 +353,24 @@ def add_vacancy(request):
                     title=form.cleaned_data['title'],
                     description=form.cleaned_data['description'],
                     geography=form.cleaned_data['geography'],
-                    company=company)
+                    company=company,
+                    min_salary=form.cleaned_data['min_salary'],
+                    max_salary=form.cleaned_data['max_salary'],
+                    currency=form.cleaned_data['currency']
+                    )
                 try:
                     api_key = os.environ.get("OPENAI_API_KEY")
                     client = ChatGPT(api_key=api_key)
                     response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
                     vacancy.ai_rating = int(response_text['rating'])
                     tags = {
-                        'specialization': request.POST.get('specialization'),
-                        'occupancy': request.POST.get('occupancy'),
-                        'position': request.POST.get('position'),
-                        'tech': request.POST.get('tech'),
-                        'industry': request.POST.get('industry')
+                        'specialization': list(request.POST.get('specialization').split(',')),
+                        'occupancy': list(request.POST.get('occupancy').split(',')),
+                        'position': list(request.POST.get('position').split(',')),
+                        'tech': list(request.POST.get('tech').split(',')),
+                        'industry': list(request.POST.get('industry').split(','))
                     }
-                    empty_fields = [key for key, elem in tags.items() if elem == '']
+                    empty_fields = [key for key, elem in tags.items() if elem == ['']]
                     if empty_fields:
                         tags_text_raw = client.get_response(prompts.TAGS_ASSIGN, f'{vacancy.title}\nОтсутствуют теги {empty_fields}\n{vacancy.description}')
                         try:
@@ -439,7 +443,9 @@ def apply_to_vacancy(request, vacancy_id):
         api_key = os.getenv("OPENAI_API_KEY")
         client = ChatGPT(api_key=api_key)
         content = f'''Vacancy: {vacancy.description}\n\n
-        Candidate resume: {request.user.cuser.resume + request.user.description}'''
+        Candidate resume: {request.user.cuser.resume }
+        Candidate description: {request.user.description}
+        '''
         response_text = client.get_response(prompts.JOB_RANKING_CANDIDATE, content)
         logger.debug(f"ChatGPT response for candidate evaluation: {response_text}")
         response_data = json.loads(response_text)
