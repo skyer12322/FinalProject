@@ -36,9 +36,9 @@
                                 <div class="avatar-upload position-relative">
                                     <img src="
                                         {% if user|is_instance:'Company' and user.company.avatar %}
-                                            {{ user.company.avatar.url }}
+                                            {{ company.avatar.url }}
                                         {% elif user|is_instance:'CUser' and user.cuser.avatar %}
-                                            {{ user.cuser.avatar.url }}
+                                            {{ company.avatar.url }}
                                         {% else %}
                                             {% static 'images/default_avatar.png' %}
                                         {% endif %}" 
@@ -47,37 +47,26 @@
                                         height="120"
                                         alt="Аватар">
                                 </div>
-                                {% if user.role == 'user' %}
-                                <h5 class="mt-3 mb-0">
-                                    @{{ user.main_name|default:"Без имени" }}
-                                </h5>
-                                {% endif %}
                             </div>
 
                             <div class="col-md-9 mt-4 mt-md-0">
                                 <div class="d-flex flex-column gap-2" style="text-align: justify;">
-                                    {% if user.role == 'user' %}
-                                        <h2 class="mb-0">
-                                            {{ user.cuser.first_name|default:"" }} {{ user.cuser.last_name|default:"" }}
-                                        </h2>
-                                    {% else %}
-                                        <h2 class="mb-0">{{ user.main_name }}</h2>
-                                    {% endif %}
+                                    <h2 class="mb-0">{{ company.user.main_name }}</h2>
                                     
                                     <div class="d-flex flex-wrap gap-3 text-muted">
                                         <div>
                                             <i class="fas fa-envelope me-2"></i>
-                                            {{ user.email }}
+                                            {{ company.user.email }}
                                         </div>
                                         <div>
                                             <i class="fas fa-calendar-day me-2"></i>
-                                            Присоединился {{ user.date_joined|date:"d.m.Y" }}
+                                            Присоединился {{ company.user.date_joined|date:"d.m.Y" }}
                                         </div>
-                                        {% if user.role == 'company' and user.company.website %}
+                                        {% if company.user.role == 'company' and company.user.company.website %}
                                         <div>
                                             <i class="fas fa-globe me-2"></i>
                                             <a href="{{ user.company.website }}" class="text-decoration-none">
-                                                {{ user.company.website|truncatechars:20 }}
+                                                {{ company.user.company.website|truncatechars:20 }}
                                             </a>
                                         </div>
                                         {% endif %}
@@ -91,14 +80,14 @@
                 <div class="card shadow-sm border-0 mt-4">
                     <div class="card-body p-4">
                         <h5 class="mb-3">
-                            {% if user.role == 'company' %}
+                            {% if company.user.role == 'company' %}
                                 <i class="fas fa-user-circle me-2"></i>О нас
                             {% else %}
                                 <i class="fas fa-user-circle me-2"></i>О себе
                             {% endif %}
                         </h5>
                         <div class="text-muted line-height-2">
-                            {{ user.description|default:"Информация отсутствует" }}
+                            {{ company.user.description|default:"Информация отсутствует" }}
                         </div>
                     </div>
                 </div>
