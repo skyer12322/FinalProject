@@ -51,16 +51,16 @@
 
                             <div class="col-md-9 mt-4 mt-md-0">
                                 <div class="d-flex flex-column gap-2" style="text-align: justify;">
-                                    <h2 class="mb-0">{{ cuser.user.main_name }}</h2>
+                                    <h2 class="mb-0">{{ user.main_name }}</h2>
                                     
                                     <div class="d-flex flex-wrap gap-3 text-muted">
                                         <div>
                                             <i class="fas fa-envelope me-2"></i>
-                                            {{ cuser.user.email }}
+                                            {{ user.email }}
                                         </div>
                                         <div>
                                             <i class="fas fa-calendar-day me-2"></i>
-                                            Присоединился {{ cuser.user.date_joined|date:"d.m.Y" }}
+                                            Присоединился {{ user.date_joined|date:"d.m.Y" }}
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +75,7 @@
                             <i class="fas fa-user-circle me-2"></i>О себе
                         </h5>
                         <div class="text-muted line-height-2">
-                            {{ cuser.user.description|default:"Информация отсутствует" }}
+                            {{ user.description|default:"Информация отсутствует" }}
                         </div>
                     </div>
                 </div>

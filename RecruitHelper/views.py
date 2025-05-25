@@ -287,8 +287,8 @@ def candidate(request, user_id):
     """
     logger.info("Candidate page request received")
     logger.debug(f"Requesting candidate page ID: {user_id}")
-    candidate_user = get_object_or_404(CUser, id=user_id)
-    context = {'cuser': candidate_user}
+    candidate_user = get_object_or_404(User, id=user_id)
+    context = {'user': candidate_user}
     return render(request, 'users/candidatepage.html', context)
 
 def vacancies(request):
