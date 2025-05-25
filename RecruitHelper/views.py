@@ -361,7 +361,7 @@ def add_vacancy(request):
                 try:
                     api_key = os.environ.get("OPENAI_API_KEY")
                     client = ChatGPT(api_key=api_key)
-                    response_text = client.get_response(prompts.JOB_RANKING, vacancy.description)
+                    response_text = client.get_response(prompts.JOB_RANKING + f'\nЗарплата: {vacancy.min_salary} - {vacancy.max_salary} {vacancy.currency}', vacancy.description)
                     vacancy.ai_rating = int(response_text['rating'])
                     tags = {
                         'specialization': list(request.POST.get('specialization').split(',')),

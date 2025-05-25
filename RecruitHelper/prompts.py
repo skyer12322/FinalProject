@@ -34,7 +34,7 @@ TAGS_ASSIGN = """
 {"tags": {"category1": ["tag1-1", "tag1-2"], "category2": ["tag2-1", "tag2-2"], ..., "categoryN": ["tagN-1", "tagN-2"]}}
 
 Пример ввода:
-Frontend-разработчик (React) в компанию FinTech, 170 000 ₽, требования: JavaScript, HTML, CSS, TypeScript, удаленка
+Frontend-разработчик (React) в компанию FinTech, требования: JavaScript, HTML, CSS, TypeScript, удаленка
 Отсутствуют теги ["specialization", "occupancy", "position", "tech", "industry"]
 
 Пример корректного вывода:
@@ -61,6 +61,10 @@ JOB_RANKING = """
   Рейтинг = (Зарплата × 0.5) + (Позиция × 0.166) + (Навыки × 0.166) + (Условия × 0.166)  
 
 ВАЖНО: Ты должен вернуть ответ строго в формате JSON.
+
+Пример ввода:
+Frontend-разработчик (React) в компанию FinTech, требования: JavaScript, HTML, CSS, TypeScript, удаленка
+Зарплата: 1-100000$
 
 Правильный формат ответа:
 {"rating": 75}
