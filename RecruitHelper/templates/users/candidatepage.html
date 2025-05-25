@@ -3,101 +3,86 @@
 
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль кандидата</title>
+    <title>Профиль пользователя</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <style>
-
-
-
-
-        .avatar-placeholder {
-            width: 150px;
-            height: 140px;
-            border-radius: 50%;
-            background: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-        .highlight-block {
-            border: 2px solid #0d6efd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .resume-block {
-            box-shadow: #282828;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            min-height: 200px;
+        :root {
+            --primary-color: #6366f1;
+            --hover-color: #4f46e5;
+            --background: #f8f9fa;
         }
     </style>
 </head>
 
-<body class="profile-body">
+<body class="profile-body bg-light">
     {% include "../main/menu.html" %}
-    <div class="row" style="margin:20px">
-        <div class="profile-detail-container col-md-8 flex-container">
-            <div style="margin-top: 10px">
-                <div class="profile-card row card-box">
-                    <div class="col-3">
-                        <img src="
-                            {% if candidate.avatar %}
-                                {{ candidate.avatar.url }}
-                            {% else %}
-                                {% static 'images/default_avatar.png' %}
-                            {% endif %}" 
-                            alt="Аватар кандидата" 
-                            class="profile-avatar" style="align-content:center">
-                        {% if candidate.main_name %}
-                        <p class="profile-name" style="margin-top:10px; font-size:35px; margin-bottom:0px">
-                            @{{ candidate.main_name }}
-                        </p>
-                        {% else %}
-                        <p>
-                            Нет имени пользователя
-                        </p>
-                        {% endif %}
-                    </div>
-                    <div class="secondary-info col-5">
-                        {% if candidate.cuser.first_name and candidate.cuser.last_name %}
-                        <p style="font-size: 35px"><strong>{{ candidate.cuser.first_name }} {{ candidate.cuser.last_name }}</strong></p>
-                        {% else %}
-                        <p>Имя и фамилия не указаны</p>
-                        {% endif %}
-                        <p class="profile-email"><strong>Email:</strong> {{ candidate.email }}</p>
-                        <p class="profile-joined"><strong>Дата регистрации:</strong> {{ candidate.date_joined|date:"d.m.Y" }}</p>
+    
+    <div class="container-lg py-5">
+        <div>
+            <div>
+                <div class="card shadow-sm border-0 overflow-hidden">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center">
+                                <div class="avatar-upload position-relative">
+                                    <img src="
+                                        {% if cuser|is_instance:'Company' and user.company.avatar %}
+                                            {{ company.avatar.url }}
+                                        {% elif cuser.user|is_instance:'CUser' and user.cuser.avatar %}
+                                            {{ company.avatar.url }}
+                                        {% else %}
+                                            {% static 'images/default_avatar.png' %}
+                                        {% endif %}" 
+                                        class="rounded-circle shadow" 
+                                        width="120" 
+                                        height="120"
+                                        alt="Аватар">
+                                </div>
+                            </div>
+
+                            <div class="col-md-9 mt-4 mt-md-0">
+                                <div class="d-flex flex-column gap-2" style="text-align: justify;">
+                                    <h2 class="mb-0">{{ cuser.user.main_name }}</h2>
+                                    
+                                    <div class="d-flex flex-wrap gap-3 text-muted">
+                                        <div>
+                                            <i class="fas fa-envelope me-2"></i>
+                                            {{ cuser.user.email }}
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-calendar-day me-2"></i>
+                                            Присоединился {{ cuser.user.date_joined|date:"d.m.Y" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-12 main-info-card">
-                    <div class="bio card-box">
-                        {{ candidate.description|default:"Информация о себе не добавлена" }}
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user-circle me-2"></i>О себе
+                        </h5>
+                        <div class="text-muted line-height-2">
+                            {{ cuser.user.description|default:"Информация отсутствует" }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="flex-container options card-box col-md-3">
-            <div class="resume card-box">
-                {% if candidate.cuser.resume %}
-                <a href="{{ candidate.cuser.resume.url }}"><p><strong>Скачать резюме</strong></p></a>
-                {% else %}
-                <p><strong>Резюме не загружено</strong></p>
-                {% endif %}
-            </div>
-        </div>
     </div>
-    </div>
+
     {% include "../main/footer.html" %}
 </body>
 </html>
