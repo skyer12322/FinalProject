@@ -1,167 +1,195 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редактирование профиля</title>
+    <title>Редактирование профиля - CareerAI</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/chat.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <style>
-        .avatar-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+            padding: 12px 16px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0091ea;
+            box-shadow: 0 0 0 0.2rem rgba(0,145,234,0.25);
         }
     </style>
 </head>
-
-<body class="bg-light">
+<body>
     {% include "../main/menu.html" %}
     
-    <div class="container-lg py-5">
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h2 class="mb-4">
-                            <i class="fas fa-user-edit me-2"></i>Редактирование профиля
-                        </h2>
-                        
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            
-                            <!-- Основная форма пользователя -->
-                            <div class="mb-4">
-                                <label class="form-label">Имя пользователя/компании</label>
-                                {{ base_form.main_name }}
-                                {% if base_form.main_name.errors %}
-                                    <div class="text-danger">{{ base_form.main_name.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label">Email</label>
-                                {{ base_form.email }}
-                                {% if base_form.email.errors %}
-                                    <div class="text-danger">{{ base_form.email.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Аватар -->
-                            <div class="mb-4">
-                                <label class="form-label">Аватар</label>
-                                <div class="d-flex align-items-center gap-3">
-                                    {% if request.user.profile_image %}
-                                    <div class="avatar-preview">
-                                        <img src="{{ request.user.profile_image.url|default:'/static/images/default_avatar.png' }}" 
-                                             class="w-100 h-100 object-fit-cover">
-                                    </div>
-                                    {% endif %}
-                                    {{ base_form.profile_image }}
-                                </div>
-                                {% if base_form.profile_image.errors %}
-                                    <div class="text-danger">{{ base_form.profile_image.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Описание -->
-                            <div class="mb-4">
-                                <label class="form-label">Описание</label>
-                                {{ base_form.description }}
-                                {% if base_form.description.errors %}
-                                    <div class="text-danger">{{ base_form.description.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Поля для обычных пользователей -->
-                            {% if request.user.role == 'user' %}
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Имя</label>
-                                        {{ cuser_form.first_name }}
-                                        {% if cuser_form.first_name.errors %}
-                                            <div class="text-danger">{{ cuser_form.first_name.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Фамилия</label>
-                                        {{ cuser_form.last_name }}
-                                        {% if cuser_form.last_name.errors %}
-                                            <div class="text-danger">{{ cuser_form.last_name.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label">Резюме</label>
-                                {{ cuser_form.resume }}
-                                {% if cuser_form.resume.errors %}
-                                    <div class="text-danger">{{ cuser_form.resume.errors }}</div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-
-                            <!-- Поле для компаний -->
-                            {% if request.user.role == 'company' %}
-                            <div class="mb-4">
-                                <label class="form-label">Сайт компании</label>
-                                {{ company_form.website }}
-                                {% if company_form.website.errors %}
-                                    <div class="text-danger">{{ company_form.website.errors }}</div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-
-                            <div class="d-grid gap-3 mt-4">
-                                <button type="submit" class="btn btn-primary py-2">
-                                    <i class="fas fa-save me-2"></i>Сохранить изменения
-                                </button>
-                                <a href="/profile/" class="btn btn-outline-secondary py-2">
-                                    <i class="fas fa-times me-2"></i>Отмена
-                                </a>
-                            </div>
-                        </form>
+    <div class="container-fluid py-4">
+        <div class="chat-container">
+            <!-- Edit Sidebar -->
+            <div class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <i class="fas fa-user-edit"></i>
+                    Редактирование
+                </div>
+                
+                <div class="chat-list">
+                    <div class="chat-item active">
+                        <div class="chat-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Основные данные</div>
+                            <div class="chat-vacancy">Имя, email, описание</div>
+                        </div>
                     </div>
+                    
+                    {% if request.user.role == 'user' %}
+                    <div class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Личная информация</div>
+                            <div class="chat-vacancy">Имя, фамилия, резюме</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Информация о компании</div>
+                            <div class="chat-vacancy">Веб-сайт компании</div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Боковая панель -->
-            <div class="col-lg-4">
-                <div class="sticky-top" style="top: 20px;">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="mb-3">
-                                <i class="fas fa-info-circle me-2"></i>Рекомендации
-                            </h5>
-                            <ul class="list-unstyled text-muted">
-                                <li class="mb-2">
-                                    <i class="fas fa-check-circle text-success me-2"></i>
-                                    Используйте актуальную информацию
-                                </li>
-                                {% if request.user.role == 'user' %}
-                                <li class="mb-2">
-                                    <i class="fas fa-file-pdf text-danger me-2"></i>
-                                    Обновляйте резюме регулярно
-                                </li>
-                                {% else %}
-                                <li class="mb-2">
-                                    <i class="fas fa-globe text-primary me-2"></i>
-                                    Укажите официальный сайт компании
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </div>
+            <!-- Main Edit Area -->
+            <div class="chat-main">
+                <div class="chat-header">
+                    <div class="chat-header-avatar">
+                        <i class="fas fa-user-edit"></i>
                     </div>
+                    <div class="chat-header-info">
+                        <h3>Редактирование профиля</h3>
+                        <p>Обновите информацию о себе</p>
+                    </div>
+                </div>
+
+                <div class="chat-messages">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="message other">
+                            <div class="message-bubble">
+                                <div class="message-sender"><i class="fas fa-user"></i> Основная информация</div>
+                                <div class="message-content">
+                                    <div class="mb-3">
+                                        <label class="form-label">Имя пользователя/компании</label>
+                                        {{ base_form.main_name }}
+                                        {% if base_form.main_name.errors %}
+                                            <div class="text-danger">{{ base_form.main_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        {{ base_form.email }}
+                                        {% if base_form.email.errors %}
+                                            <div class="text-danger">{{ base_form.email.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Аватар</label>
+                                        {{ base_form.profile_image }}
+                                        {% if base_form.profile_image.errors %}
+                                            <div class="text-danger">{{ base_form.profile_image.errors }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Описание</label>
+                                        {{ base_form.description }}
+                                        {% if base_form.description.errors %}
+                                            <div class="text-danger">{{ base_form.description.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if request.user.role == 'user' %}
+                        <div class="message other">
+                            <div class="message-bubble">
+                                <div class="message-sender"><i class="fas fa-id-card"></i> Личная информация</div>
+                                <div class="message-content">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Имя</label>
+                                            {{ cuser_form.first_name }}
+                                            {% if cuser_form.first_name.errors %}
+                                                <div class="text-danger">{{ cuser_form.first_name.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Фамилия</label>
+                                            {{ cuser_form.last_name }}
+                                            {% if cuser_form.last_name.errors %}
+                                                <div class="text-danger">{{ cuser_form.last_name.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Резюме</label>
+                                        {{ cuser_form.resume }}
+                                        {% if cuser_form.resume.errors %}
+                                            <div class="text-danger">{{ cuser_form.resume.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if request.user.role == 'company' %}
+                        <div class="message other">
+                            <div class="message-bubble">
+                                <div class="message-sender"><i class="fas fa-building"></i> Информация о компании</div>
+                                <div class="message-content">
+                                    <div class="mb-3">
+                                        <label class="form-label">Сайт компании</label>
+                                        {{ company_form.website }}
+                                        {% if company_form.website.errors %}
+                                            <div class="text-danger">{{ company_form.website.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="message own">
+                            <div class="message-bubble">
+                                <div class="message-content">
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Сохранить изменения
+                                        </button>
+                                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-2"></i>Отмена
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

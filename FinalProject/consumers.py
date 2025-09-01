@@ -41,22 +41,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         :return: True, если доступ разрешен, False в противном случае.
         """
-        if self.user.role == 'company':
-            print(self.user.company, 'company')
-            validated = Chat.objects.filter(
-                id=self.chat_id,
-                company=self.user.company
-            ).exists()
-            print(validated)
-            return validated
-        else:
-            print(self.user.cuser, 'cuser')
-            validated = Chat.objects.filter(
-                id=self.chat_id,
-                user=self.user.cuser
-            ).exists()
-            print(validated)
-            return validated
+        return Chat.objects.filter(
+            id=self.chat_id,
+            **({'company': self.user.company} if self.user.role == 'company' 
+               else {'user': self.user.cuser})
+        ).exists()
 
     async def disconnect(self, close_code):
         """
@@ -84,7 +73,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': message,
+                'sender_channel': self.channel_name
             }
         )
 
@@ -96,18 +86,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         :param content: Содержимое сообщения.
         :return: Словарь с данными созданного сообщения для отправки клиентам.
         """
-        chat = Chat.objects.get(id=self.chat_id)
         message = Message.objects.create(
             user=self.user,
             content=content
         )
-        message.chat.add(chat)
+        chat = Chat.objects.get(id=self.chat_id)
+        chat.messages.add(message)
         return {
-            'user': {
-                'main_name': message.user.main_name,
-            },
-            'content': message.content,
-            'timestamp': message.timestamp.isoformat()
+            'id': message.id,
+            'content': content,
+            'timestamp': message.timestamp.isoformat(),
+            'user_id': self.user.id,
+            'user_name': self.user.main_name
         }
 
     async def chat_message(self, event):
@@ -116,4 +106,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         :param event: Словарь с данными сообщения (ожидается ключ 'message').
         """
-        await self.send(text_data=json.dumps(event['message']))
+        # Не отправляем сообщение обратно отправителю
+        if event.get('sender_channel') != self.channel_name:
+            await self.send(text_data=json.dumps(event['message']))

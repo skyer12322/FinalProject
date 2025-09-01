@@ -1,119 +1,105 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои вакансии</title>
+    <title>Мои вакансии - CareerAI</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/chat.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <style>
-        .card-box {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .vacancy-item:hover {
-            transform: translateX(5px);
-            transition: all 0.2s ease;
-        }
-        .salary-badge {
-            background: #e9f5ff;
-            color: #1e88e5;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-    </style>
 </head>
-
-<body class="profile-body bg-light">
+<body>
     {% include "../main/menu.html" %}
-
-    <div class="container-lg py-5">
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3 class="mb-0">
-                                <i class="fas fa-briefcase me-2 text-primary"></i>Мои вакансии
-                            </h3>
-                            <a href="/vacancies/add/" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Новая вакансия
-                            </a>
+    
+    <div class="container-fluid py-4">
+        <div class="chat-container">
+            <!-- Vacancies Sidebar -->
+            <div class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <i class="fas fa-briefcase"></i>
+                    Мои вакансии
+                </div>
+                
+                <div class="chat-list">
+                    {% for vacancy in vacancies %}
+                        <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="chat-item">
+                            <div class="chat-avatar">
+                                {{ vacancy.title|first|upper }}
+                            </div>
+                            <div class="chat-info">
+                                <div class="chat-name">{{ vacancy.title }}</div>
+                                <div class="chat-vacancy">{{ vacancy.min_salary }}-{{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</div>
+                                <div class="chat-last-message">AIR: {{ vacancy.ai_rating }}</div>
+                            </div>
+                        </a>
+                    {% empty %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-briefcase fa-2x mb-3"></i>
+                            <p>У вас пока нет вакансий</p>
                         </div>
-                        
-                        {% if vacancies %}
-                            <div class="list-group-flush">
-                                {% for it in vacancies %}
-                                    <div class="col-12" style="margin-bottom: 10px;">
-                                        <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
-                                            <div class="job-card vacancy" style="background-color: #f8f9fa;">
-                                                <div class="job-header">
-                                                    <h3>{{ it.title }}</h3>
-                                                    <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
-                                                </div>
-                                                <div class="job-meta">
-                                                    <span class="company">{{ it.company }}</span>
-                                                    <span class="location">{{ it.location }}</span>
-                                                    <span class="salary">{{ it.min_salary }} - {{it.max_salary}} 
-                                                        <!-- <span class="currency-badge">{{ it.get_currency_display }}</span> -->
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-4">
-                                <i class="fas fa-file-circle-exclamation fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">У вас пока нет активных вакансий</p>
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="sticky-top" style="top: 20px;">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <h5 class="mb-3">
-                                <i class="fas fa-bars me-2"></i>Навигация
-                            </h5>
-                            <div class="list-group list-group-flush">
-                                <a href="{% url 'profile' %}" 
-                                   class="list-group-item list-group-item-action d-flex align-items-center">
-                                    <i class="fas fa-user-circle me-3 text-primary"></i>
-                                    Профиль
-                                </a>
-                                <a href="{% url 'profile_vacancies' %}" 
-                                   class="list-group-item list-group-item-action d-flex align-items-center active">
-                                    <i class="fas fa-briefcase me-3 text-white"></i>
-                                    Вакансии
-                                </a>
-                                <a href="{% url 'applications' %}" 
-                                   class="list-group-item list-group-item-action d-flex align-items-center">
-                                    <i class="fas fa-clipboard-list me-3 text-warning"></i>
-                                    Заявки
-                                </a>
-                                <a href="{% url 'chats' %}" 
-                                   class="list-group-item list-group-item-action d-flex align-items-center">
-                                    <i class="fas fa-comments me-3 text-info"></i>
-                                    Чаты
+            <!-- Main Vacancies Area -->
+            <div class="chat-main">
+                <div class="chat-header">
+                    <div class="chat-header-avatar">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="chat-header-info">
+                        <h3>Управление вакансиями</h3>
+                        <p>Создавайте и редактируйте ваши вакансии</p>
+                    </div>
+                </div>
+
+                <div class="chat-messages">
+                    <div class="message other">
+                        <div class="message-bubble">
+                            <div class="message-sender"><i class="fas fa-plus"></i> Действия</div>
+                            <div class="message-content">
+                                <a href="/vacancies/add/" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Создать новую вакансию
                                 </a>
                             </div>
                         </div>
                     </div>
+
+                    {% for vacancy in vacancies %}
+                        <div class="message other">
+                            <div class="message-bubble">
+                                <div class="message-sender">
+                                    <i class="fas fa-briefcase"></i> {{ vacancy.title }}
+                                </div>
+                                <div class="message-content">
+                                    <strong>{{ vacancy.title }}</strong>
+                                    <br>
+                                    <span class="text-muted">{{ vacancy.company.user.main_name }}</span>
+                                    <br>
+                                    <span class="badge bg-success">{{ vacancy.min_salary }}-{{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</span>
+                                    <span class="badge bg-primary">AIR: {{ vacancy.ai_rating }}</span>
+                                    <br><br>
+                                    <div class="text-truncate" style="max-height: 60px; overflow: hidden;">
+                                        {{ vacancy.description|truncatewords:20 }}
+                                    </div>
+                                    <br>
+                                    <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> Просмотр
+                                    </a>
+                                </div>
+                                <div class="message-time">{{ vacancy.created_at|date:"d.m.Y" }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="chat-empty">
+                            <i class="fas fa-briefcase"></i>
+                            <h3>Нет вакансий</h3>
+                            <p>Создайте свою первую вакансию</p>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

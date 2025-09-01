@@ -8,7 +8,7 @@ from RecruitHelper.views import home, vacancies, add_vacancy, profile, vacancy, 
 from RecruitHelper.views import login_view, register, privacy, news, about_us, logout_view, edit_user
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
 from RecruitHelper.views import download_logs
-from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume, chats, chat
+from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume, chats, chat, chat_api
 from RecruitHelper.ajax_handlers import filters_handler, search_handler
 
 
@@ -38,6 +38,7 @@ urlpatterns = [
     path('vacancies/search', search_handler),
     path('profile/chats/', chats, name='chats'),
     path('profile/chat/<int:chat_id>', chat, name='chat'),
+    path('api/chat/<int:chat_id>/', chat_api, name='chat_api'),
     re_path(r'^docs/(?P<path>.*)$', serve, {
         'document_root': settings.STATIC_ROOT + '/docs/',
     }),

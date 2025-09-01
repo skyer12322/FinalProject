@@ -1,50 +1,15 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <script src="{% static 'js/vacancies/chat.js' %}"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <title>Перенаправление</title>
 </head>
 <body>
-    {% include "../main/menu.html" %}
-    <div class="container">
-        <div class="card-box w-75"><h1>{{chat}}</h1>
-            <div id="chat-log">
-                {% for message in messages %}
-                <div class="message" data-timestamp="{{message.timestamp|date:'c'}}">  <!-- Use ISO format for easy parsing -->
-                    <div class="sender">{{message.user.main_name}}</div>
-                    <div class="content">{{message.content}}</div>
-                    <div class="time" id="time-{{forloop.counter}}"></div>  <!-- Placeholder for formatted time -->
-                </div>
-                <hr>
-                {% endfor %}
-            </div>
-            <input type="text" id="chat-input">
-            <button onclick="sendMessage()" class="btn w-50">Send</button>
-        </div>
-    </div>
-
-    {% include "../main/footer.html" %}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const messageElements = document.querySelectorAll('.message');
-            messageElements.forEach(function(element) {
-                const timestampStr = element.getAttribute('data-timestamp');  // Get the ISO timestamp
-                if (timestampStr) {
-                    const date = new Date(timestampStr);
-                    const timeElement = element.querySelector('.time');  // Target the time div
-                    if (timeElement) {
-                        timeElement.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });  // Format to local time
-                    }
-                }
-            });
-        });
+        // Перенаправляем на новый интерфейс чатов
+        window.location.href = '/profile/chats/';
     </script>
+    <p>Перенаправление на новый интерфейс чатов...</p>
 </body>
 </html>

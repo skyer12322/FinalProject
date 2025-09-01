@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
@@ -563,7 +563,7 @@ def download_logs(request):
 
 def chats(request):
     """
-    Отображает список чатов для текущего пользователя (соискателя или компании).
+    Отображает интерфейс чатов для текущего пользователя (соискателя или компании).
 
     :param request: Объект запроса Django.
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
@@ -577,20 +577,67 @@ def chats(request):
     else:
         chats = []
 
-    return render(request, 'users/chats.html', {'chats': chats})
+    return render(request, 'users/chat_interface.html', {'chats': chats})
+
+def chat_interface(request):
+    """
+    Отображает объединенный интерфейс чатов.
+
+    :param request: Объект запроса Django.
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    """
+    return chats(request)
 
 @login_required
 def chat(request, chat_id):
     """
-    Отображает конкретный чат по его ID.
+    Перенаправляет на новый интерфейс чатов.
 
     :param request: Объект запроса Django.
     :param chat_id: ID чата.
-    :return: Объект HttpResponse с отрендеренной HTML-страницей.
+    :return: Объект HttpResponse (перенаправление).
     """
-    chat = Chat.objects.get(id=chat_id)
-    messages = []
-    for message in chat.messages.all():
-        messages.append(message)
-    context = {'messages': messages}
-    return render(request, 'vacancies/chat.html', context)
+    return redirect('chats')
+
+@login_required
+def chat_api(request, chat_id):
+    """
+    API endpoint для получения данных чата.
+
+    :param request: Объект запроса Django.
+    :param chat_id: ID чата.
+    :return: JsonResponse с данными чата.
+    """
+    try:
+        chat = Chat.objects.select_related(
+            'company__user', 'user__user', 'vacancy'
+        ).prefetch_related(
+            'messages__user'
+        ).get(id=chat_id)
+        
+        # Проверяем права доступа
+        if request.user.role == 'company' and chat.company.user != request.user:
+            return JsonResponse({'error': 'Access denied'}, status=403)
+        elif request.user.role == 'user' and chat.user.user != request.user:
+            return JsonResponse({'error': 'Access denied'}, status=403)
+        
+        messages = [{
+            'id': msg.id,
+            'content': msg.content,
+            'timestamp': msg.timestamp.isoformat(),
+            'user_id': msg.user.id,
+            'user_name': msg.user.main_name
+        } for msg in chat.messages.all().order_by('timestamp')]
+        
+        return JsonResponse({
+            'id': chat.id,
+            'name': chat.name,
+            'vacancy_title': chat.vacancy.title,
+            'company_name': chat.company.user.main_name,
+            'user_name': f"{chat.user.first_name} {chat.user.last_name}",
+            'messages': messages
+        })
+    except Chat.DoesNotExist:
+        return JsonResponse({'error': 'Chat not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

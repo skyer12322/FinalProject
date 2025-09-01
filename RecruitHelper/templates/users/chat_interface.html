@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чаты - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/chat.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    {% include "../main/menu.html" %}
+    
+    <div class="container-fluid py-4">
+        <div class="chat-container">
+            <!-- Chat Sidebar -->
+            <div class="chat-sidebar" id="chatSidebar">
+                <div class="chat-sidebar-header">
+                    <i class="fas fa-comments"></i>
+                    Чаты
+                </div>
+                
+                <div class="chat-list" id="chatList">
+                    {% if user.is_authenticated %}
+                        {% if chats %}
+                            {% for chat in chats %}
+                                <a href="#" class="chat-item" data-chat-id="{{ chat.id }}" onclick="loadChat({{ chat.id }})">
+                                    <div class="chat-avatar">
+                                        {% if user.role == 'user' %}
+                                            {{ chat.company.user.main_name|first|upper }}
+                                        {% else %}
+                                            {{ chat.user.first_name|first|upper }}{{ chat.user.last_name|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="chat-info">
+                                        <div class="chat-name">
+                                            {% if user.role == 'user' %}
+                                                {{ chat.company.user.main_name }}
+                                            {% else %}
+                                                {{ chat.user.first_name }} {{ chat.user.last_name }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="chat-vacancy">{{ chat.vacancy.title }}</div>
+                                        <div class="chat-last-message">Нажмите для просмотра сообщений</div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="p-4 text-center text-muted">
+                                <i class="fas fa-comment-slash fa-2x mb-3"></i>
+                                <p>
+                                    {% if user.role == 'user' %}
+                                        Чатов с компаниями пока нет
+                                    {% else %}
+                                        Чатов с кандидатами пока нет
+                                    {% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-lock fa-2x mb-3"></i>
+                            <p>Войдите в систему для просмотра чатов</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-main" id="chatMain">
+                <div class="chat-empty" id="chatEmpty">
+                    <i class="fas fa-comments"></i>
+                    <h3>Выберите чат</h3>
+                    <p>Выберите чат из списка слева, чтобы начать общение</p>
+                </div>
+
+                <!-- Chat Header (hidden by default) -->
+                <div class="chat-header" id="chatHeader" style="display: none;">
+                    <div class="chat-header-avatar" id="chatHeaderAvatar"></div>
+                    <div class="chat-header-info">
+                        <h3 id="chatHeaderName"></h3>
+                        <p id="chatHeaderVacancy"></p>
+                    </div>
+                </div>
+
+                <!-- Messages Area (hidden by default) -->
+                <div class="chat-messages" id="chatMessages" style="display: none;"></div>
+
+                <!-- Chat Input (hidden by default) -->
+                <div class="chat-input-container" id="chatInputContainer" style="display: none;">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение...">
+                    <button class="chat-send-btn" id="sendButton" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "../main/footer.html" %}
+
+    <script>
+        let currentChatId = null;
+        let chatSocket = null;
+        let chatCache = new Map();
+
+        function loadChat(chatId) {
+            if (currentChatId === chatId) return;
+            
+            // Update active chat item
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-chat-id="${chatId}"]`).classList.add('active');
+
+            // Close existing socket
+            if (chatSocket) {
+                chatSocket.close();
+            }
+
+            currentChatId = chatId;
+
+            // Show chat interface
+            const elements = ['chatEmpty', 'chatHeader', 'chatMessages', 'chatInputContainer'];
+            elements[0] && (document.getElementById(elements[0]).style.display = 'none');
+            elements.slice(1).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'flex';
+            });
+
+            // Check cache first
+            if (chatCache.has(chatId)) {
+                const data = chatCache.get(chatId);
+                updateChatHeader(data);
+                loadMessages(data.messages);
+            } else {
+                // Load from API and cache
+                fetch(`/api/chat/${chatId}/`)
+                    .then(r => r.json())
+                    .then(data => {
+                        chatCache.set(chatId, data);
+                        updateChatHeader(data);
+                        loadMessages(data.messages);
+                    })
+                    .catch(console.error);
+            }
+            
+            // Setup WebSocket separately
+            setupWebSocket(chatId);
+        }
+
+        function updateChatHeader(data) {
+            const avatar = document.getElementById('chatHeaderAvatar');
+            const name = document.getElementById('chatHeaderName');
+            const vacancy = document.getElementById('chatHeaderVacancy');
+            
+            {% if user.role == 'user' %}
+                avatar.textContent = data.company_name.charAt(0).toUpperCase();
+                name.textContent = data.company_name;
+            {% else %}
+                avatar.textContent = data.user_name.charAt(0).toUpperCase();
+                name.textContent = data.user_name;
+            {% endif %}
+            vacancy.textContent = data.vacancy_title;
+        }
+
+        function loadMessages(messages) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+
+            messages.forEach(message => {
+                addMessageToUI(message);
+            });
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addMessageToUI(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            
+            const isOwn = message.user_id === {{ user.id }};
+            messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+
+            const time = new Date(message.timestamp).toLocaleTimeString('ru-RU', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${!isOwn ? `<div class="message-sender">${message.user_name}</div>` : ''}
+                    <div class="message-content">${message.content}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function setupWebSocket(chatId) {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            chatSocket = new WebSocket(`${protocol}//${window.location.host}/ws/chat/${chatId}/`);
+            
+            chatSocket.onmessage = (e) => addMessageToUI(JSON.parse(e.data));
+            chatSocket.onclose = () => console.log('Chat socket closed');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (message === '' || !currentChatId || !chatSocket) return;
+
+            // Показываем сообщение мгновенно
+            addMessageToUI({
+                id: Date.now(),
+                content: message,
+                timestamp: new Date().toISOString(),
+                user_id: {{ user.id }},
+                user_name: '{{ user.main_name }}'
+            });
+
+            // Отправляем через WebSocket
+            chatSocket.send(JSON.stringify({
+                'content': message
+            }));
+
+            input.value = '';
+        }
+
+        // Send message on Enter key
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('chatInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+        });
+
+        // Mobile responsive
+        function toggleSidebar() {
+            const sidebar = document.getElementById('chatSidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Add mobile menu button for small screens
+        if (window.innerWidth <= 768) {
+            const chatHeader = document.getElementById('chatHeader');
+            if (chatHeader) {
+                const menuButton = document.createElement('button');
+                menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+                menuButton.className = 'btn btn-link text-primary';
+                menuButton.onclick = toggleSidebar;
+                chatHeader.insertBefore(menuButton, chatHeader.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>
