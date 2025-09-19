@@ -30,7 +30,7 @@
                                 {{ vacancy.title|first|upper }}
                             </div>
                             <div class="chat-info">
-                                <div class="chat-name">{{ vacancy.title }}</div>
+                                <div class="chat-name" style="overflow: hidden; text-overflow: ellipsis; max-width: 500px; max-height:40px; white-space: nowrap">{{ vacancy.title }}</div>
                                 <div class="chat-vacancy">{{ vacancy.min_salary }}-{{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</div>
                                 <div class="chat-last-message">AIR: {{ vacancy.ai_rating }}</div>
                             </div>
@@ -69,21 +69,18 @@
                     </div>
 
                     {% for vacancy in vacancies %}
-                        <div class="message other">
-                            <div class="message-bubble">
-                                <div class="message-sender">
-                                    <i class="fas fa-briefcase"></i> {{ vacancy.title }}
-                                </div>
+                        <div class="message other" style="width: 500px">
+                            <div class="message-bubble" style="border-radius: 18px !important;">
                                 <div class="message-content">
-                                    <strong>{{ vacancy.title }}</strong>
+                                    <strong><i class="fas fa-briefcase"></i></strong><strong style="overflow: hidden; text-overflow: ellipsis; max-width: 500px; max-height:40px; white-space: nowrap">{{ vacancy.title }}</strong>
                                     <br>
                                     <span class="text-muted">{{ vacancy.company.user.main_name }}</span>
                                     <br>
                                     <span class="badge bg-success">{{ vacancy.min_salary }}-{{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</span>
                                     <span class="badge bg-primary">AIR: {{ vacancy.ai_rating }}</span>
                                     <br><br>
-                                    <div class="text-truncate" style="max-height: 60px; overflow: hidden;">
-                                        {{ vacancy.description|truncatewords:20 }}
+                                    <div class="text-truncate" style="max-height: 60px; overflow: hidden; text-overflow: ellipsis; max-width: 500px; white-space: nowrap"">
+                                        {{ vacancy.description }}
                                     </div>
                                     <br>
                                     <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="btn btn-outline-primary btn-sm">
