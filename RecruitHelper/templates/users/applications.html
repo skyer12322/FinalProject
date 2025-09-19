@@ -17,49 +17,75 @@
     
     <div class="container-fluid py-4">
         <div class="chat-container">
-            <!-- Applications Sidebar -->
+            <!-- Profile Navigation Sidebar -->
             <div class="chat-sidebar">
                 <div class="chat-sidebar-header">
-                    <i class="fas fa-clipboard-list"></i>
-                    Заявки
+                    <i class="fas fa-user-circle"></i>
+                    Профиль
                 </div>
                 
                 <div class="chat-list">
-                    {% for it in applications %}
-                        <div class="chat-item">
-                            <div class="chat-avatar">
-                                {% if request.user.role == 'user' %}
-                                    {{ it.vacancy.company.user.main_name|first|upper }}
-                                {% else %}
-                                    {{ it.candidate.first_name|first|upper }}{{ it.candidate.last_name|first|upper }}
-                                {% endif %}
-                            </div>
-                            <div class="chat-info">
-                                <div class="chat-name">
-                                    {% if request.user.role == 'user' %}
-                                        {{ it.vacancy.title }}
-                                    {% else %}
-                                        {{ it.candidate.first_name }} {{ it.candidate.last_name }}
-                                    {% endif %}
-                                </div>
-                                <div class="chat-vacancy">
-                                    {% if request.user.role == 'user' %}
-                                        {{ it.vacancy.company.user.main_name }}
-                                    {% else %}
-                                        {{ it.vacancy.title }}
-                                    {% endif %}
-                                </div>
-                                <div class="chat-last-message">
-                                    Статус: {{ it.status|title }} • AIR: {{ it.ai_rating }}
-                                </div>
-                            </div>
+                    <a href="{% url 'profile' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-info-circle"></i>
                         </div>
-                    {% empty %}
-                        <div class="p-4 text-center text-muted">
-                            <i class="fas fa-inbox fa-2x mb-3"></i>
-                            <p>Пока нет заявок</p>
+                        <div class="chat-info">
+                            <div class="chat-name">Информация</div>
+                            <div class="chat-vacancy">Основные данные</div>
                         </div>
-                    {% endfor %}
+                    </a>
+                    
+                    {% if user.role == 'user' %}
+                    <a href="{% url 'profile' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Резюме</div>
+                            <div class="chat-vacancy">Загрузка документов</div>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'profile_vacancies' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Вакансии</div>
+                            <div class="chat-vacancy">Управление вакансиями</div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'applications' %}" class="chat-item active">
+                        <div class="chat-avatar">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Заявки</div>
+                            <div class="chat-vacancy">Отклики и предложения</div>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'chats' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Чаты</div>
+                            <div class="chat-vacancy">Сообщения</div>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'profile' %}#settings" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Настройки</div>
+                            <div class="chat-vacancy">Редактирование профиля</div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -77,8 +103,8 @@
 
                 <div class="chat-messages">
                     {% for it in applications %}
-                        <div class="message other">
-                            <div class="message-bubble">
+                        <div class="message other" style="max-width: 70%; width: 70%;">
+                            <div class="message-bubble" style="border-radius: 18px;">
                                 <div class="message-sender">
                                     {% if request.user.role == 'user' %}
                                         <i class="fas fa-building"></i> {{ it.vacancy.company.user.main_name }}
@@ -87,7 +113,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="message-content">
-                                    <strong>
+                                    <strong style="font-size: 1.25em;">
                                         {% if request.user.role == 'user' %}
                                             {{ it.vacancy.title }}
                                         {% else %}
@@ -95,27 +121,36 @@
                                         {% endif %}
                                     </strong>
                                     <br>
-                                    <span class="{% if it.status == 'accepted' %}text-success{% elif it.status == 'rejected' %}text-danger{% else %}text-warning{% endif %}">
-                                        Статус: {{ it.status|title }}
+                                    <span class="badge fs-6 px-3 py-2" style="width: 150px; {% if it.status == 'accepted' %}background: #28a745; color: white;{% elif it.status == 'rejected' %}background: #dc3545; color: white;{% else %}background: #ffc107; color: black;{% endif %}">
+                                        {{ it.status|title }}
                                     </span>
+                                    <div style="margin-bottom: 5px;"></div>
+                                    <span class="badge fs-6 px-3 py-2" style="background: #27ae60; color: white;">AIR: {{ it.ai_rating }}</span>
                                     <br>
-                                    <small>AI Рейтинг: {{ it.ai_rating }}</small>
-                                    
                                     {% if request.user.role == 'company' and it.status == 'pending' %}
                                         <form method="POST" class="mt-2">
                                             {% csrf_token %}
                                             <input type="hidden" name="application_id" value="{{ it.id }}">
-                                            <button type="submit" class="btn btn-success btn-sm">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-success btn-sm" style="width: 200px;">
                                                 <i class="fas fa-check"></i> Одобрить
                                             </button>
                                         </form>
+                                        <form method="POST" class="mt-2">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="application_id" value="{{ it.id }}">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-sm" style="width: 200px; background-color: #dc3545; color: white; border-color: #dc3545;">
+                                                <i class="fas fa-times"></i> Отклонить
+                                            </button>
+                                        </form>
                                     {% elif it.status == 'accepted' %}
-                                        <a href="{% url 'chats' %}" class="btn btn-primary btn-sm mt-2">
+                                        <a href="{% url 'chats' %}" class="btn btn-primary btn-sm mt-2" style="width: 200px;">
                                             <i class="fas fa-comments"></i> Перейти к чату
                                         </a>
                                     {% endif %}
                                 </div>
-                                <div class="message-time">{{ it.created_at|date:"d.m.Y H:i" }}</div>
+                                <div class="message-time" style="font-size: 1.125em;">{{ it.created_at|date:"d.m.Y H:i" }}</div>
                             </div>
                         </div>
                     {% empty %}

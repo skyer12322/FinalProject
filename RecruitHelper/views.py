@@ -16,6 +16,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from RecruitHelper.models import (
     User, Company, Vacancy, Application, Chat, CUser, Notification
 )
@@ -28,6 +30,7 @@ from . import prompts
 
 logger = logging.getLogger(__name__)
 
+@cache_page(60 * 15)  # Cache for 15 minutes
 def home(request):
     """
     Отображает главную страницу с вакансиями, тегами и популярными категориями.
@@ -160,6 +163,7 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+@cache_page(60 * 30)  # Cache for 30 minutes
 def company(request, company_id):
     """
     Отображает страницу компании по её ID.
@@ -175,6 +179,8 @@ def company(request, company_id):
     return render(request, 'users/HRpage.html', context)
 
 @login_required
+@vary_on_cookie
+@cache_page(60 * 10)  # Cache for 10 minutes
 def profile(request):
     """
     Отображает страницу профиля текущего пользователя.
@@ -189,6 +195,8 @@ def profile(request):
     return render(request, 'users/profile.html', context)
 
 @login_required
+@vary_on_cookie
+@cache_page(60 * 5)  # Cache for 5 minutes
 def profile_vacancies(request):
     """
     Отображает вакансии, созданные текущим пользователем (для компаний).
@@ -261,22 +269,28 @@ def applications(request):
         }
     if request.method == 'POST':
         application_id = request.POST.get('application_id')
-        if application_id:
+        action = request.POST.get('action')
+        if application_id and action:
             try:
                 application = Application.objects.get(id=application_id)
                 if request.user.role=='company' and application.vacancy.company.user==request.user:
-                    application.status = 'accepted'
-                    application.save()
-                    Chat.objects.create(id=application.vacancy.id,
-                                        user=application.candidate,
-                                        company=request.user.company,
-                                        name=application.vacancy.title,
-                                        vacancy=application.vacancy)
+                    if action == 'approve':
+                        application.status = 'accepted'
+                        application.save()
+                        Chat.objects.create(id=application.vacancy.id,
+                                            user=application.candidate,
+                                            company=request.user.company,
+                                            name=application.vacancy.title,
+                                            vacancy=application.vacancy)
+                    elif action == 'reject':
+                        application.status = 'rejected'
+                        application.save()
             except Application.DoesNotExist:
                 pass
         return redirect('applications')
     return render(request, 'users/applications.html', context)
 
+@cache_page(60 * 30)  # Cache for 30 minutes
 def candidate(request, user_id):
     """
     Отображает страницу кандидата по ID пользователя.
@@ -291,6 +305,7 @@ def candidate(request, user_id):
     context = {'user': candidate_user}
     return render(request, 'users/candidatepage.html', context)
 
+@cache_page(60 * 5)  # Cache for 5 minutes
 def vacancies(request):
     """
     Отображает список всех вакансий с возможностью фильтрации.

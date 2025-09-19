@@ -31,7 +31,7 @@ function applyFilters() {
                     vacanciesList.innerHTML = ''
                     data.data.vacancies.forEach((item, index) => {
                         let vacancyHtml = `
-                            <div class="col-12">
+                            <div class="col-12" style="margin-bottom: 20px;">
                                 <a href="/vacancies/${item.id}" style="text-decoration: none;">
                                     <div class="job-card vacancy">
                                         <div class="job-header">

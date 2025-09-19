@@ -16,31 +16,75 @@
     
     <div class="container-fluid py-4">
         <div class="chat-container">
-            <!-- Vacancies Sidebar -->
+            <!-- Profile Navigation Sidebar -->
             <div class="chat-sidebar">
                 <div class="chat-sidebar-header">
-                    <i class="fas fa-briefcase"></i>
-                    Мои вакансии
+                    <i class="fas fa-user-circle"></i>
+                    Профиль
                 </div>
                 
                 <div class="chat-list">
-                    {% for vacancy in vacancies %}
-                        <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="chat-item">
-                            <div class="chat-avatar">
-                                {{ vacancy.title|first|upper }}
-                            </div>
-                            <div class="chat-info">
-                                <div class="chat-name" style="overflow: hidden; text-overflow: ellipsis; max-width: 500px; max-height:40px; white-space: nowrap">{{ vacancy.title }}</div>
-                                <div class="chat-vacancy">{{ vacancy.min_salary }}-{{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</div>
-                                <div class="chat-last-message">AIR: {{ vacancy.ai_rating }}</div>
-                            </div>
-                        </a>
-                    {% empty %}
-                        <div class="p-4 text-center text-muted">
-                            <i class="fas fa-briefcase fa-2x mb-3"></i>
-                            <p>У вас пока нет вакансий</p>
+                    <a href="{% url 'profile' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-info-circle"></i>
                         </div>
-                    {% endfor %}
+                        <div class="chat-info">
+                            <div class="chat-name">Информация</div>
+                            <div class="chat-vacancy">Основные данные</div>
+                        </div>
+                    </a>
+                    
+                    {% if user.role == 'user' %}
+                    <a href="{% url 'profile' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Резюме</div>
+                            <div class="chat-vacancy">Загрузка документов</div>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'profile_vacancies' %}" class="chat-item active">
+                        <div class="chat-avatar">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Вакансии</div>
+                            <div class="chat-vacancy">Управление вакансиями</div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'applications' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Заявки</div>
+                            <div class="chat-vacancy">Отклики и предложения</div>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'chats' %}" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Чаты</div>
+                            <div class="chat-vacancy">Сообщения</div>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'profile' %}#settings" class="chat-item">
+                        <div class="chat-avatar">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">Настройки</div>
+                            <div class="chat-vacancy">Редактирование профиля</div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
