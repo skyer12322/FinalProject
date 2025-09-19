@@ -127,7 +127,7 @@
                             <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
                                 <div class="job-card vacancy">
                                     <div class="job-header">
-                                        <h3>{{ it.title }}</h3>
+                                        <h3 style="overflow: hidden; text-overflow: ellipsis; max-width: 500px; max-height:40px; white-space: nowrap">{{ it.title }}</h3>
                                         <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
                                     </div>
                                     <div class="job-meta">
