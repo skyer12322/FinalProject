@@ -27,9 +27,9 @@ class UserAuthBackend(BaseBackend):
         :return: Объект пользователя, если аутентификация успешна, иначе None.
         """
         logger.debug(f"Authentication attempt - email: {email}, check_company: {check_company}")
-
+        is_company = "company" if check_company else "user"
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=email, role=is_company)
             logger.debug(f"User found by email: {email}")
         except User.DoesNotExist:
             logger.debug(f"Email not found, trying username: {email}")
@@ -42,10 +42,6 @@ class UserAuthBackend(BaseBackend):
 
         if not user.check_password(password):
             logger.warning(f"Invalid password for user: {email}")
-            return None
-
-        if check_company and user.role != "company":
-            logger.warning(f"Non-company user attempting company login: {email}")
             return None
 
         logger.info(f"Successful authentication for: {email} (ID: {user.id})")

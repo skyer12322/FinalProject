@@ -319,8 +319,23 @@
             }
             
             // Add active class to clicked nav item
-            event.target.closest('.chat-item').classList.add('active');
+            if (event && event.target) {
+                event.target.closest('.chat-item').classList.add('active');
+            }
         }
+        
+        // Check for hash on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash === 'settings') {
+                showSection('settings');
+                // Update active nav item
+                document.querySelectorAll('.chat-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector('a[href*="#settings"]').closest('.chat-item').classList.add('active');
+            }
+        });
     </script>
 </body>
 </html>
