@@ -14,6 +14,12 @@
 <body>
     {% include "../main/menu.html" %}
     
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
     <div class="container-fluid py-4">
         <div class="chat-container">
             <!-- Chat Sidebar -->
@@ -173,6 +179,36 @@
     {% include "../main/footer.html" %}
 
     <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('chatSidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        if (menuToggle && sidebar && overlay) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+                overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+                overlay.style.display = 'none';
+            });
+            
+            // Close menu when clicking on a nav item
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                        overlay.classList.remove('show');
+                        overlay.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
         let currentChatId = null;
         let chatSocket = null;
         let chatCache = new Map();
