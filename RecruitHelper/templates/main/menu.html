@@ -2,7 +2,6 @@
 
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <link rel="stylesheet" href="{% static 'css/main/menu.css' %}">
-<link rel="stylesheet" href="{% static 'css/mobile.css' %}">
 
 <nav class="navbar">
     <div class="nav-container">
@@ -10,13 +9,7 @@
             <img src="{% static 'images/logo.jpg' %}" alt="Лого компании" class="logo" style="width: 50px; height: 50px; border-radius: 10%;">
         </div>
         
-        <button class="mobile-menu-toggle" id="mobileMenuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        
-        <ul class="centered-menu" id="mobileMenu">
+        <ul class="centered-menu">
             <li><a href="{% url 'home' %}">Главная</a></li>
             {% if request.path != '/login/' %}
                 <li><a href="{% url 'vacancies_list' %}">Список вакансий</a></li>
@@ -41,22 +34,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggle = document.getElementById('mobileMenuToggle');
-    const menu = document.getElementById('mobileMenu');
-    if (toggle && menu) {
-        toggle.addEventListener('click', function() {
-            menu.classList.toggle('active');
-            toggle.classList.toggle('active');
-        });
-        menu.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A') {
-                menu.classList.remove('active');
-                toggle.classList.remove('active');
-            }
-        });
-    }
-});
-</script>
