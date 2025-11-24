@@ -1,19 +1,48 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Новости сайта</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Новости - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
-
 <body>
     {% include "../main/menu.html" %}
+    
+    <main>
+        <div class="vacancies" style="margin-top: 40px;">
+            <h1 style="font-size: 32px; margin-bottom: 32px;">Новости</h1>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="vacancy-card" style="cursor: default;">
+                    <h3 class="vacancy-title">Запуск платформы CareerAI</h3>
+                    <div class="vacancy-meta">
+                        <span>📅 01.01.2025</span>
+                    </div>
+                    <p style="color: var(--dark-text); margin-top: 12px; line-height: 1.6;">
+                        Мы рады объявить о запуске нашей инновационной платформы для поиска работы 
+                        с использованием искусственного интеллекта. Теперь поиск идеальной вакансии 
+                        стал еще проще и эффективнее!
+                    </p>
+                </div>
+                
+                <div class="vacancy-card" style="cursor: default;">
+                    <h3 class="vacancy-title">Новая функция AI-рейтинга</h3>
+                    <div class="vacancy-meta">
+                        <span>📅 15.01.2025</span>
+                    </div>
+                    <p style="color: var(--dark-text); margin-top: 12px; line-height: 1.6;">
+                        Представляем улучшенную систему AI-рейтинга, которая еще точнее оценивает 
+                        соответствие кандидатов вакансиям. Теперь работодатели могут быстрее находить 
+                        идеальных сотрудников!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
     {% include "../main/footer.html" %}
 </body>
 </html>

@@ -1,230 +1,145 @@
 {% load static %}
-{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заявки</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/users/chat.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
+    <title>Заявки - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     <style>
+        .applications-page {
+            max-width: 1280px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
         .application-card {
-            transition: transform 0.2s;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
         }
         .application-card:hover {
-            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .application-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .application-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--light-text);
+            font-size: 14px;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .application-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
         }
     </style>
 </head>
-<body class="profile-body bg-light">
+<body>
     {% include "../main/menu.html" %}
     
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-    
-    <div class="container-fluid py-4">
-        <div class="chat-container">
-            <!-- Profile Sidebar -->
-            <div class="chat-sidebar" id="profileSidebar">
-                <div class="chat-sidebar-header">
-                    <i class="fas fa-user-circle"></i>
-                    Профиль
-                </div>
-                
-                <div class="chat-list" id="profileNav">
-                    <a href="{% url 'profile' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Информация</div>
-                            <div class="chat-vacancy">Основные данные</div>
-                        </div>
-                    </a>
-                    
-                    {% if user.role == 'user' %}
-                    <a href="{% url 'profile' %}#resume" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Резюме</div>
-                            <div class="chat-vacancy">Загрузка документов</div>
-                        </div>
-                    </a>
-                    {% else %}
-                    <a href="{% url 'profile_vacancies' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Вакансии</div>
-                            <div class="chat-vacancy">Управление вакансиями</div>
-                        </div>
-                    </a>
-                    {% endif %}
-                    
-                    <a href="{% url 'applications' %}" class="chat-item active">
-                        <div class="chat-avatar">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Заявки</div>
-                            <div class="chat-vacancy">Отклики и предложения</div>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'chats' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Чаты</div>
-                            <div class="chat-vacancy">Сообщения</div>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'profile' %}#settings" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Настройки</div>
-                            <div class="chat-vacancy">Редактирование профиля</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="chat-main">
-                <div class="chat-messages" style="display: block;">
-                    <div class="container-lg py-3">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body p-4">
-                                <h1 class="mb-4">
-                                    <i class="fas fa-clipboard-list me-2"></i>Мои заявки
-                                </h1>
-                
-                <div class="row g-4">
-                    {% for it in applications %}
-                    <div class="col-12">
-                        {% if request.user.role == 'user' %}
-                        <a href="{% url 'company' company_id=it.vacancy.company.id %}" class="text-decoration-none">
-                            <div class="card shadow-sm border-0 hover-shadow mb-3">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h3 class="mb-0">{{ it.vacancy }}</h3>
-                                        <span class="badge bg-primary rounded-pill">AIR: {{ it.ai_rating }}</span>
-                                    </div>
-                                    <div class="d-flex flex-wrap gap-4 text-muted">
-                                        <span>
-                                            <i class="fas fa-building me-2"></i>{{ it.vacancy.company }}
-                                        </span>
-                                        <span>
-                                            <i class="fas fa-wallet me-2"></i>{{ it.vacancy.salary }}
-                                        </span>
-                                        <span class="{% if it.status == 'accepted' %}text-success{% elif it.status == 'rejected' %}text-danger{% else %}text-warning{% endif %}">
-                                            <i class="fas fa-circle me-2"></i>{{ it.status|title }}
-                                        </span>
-                                    </div>
-                                </div>
+    <main>
+        <div class="applications-page">
+            <h1 style="font-size: 32px; margin-bottom: 32px;">
+                {% if user.role == 'company' %}Заявки на вакансии{% else %}Мои отклики{% endif %}
+            </h1>
+            
+            {% if applications %}
+            <div>
+                {% for application in applications %}
+                <div class="application-card">
+                    <div class="application-header">
+                        <div style="flex: 1;">
+                            <h3 class="application-title">{{ application.vacancy.title }}</h3>
+                            <div class="application-meta">
+                                {% if user.role == 'company' %}
+                                <span>👤 {{ application.candidate.first_name }} {{ application.candidate.last_name }}</span>
+                                {% else %}
+                                <span>🏢 {{ application.vacancy.company.user.main_name }}</span>
+                                {% endif %}
+                                <span>📅 {{ application.created_at|date:"d.m.Y" }}</span>
+                                {% if application.ai_rating %}
+                                <span class="ai-badge">AIR: {{ application.ai_rating }}</span>
+                                {% endif %}
                             </div>
-                        </a>
-                        {% else %}
-                            {% if it.status != 'rejected' %}
-                            <form name="{{it.id}}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="application_id" value="{{it.id}}">
-                                <div class="card shadow-sm border-0 hover-shadow mb-3">
-                                    <div class="card-body p-4">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <a href="{% url 'candidate' user_id=it.candidate.user.id %}" class="text-decoration-none">
-                                                <h3 class="mb-0">{{ it.candidate.first_name }} {{ it.candidate.last_name }}</h3>
-                                            </a>
-                                            <span class="badge bg-primary rounded-pill">AIR: {{ it.ai_rating }}</span>
-                                        </div>
-                                        <div class="d-flex flex-wrap gap-4 align-items-center text-muted">
-                                            <span>
-                                                <i class="fas fa-briefcase me-2"></i>{{ it.vacancy }}
-                                            </span>
-                                            <span class="{% if it.status == 'accepted' %}text-success{% elif it.status == 'rejected' %}text-danger{% else %}text-warning{% endif %}">
-                                                <i class="fas fa-circle me-2"></i>{{ it.status|title }}
-                                            </span>
-                                            {% if it.status == 'pending' %}
-                                                <button class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check me-2"></i>Одобрить
-                                                </button>
-                                            {% else %}
-                                                <a href="{% url 'chat' chat_id=it.chats.id %}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-comments me-2"></i>Написать
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        </div>
+                        <div>
+                            {% if application.status == 'pending' %}
+                            <span class="status-badge status-pending">На рассмотрении</span>
+                            {% elif application.status == 'accepted' %}
+                            <span class="status-badge status-accepted">Принято</span>
+                            {% elif application.status == 'rejected' %}
+                            <span class="status-badge status-rejected">Отклонено</span>
                             {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="application-actions">
+                        <a href="{% url 'vacancy' vacancy_id=application.vacancy.id %}" class="btn btn-outline">Посмотреть вакансию</a>
+                        {% if user.role == 'company' %}
+                        <a href="{% url 'candidate' user_id=application.candidate.user.id %}" class="btn btn-outline">Профиль кандидата</a>
+                        {% if application.status == 'pending' %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="application_id" value="{{ application.id }}">
+                            <button type="submit" name="action" value="approve" class="btn btn-primary">Принять</button>
+                            <button type="submit" name="action" value="reject" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">Отклонить</button>
+                        </form>
+                        {% endif %}
                         {% endif %}
                     </div>
-                    {% empty %}
-                    <div class="col-12 text-center py-5">
-                        <div class="display-5 text-muted mb-3">
-                            <i class="fas fa-inbox"></i>
-                        </div>
-                        <h2 class="h4">Пока нет заявок</h2>
-                    </div>
-                    {% endfor %}
-                            </div>
-                        </div>
-                    </div>
                 </div>
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="text-center" style="padding: 60px 20px;">
+                <div style="font-size: 64px; margin-bottom: 16px;">📋</div>
+                <h2>Заявок пока нет</h2>
+                <p style="color: var(--light-text); margin-top: 12px;">
+                    {% if user.role == 'company' %}
+                    Когда кандидаты откликнутся на ваши вакансии, они появятся здесь
+                    {% else %}
+                    Откликайтесь на вакансии, и ваши заявки появятся здесь
+                    {% endif %}
+                </p>
+                <a href="{% url 'vacancies_list' %}" class="btn btn-primary mt-3">Смотреть вакансии</a>
+            </div>
+            {% endif %}
         </div>
-    </div>
-
-    {% include "../main/footer.html" %}
+    </main>
     
-    <script>
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('mobileMenuToggle');
-        const sidebar = document.getElementById('profileSidebar');
-        const overlay = document.getElementById('mobileOverlay');
-        
-        if (menuToggle && sidebar && overlay) {
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-                overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
-            });
-            
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-                overlay.style.display = 'none';
-            });
-            
-            // Close menu when clicking on a nav item
-            document.querySelectorAll('.chat-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('show');
-                        overlay.classList.remove('show');
-                        overlay.style.display = 'none';
-                    }
-                });
-            });
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% include "../main/footer.html" %}
 </body>
 </html>

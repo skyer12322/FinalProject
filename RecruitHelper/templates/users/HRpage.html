@@ -7,93 +7,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Профиль компании - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <style>
-        :root {
-            --primary-color: #6366f1;
-            --hover-color: #4f46e5;
-            --background: #f8f9fa;
-        }
-    </style>
 </head>
 
-<body class="profile-body bg-light">
+<body>
     {% include "../main/menu.html" %}
     
-    <div class="container-lg py-5">
-        <div>
-            <div>
-                <div class="card shadow-sm border-0 overflow-hidden">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 text-center">
-                                <div class="avatar-upload position-relative">
-                                    <img src="
-                                        {% if user|is_instance:'Company' and user.company.avatar %}
-                                            {{ company.avatar.url }}
-                                        {% elif user|is_instance:'CUser' and user.cuser.avatar %}
-                                            {{ company.avatar.url }}
-                                        {% else %}
-                                            {% static 'images/default_avatar.png' %}
-                                        {% endif %}" 
-                                        class="rounded-circle shadow" 
-                                        width="120" 
-                                        height="120"
-                                        alt="Аватар">
-                                </div>
+    <main>
+        <div class="container">
+            <div class="profile-view-container">
+                <div class="profile-view-main">
+                    <div class="profile-view-header">
+                        {% if company.user.profile_image %}
+                        <img src="{{ company.user.profile_image.url }}" alt="Avatar" class="profile-avatar-large">
+                        {% else %}
+                        <div class="profile-avatar-large" style="background: linear-gradient(135deg, var(--primary-green), var(--primary-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: 600;">
+                            {{ company.user.main_name|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="profile-view-info">
+                            <h1>{{ company.user.main_name }}</h1>
+                            <div class="profile-view-meta">
+                                <span>📧 {{ company.user.email }}</span>
+                                <span>📅 Присоединился {{ company.user.date_joined|date:"d.m.Y" }}</span>
+                                {% if company.website %}
+                                <span>🌐 <a href="{{ company.website }}" target="_blank" style="color: var(--primary-blue); text-decoration: none;">{{ company.website }}</a></span>
+                                {% endif %}
                             </div>
-
-                            <div class="col-md-9 mt-4 mt-md-0">
-                                <div class="d-flex flex-column gap-2" style="text-align: justify;">
-                                    <h2 class="mb-0">{{ company.user.main_name }}</h2>
-                                    
-                                    <div class="d-flex flex-wrap gap-3 text-muted">
-                                        <div>
-                                            <i class="fas fa-envelope me-2"></i>
-                                            {{ company.user.email }}
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-calendar-day me-2"></i>
-                                            Присоединился {{ company.user.date_joined|date:"d.m.Y" }}
-                                        </div>
-                                        {% if company.user.role == 'company' and company.user.company.website %}
-                                        <div>
-                                            <i class="fas fa-globe me-2"></i>
-                                            <a href="{{ user.company.website }}" class="text-decoration-none">
-                                                {{ company.user.company.website|truncatechars:20 }}
-                                            </a>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                    
+                    {% if company.user.description %}
+                    <div class="profile-view-section">
+                        <h2>О компании</h2>
+                        <div class="profile-view-description">
+                            {{ company.user.description }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="profile-view-section">
+                        <h2>Информация</h2>
+                        <div class="profile-view-grid">
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Email</div>
+                                <div class="profile-view-value">{{ company.user.email }}</div>
+                            </div>
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Тип</div>
+                                <div class="profile-view-value">Компания</div>
+                            </div>
+                            {% if company.website %}
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Веб-сайт</div>
+                                <div class="profile-view-value"><a href="{{ company.website }}" target="_blank" style="color: var(--primary-blue); text-decoration: none;">{{ company.website }}</a></div>
+                            </div>
+                            {% endif %}
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Дата регистрации</div>
+                                <div class="profile-view-value">{{ company.user.date_joined|date:"d.m.Y" }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="card shadow-sm border-0 mt-4">
-                    <div class="card-body p-4">
-                        <h5 class="mb-3">
-                            {% if company.user.role == 'company' %}
-                                <i class="fas fa-user-circle me-2"></i>О нас
-                            {% else %}
-                                <i class="fas fa-user-circle me-2"></i>О себе
-                            {% endif %}
-                        </h5>
-                        <div class="text-muted line-height-2">
-                            {{ company.user.description|default:"Информация отсутствует" }}
-                        </div>
+                
+                <div class="profile-view-sidebar">
+                    <div class="profile-view-card">
+                        <h3>💼 Вакансии</h3>
+                        <p>Количество активных вакансий: {{ company.vacancies.count }}</p>
+                        <a href="{% url 'vacancies_list' %}" class="btn btn-outline">
+                            Посмотреть вакансии
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     {% include "../main/footer.html" %}
 </body>

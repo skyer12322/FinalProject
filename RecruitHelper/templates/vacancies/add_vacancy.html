@@ -1,89 +1,174 @@
 {% load static %}
-{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавить вакансию</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vacancies/add_vacancy.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Добавить вакансию - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <style>
+        .form-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .form-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+        .form-card h1 {
+            font-size: 32px;
+            margin-bottom: 32px;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-text);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-blue);
+        }
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+        .error-message {
+            color: #c33;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            min-height: 48px;
+        }
+        .tag-item {
+            background: #e3f2fd;
+            color: var(--primary-blue);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body class="vacancies-list-body">
+<body>
     {% include "../main/menu.html" %}
-    <div class="vacancy-add-card card-box" style="margin-bottom: 20px;">
-        <h1 class="vacancies-list-h1">Добавить вакансию</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                {% if field.name != 'min_salary' and field.name != 'max_salary' and field.name != 'currency' %}
-                    <div class="container mb-3">
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in field.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+    
+    <main>
+        <div class="form-page">
+            <div class="form-card">
+                <h1>Разместить вакансию</h1>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.title.id_for_label }}">Название вакансии *</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="error-message">{{ form.title.errors }}</div>
                         {% endif %}
                     </div>
-                {% endif %}
-            {% endfor %}
-            <div class="salary container mb-3">
-                <p class="text-muted"><i>Требуется указать хотя бы минимальную зарплату</i></p>
-                <div class="row">
-                    <div class="col">
-                        {{ form.min_salary }}
-                        {% if form.min_salary.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.min_salary.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">Описание вакансии *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="error-message">{{ form.description.errors }}</div>
                         {% endif %}
                     </div>
-                    <div class="col-auto"> {# Use col-auto for the separator column #}
-                        -
-                   </div>
-                    <div class="col">
-                        {{ form.max_salary }}
-                         {% if form.max_salary.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.max_salary.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.min_salary.id_for_label }}">Минимальная зарплата</label>
+                            {{ form.min_salary }}
+                            {% if form.min_salary.errors %}
+                            <div class="error-message">{{ form.min_salary.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.max_salary.id_for_label }}">Максимальная зарплата</label>
+                            {{ form.max_salary }}
+                            {% if form.max_salary.errors %}
+                            <div class="error-message">{{ form.max_salary.errors }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col">
+                    
+                    <div class="form-group">
+                        <label for="{{ form.currency.id_for_label }}">Валюта</label>
                         {{ form.currency }}
+                        {% if form.currency.errors %}
+                        <div class="error-message">{{ form.currency.errors }}</div>
+                        {% endif %}
                     </div>
-                </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.geography.id_for_label }}">География (город, регион)</label>
+                        {{ form.geography }}
+                        {% if form.geography.errors %}
+                        <div class="error-message">{{ form.geography.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <input type="hidden" name="specialization" id="specialization" value="">
+                    <input type="hidden" name="occupancy" id="occupancy" value="">
+                    <input type="hidden" name="position" id="position" value="">
+                    <input type="hidden" name="tech" id="tech" value="">
+                    <input type="hidden" name="industry" id="industry" value="">
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Опубликовать вакансию</button>
+                        <a href="{% url 'profile_vacancies' %}" class="btn btn-outline">Отмена</a>
+                    </div>
+                </form>
             </div>
-            <h4>Теги</h4>
-            <h6>(Через запятую)</h6>
-            <h6 class="text-muted"><i>Они не обязательны, но если не указать некоторые из них, то ИИ сгенерирует их сам на основе описания вашей компании и вакансии</i></h6>
-            <div class="container mb-3">
-                <input type="text" class='form-control container' name="specialization" id="specializatin" placeholder="Специализация сотрудника">
-            </div>
-            <div class="container mb-3">
-                <input type="text" class='form-control container' name="occupancy" id="occupancy" placeholder="Условия работы">
-            </div>
-            <div class="container mb-3">
-                <input type="text" class='form-control container' name="position" id="position" placeholder="Позиция по должности">
-            </div>
-            <div class="container mb-3">
-                <input type="text" class='form-control container' name="tech" id="tech" placeholder="Технологии">
-            </div>
-            <div class="container mb-3">
-                <input type="text" class='form-control container' name="industry" id="industry" placeholder="Сфера деятельности компании">
-            </div>
-            <button type="submit" class="btn btn-primary mt-3 w-75" style="padding: 12px; background-color: #00c4a0; border: none; font-size: 1.1rem">Добавить вакансию</button>
-        </form>
-    </div>
+        </div>
+    </main>
+    
     {% include "../main/footer.html" %}
 </body>
 </html>

@@ -7,102 +7,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/users/profile.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Профиль пользователя - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <style>
-        :root {
-            --primary-color: #6366f1;
-            --hover-color: #4f46e5;
-            --background: #f8f9fa;
-        }
-    </style>
 </head>
 
-<body class="profile-body bg-light">
+<body>
     {% include "../main/menu.html" %}
     
-    <div class="container-lg py-5">
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0 overflow-hidden">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 text-center">
-                                <div class="avatar-upload position-relative">
-                                    <img src="
-                                        {% if cuser|is_instance:'Company' and user.company.avatar %}
-                                            {{ company.avatar.url }}
-                                        {% elif cuser.user|is_instance:'CUser' and user.cuser.avatar %}
-                                            {{ company.avatar.url }}
-                                        {% else %}
-                                            {% static 'images/default_avatar.png' %}
-                                        {% endif %}" 
-                                        class="rounded-circle shadow" 
-                                        width="120" 
-                                        height="120"
-                                        alt="Аватар">
-                                </div>
+    <main>
+        <div class="container">
+            <div class="profile-view-container">
+                <div class="profile-view-main">
+                    <div class="profile-view-header">
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Avatar" class="profile-avatar-large">
+                        {% else %}
+                        <div class="profile-avatar-large" style="background: linear-gradient(135deg, var(--primary-green), var(--primary-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: 600;">
+                            {{ user.cuser.first_name|first|default:user.main_name|first|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="profile-view-info">
+                            <h1>{{ user.cuser.first_name|default:user.main_name }} {{ user.cuser.last_name|default:"" }}</h1>
+                            <div class="profile-view-meta">
+                                <span>📧 {{ user.email }}</span>
+                                <span>📅 Присоединился {{ user.date_joined|date:"d.m.Y" }}</span>
                             </div>
-
-                            <div class="col-md-9 mt-4 mt-md-0">
-                                <div class="d-flex flex-column gap-2" style="text-align: justify;">
-                                    <h2 class="mb-0">{{ user.cuser.first_name }} {{ user.cuser.last_name }}</h2>
-                                    
-                                    <div class="d-flex flex-wrap gap-3 text-muted">
-                                        <div>
-                                            <i class="fas fa-envelope me-2"></i>
-                                            {{ user.email }}
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-calendar-day me-2"></i>
-                                            Присоединился {{ user.date_joined|date:"d.m.Y" }}
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                    
+                    {% if user.description %}
+                    <div class="profile-view-section">
+                        <h2>О себе</h2>
+                        <div class="profile-view-description">
+                            {{ user.description }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="profile-view-section">
+                        <h2>Информация</h2>
+                        <div class="profile-view-grid">
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Email</div>
+                                <div class="profile-view-value">{{ user.email }}</div>
+                            </div>
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Роль</div>
+                                <div class="profile-view-value">Соискатель</div>
+                            </div>
+                            <div class="profile-view-item">
+                                <div class="profile-view-label">Дата регистрации</div>
+                                <div class="profile-view-value">{{ user.date_joined|date:"d.m.Y" }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="card shadow-sm border-0 mt-4">
-                    <div class="card-body p-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-user-circle me-2"></i>О себе
-                        </h5>
-                        <div class="text-muted line-height-2">
-                            {{ user.description|default:"Информация отсутствует" }}
+                
+                <div class="profile-view-sidebar">
+                    <div class="profile-view-card">
+                        <h3>📄 Резюме</h3>
+                        {% if user.cuser.resume %}
+                        <a href="{{ user.cuser.resume.url }}" class="btn btn-primary" download>
+                            Скачать резюме
+                        </a>
+                        {% else %}
+                        <div class="profile-view-empty">
+                            Резюме не загружено
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4" style="width: 20vw">
-                <div class="sticky-top" style="top: 20px;">
-                    <div class="d-grid gap-3">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body text-center">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-file-pdf me-2"></i>Резюме
-                                </h5>
-                                {% if user.cuser.resume %}
-                                    <a href="{{ user.cuser.resume.url }}" class="btn btn-outline-primary w-100">
-                                        Скачать резюме
-                                    </a>
-                                {% else %}
-                                    <div class="text-muted">Не загружено</div>
-                                {% endif %}
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </main>
+    
     {% include "../main/footer.html" %}
 </body>
 </html>

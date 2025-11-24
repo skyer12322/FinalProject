@@ -22,8 +22,6 @@ def filters_handler(request):
             data.get('tech', '').strip(),
             data.get('industry', '').strip()
         ])
-        print(data)
-        print(has_filters)
         # Применяем фильтры зарплаты только если есть другие фильтры
         if has_filters:
             if data.get('min_salary') and str(data.get('min_salary')).strip():
@@ -42,8 +40,6 @@ def filters_handler(request):
                 vacancies = vacancies.filter(tags_ai__industry__contains=[data['industry']])
             
         vacancies = list(vacancies)
-        print(vacancies)
-
         # Преобразуем в список словарей
         vacancies_list = []
         for vacancy in vacancies:
@@ -87,20 +83,19 @@ def search_handler(request):
         else:
             vacancies = Vacancy.objects.all()
             
-        vacancies_list = list(vacancies.values(
-            'id',
-            'title',
-            'description',
-            'geography',
-            'min_salary',
-            'max_salary',
-            'ai_rating',
-        ))
-        
-        for i in range(len(vacancies_list)):
-            vacancy = vacancies[i]
-            vacancies_list[i]['company'] = vacancy.company.user.main_name
-            vacancies_list[i]['currency'] = vacancy.get_currency_display()
+        vacancies_list = []
+        for vacancy in vacancies:
+            vacancies_list.append({
+                'id': vacancy.id,
+                'title': vacancy.title,
+                'description': vacancy.description,
+                'geography': vacancy.geography,
+                'min_salary': vacancy.min_salary,
+                'max_salary': vacancy.max_salary,
+                'ai_rating': vacancy.ai_rating,
+                'company': vacancy.company.user.main_name,
+                'currency': vacancy.get_currency_display(),
+            })
 
         context = {
             'status': 'ok',

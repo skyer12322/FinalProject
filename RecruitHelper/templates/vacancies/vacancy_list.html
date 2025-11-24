@@ -1,231 +1,180 @@
 {% load static %}
-
 <!DOCTYPE html>
-
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список вакансий</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vacancies/vacancy_card.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vacancies/vacancies_list.css' %}">
+    <title>Список вакансий - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
-<body class="vacancies-list-body">
+<body>
     {% include "../main/menu.html" %}
-    <div class="md-3 vacancies-title justify-content-center">
-        <h1>Список вакансий</h2>
-    </div>
     
-    <div class="row justify-content-center" style="margin-top: 40px">
-        <div class="col-md-4 filters" style="box-shadow: none !important">
-            <div class="col-md-4 column filters" style="padding: 10px">
-                <h2>Поиск</h2>
-                <div class="mb-3">
+    <main>
+        <div class="content-with-sidebar">
+            <aside class="filters-sidebar">
+                <h2 style="margin-bottom: 24px; font-size: 20px;">Фильтры</h2>
+                
+                <div class="filter-group">
+                    <label>Поиск</label>
                     <input type="text" id="searchInput" placeholder="Начните вводить...">
                 </div>
-                <button type="button" onclick="search()" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Найти</button>
-            </div>
-            <div class="col-md-4 column filters" style="padding: 10px">
-                <h2>Фильтры</h2>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Отрасль</strong></label>
-                    <input class="form-control" list="industryListOptions" id="industryList" placeholder="Начните вводить...">
+                
+                <div class="filter-group">
+                    <label>Отрасль</label>
+                    <input list="industryListOptions" id="industryList" placeholder="Выберите отрасль">
                     <datalist id="industryListOptions">
                         {% for industry in tags_by_category.industry %}
-                            <option value="{{ industry }}">{{ industry }}</option>
+                        <option value="{{ industry }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Используемые технологии</strong></label>
-                    <input class="form-control" list="techListOptions" id="techList" placeholder="Начните вводить...">
+                
+                <div class="filter-group">
+                    <label>Технологии</label>
+                    <input list="techListOptions" id="techList" placeholder="Выберите технологию">
                     <datalist id="techListOptions">
                         {% for tech in tags_by_category.tech %}
-                            <option value="{{ tech }}">{{ tech }}</option>
+                        <option value="{{ tech }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Тип занятости</strong></label>
-                    <input class="form-control" list="occupancyListOptions" id="occupancyList" placeholder="Начните вводить...">
+                
+                <div class="filter-group">
+                    <label>Тип занятости</label>
+                    <input list="occupancyListOptions" id="occupancyList" placeholder="Выберите тип">
                     <datalist id="occupancyListOptions">
                         {% for occupancy in tags_by_category.occupancy %}
-                            <option value="{{ occupancy }}">{{ occupancy }}</option>
+                        <option value="{{ occupancy }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Специализация</strong></label>
-                    <input class="form-control" list="specializationListOptions" id="specializationList" placeholder="Начните вводить...">
+                
+                <div class="filter-group">
+                    <label>Специализация</label>
+                    <input list="specializationListOptions" id="specializationList" placeholder="Выберите специализацию">
                     <datalist id="specializationListOptions">
                         {% for specialization in tags_by_category.specialization %}
-                            <option value="{{ specialization }}">{{ specialization }}</option>
+                        <option value="{{ specialization }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Позиция</strong></label>
-                    <input class="form-control" list="positionListOptions" id="positionList" placeholder="Начните вводить...">
+                
+                <div class="filter-group">
+                    <label>Позиция</label>
+                    <input list="positionListOptions" id="positionList" placeholder="Выберите позицию">
                     <datalist id="positionListOptions">
                         {% for position in tags_by_category.position %}
-                            <option value="{{ position }}">{{ position }}</option>
+                        <option value="{{ position }}">
                         {% endfor %}
                     </datalist>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Дополнительные условия работы</strong></label>
-                    <input class="form-control" list="conditionsListOptions" id="conditionsList" placeholder="Начните вводить...">
-                    <datalist id="conditionsListOptions">
-                        {% for condition in tags_by_category.conditions %}
-                            <option value="{{ condition }}">{{ condition }}</option>
-                        {% endfor %}
-                    </datalist>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><strong>Зарплата</strong></label>
+                
+                <div class="filter-group">
+                    <label>Зарплата</label>
                     <div class="salary-range">
-                        <div class="mb-3">
-                            <label for="min_salary_input" class="form-label">Минимальная зарплата</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="range" class="custom-slider" id="min_salary_input" name="min_salary" 
-                                    min="0" max="{{ max_salary }}" step="1" value="{{ min_salary }}">
-                                <input type="number" class="form-control salary-input" id="minSalaryInput" 
-                                    min="0" max="{{ max_salary }}" step="1" value="{{ min_salary }}">
-                            </div>
+                        <div class="salary-input-group">
+                            <input type="range" id="min_salary_input" min="0" max="{{ max_salary }}" value="{{ min_salary }}">
+                            <input type="number" id="minSalaryInput" min="0" max="{{ max_salary }}" value="{{ min_salary }}">
                         </div>
-                        <div class="mb-3">
-                            <label for="max_salary_input" class="form-label">Максимальная зарплата</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="range" class="custom-slider" id="max_salary_input" name="max_salary" 
-                                    min="0" max="{{ max_salary }}" step="1" value="{{ max_salary }}">
-                                <input type="number" class="form-control salary-input" id="maxSalaryInput" 
-                                    min="0" max="{{ max_salary }}" step="1" value="{{ max_salary }}">
-                            </div>
+                        <div class="salary-input-group">
+                            <input type="range" id="max_salary_input" min="0" max="{{ max_salary }}" value="{{ max_salary }}">
+                            <input type="number" id="maxSalaryInput" min="0" max="{{ max_salary }}" value="{{ max_salary }}">
                         </div>
                     </div>
                 </div>
+                
+                <button type="button" onclick="applyFilters()" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Применить</button>
+            </aside>
             
-                <button type="button" onclick="applyFilters()" class="filter-button btn btn-primary w-100" style="background-color: #00c4a0; border: none">Применить фильтр</button>
-            </div>
-        </div>
-        <div class="col-6 col-md-6 col-lg-6">
-            <div class="container mt-5">
-                <section class="featured-jobs mb-5" id="vacanciesList">
-                    {% if vacancies|length == 0 %}
-                    <div class="row g-4">
-                        <h1 class="no-vacancies">Пока что нет доступных вакансий</h1>
-                    </div>
-                    {% else %}
-                    <div class="row g-4 vacancies-columns">
-                        {% for it in vacancies %}
-                        <div class="col-12">
-                            <a href={% url "vacancy" vacancy_id=it.id %} style="text-decoration: none;">
-                                <div class="job-card vacancy">
-                                    <div class="job-header">
-                                        <h3 style="overflow: hidden; text-overflow: ellipsis; max-width: 500px; max-height:40px; white-space: nowrap">{{ it.title }}</h3>
-                                        <span class="ai-rating">AIR: {{ it.ai_rating }}</span>
-                                    </div>
-                                    <div class="job-meta">
-                                        <span class="company">{{ it.company }}</span>
-                                        <span class="location">{{ it.location }}</span>
-                                        <span class="salary">{{ it.min_salary }} - {{it.max_salary}} 
-                                            <!-- <span class="currency-badge">{{ it.get_currency_display }}</span> -->
-                                        </span>
+            <div>
+                <h1 style="font-size: 32px; margin-bottom: 24px;">Все вакансии</h1>
+                
+                <div id="vacanciesList">
+                    {% if vacancies %}
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        {% for vacancy in vacancies %}
+                        <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="vacancy-card">
+                            <div class="vacancy-header">
+                                <div style="flex: 1;">
+                                    <h3 class="vacancy-title">{{ vacancy.title }}</h3>
+                                    <div class="vacancy-meta">
+                                        <span>🏢 {{ vacancy.company.user.main_name }}</span>
+                                        {% if vacancy.min_salary and vacancy.max_salary %}
+                                        <span>💰 {{ vacancy.min_salary }} - {{ vacancy.max_salary }} {{ vacancy.get_currency_display }}</span>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </a>
-                        </div>
+                                <div class="ai-badge">AIR: {{ vacancy.ai_rating }}</div>
+                            </div>
+                            <p style="color: var(--light-text); margin-top: 12px;">
+                                {{ vacancy.description|truncatewords:30 }}
+                            </p>
+                        </a>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="text-center" style="padding: 60px 20px;">
+                        <h2>Вакансии не найдены</h2>
+                        <p style="color: var(--light-text); margin-top: 12px;">Попробуйте изменить параметры поиска</p>
+                    </div>
                     {% endif %}
-                </section>
+                </div>
             </div>
         </div>
-    </div>
-
+    </main>
+    
     {% include "../main/footer.html" %}
+    
+    <script>
+    const vacanciesList = document.getElementById('vacanciesList');
+    const searchInput = document.getElementById('searchInput');
+    const result_error = document.createElement('div');
+    </script>
+    <script src="{% static 'js/vacancies/vacancy_search.js' %}"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const minSlider = document.getElementById('min_salary_input');
         const maxSlider = document.getElementById('max_salary_input');
         const minInput = document.getElementById('minSalaryInput');
         const maxInput = document.getElementById('maxSalaryInput');
-        const minValue = document.getElementById('minSalaryInput');
-        const maxValue = document.getElementById('maxSalaryInput');
 
-        function formatNumber(num) {
-            return new Intl.NumberFormat('ru-RU').format(num);
-        }
-
-        function updateSlider(slider, value) {
-            value = Math.max(slider.min, Math.min(slider.max, value));
-            slider.value = value;
-            const percent = (value - slider.min) / (slider.max - slider.min) * 100;
-            slider.style.setProperty('--progress', `${percent}%`);
-            return value;
-        }
-
-        function syncValues(source, targetSlider, targetInput, targetValue) {
+        function syncValues(source, targetSlider, targetInput) {
             const value = parseInt(source.value);
-            if (isNaN(value)) return;
-
-            const cleanedValue = updateSlider(targetSlider, value);
-            targetInput.value = cleanedValue;
-            targetValue.textContent = formatNumber(cleanedValue);
+            if (!isNaN(value)) {
+                targetSlider.value = value;
+                targetInput.value = value;
+            }
         }
 
-        // Обработчики для ползунков
         [minSlider, maxSlider].forEach(slider => {
             slider.addEventListener('input', (e) => {
                 const isMin = e.target === minSlider;
-                const otherSlider = isMin ? maxSlider : minSlider;
+                syncValues(e.target, e.target, isMin ? minInput : maxInput);
                 
-                syncValues(e.target, e.target, 
-                    isMin ? minInput : maxInput, 
-                    isMin ? minValue : maxValue);
-
                 if (isMin && parseInt(minSlider.value) > parseInt(maxSlider.value)) {
-                    syncValues(minSlider, maxSlider, maxInput, maxValue);
+                    syncValues(minSlider, maxSlider, maxInput);
                 } else if (!isMin && parseInt(maxSlider.value) < parseInt(minSlider.value)) {
-                    syncValues(maxSlider, minSlider, minInput, minValue);
+                    syncValues(maxSlider, minSlider, minInput);
                 }
             });
         });
 
-        // Обработчики для текстовых полей
         [minInput, maxInput].forEach(input => {
             input.addEventListener('input', (e) => {
                 const isMin = e.target === minInput;
                 const slider = isMin ? minSlider : maxSlider;
-                const otherInput = isMin ? maxInput : minInput;
+                syncValues(e.target, slider, e.target);
                 
-                syncValues(e.target, slider, e.target, 
-                    isMin ? minValue : maxValue);
-
                 if (isMin && parseInt(minInput.value) > parseInt(maxInput.value)) {
-                    syncValues(minInput, maxSlider, maxInput, maxValue);
+                    syncValues(minInput, maxSlider, maxInput);
                 } else if (!isMin && parseInt(maxInput.value) < parseInt(minInput.value)) {
-                    syncValues(maxInput, minSlider, minInput, minValue);
+                    syncValues(maxInput, minSlider, minInput);
                 }
-                [minSlider, maxSlider].forEach(slider => {
-            updateSlider(slider, slider.value);
-        });
             });
-        });
-
-        // Инициализация
-        [minSlider, maxSlider].forEach(slider => {
-            updateSlider(slider, slider.value);
         });
     });
     </script>
-    <script src="{% static 'js/vacancies/search.js' %}"></script>
-    <script src="{% static 'js/vacancies/filters.js' %}"></script>
 </body>
 </html>
-

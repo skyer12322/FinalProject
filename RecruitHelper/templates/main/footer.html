@@ -1,13 +1,45 @@
+{% load static %}
+
 <footer class="footer">
-    <div class="container">
-        <div class="footer-content">
-            <p>© 2025 AI Career. Все права защищены.</p>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>О компании</h3>
             <ul class="footer-links">
                 <li><a href="{% url 'about_us' %}">О нас</a></li>
-                <li><a href="#">Контакты</a></li>
+                <li><a href="{% url 'news' %}">Новости</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h3>Соискателям</h3>
+            <ul class="footer-links">
+                <li><a href="{% url 'vacancies_list' %}">Поиск вакансий</a></li>
+                {% if user.is_authenticated and user.role == 'user' %}
+                    <li><a href="{% url 'applications' %}">Мои отклики</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h3>Работодателям</h3>
+            <ul class="footer-links">
+                {% if user.is_authenticated and user.role == 'company' %}
+                    <li><a href="{% url 'add_vacancy' %}">Разместить вакансию</a></li>
+                    <li><a href="{% url 'profile_vacancies' %}">Мои вакансии</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h3>Информация</h3>
+            <ul class="footer-links">
                 <li><a href="{% url 'privacy' %}">Политика конфиденциальности</a></li>
                 <li><a href="{% url 'terms' %}">Условия использования</a></li>
             </ul>
         </div>
+    </div>
+    
+    <div class="container text-center mt-4" style="padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+        <p style="opacity: 0.9;">© 2025 CareerAI. Все права защищены.</p>
     </div>
 </footer>

@@ -211,6 +211,7 @@ def profile_vacancies(request):
     return render(request, 'users/vacancies.html', context)
 
 @login_required
+@cache_page(60 * 5)
 def edit_user(request):
     """
     Обрабатывает редактирование профиля текущего пользователя.
@@ -248,6 +249,7 @@ def edit_user(request):
     return render(request, 'users/profileedit.html', context)
 
 @login_required
+@cache_page(60 * 5)
 def applications(request):
     """
     Отображает список заявок на вакансии для текущего пользователя (соискателя или компании).
@@ -348,6 +350,7 @@ def vacancies(request):
 
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
+@cache_page(60 * 2)
 def add_vacancy(request):
     """
     Обрабатывает создание новой вакансии пользователем-компанией.
@@ -443,6 +446,7 @@ def vacancy(request, vacancy_id):
 
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
+@cache_page(60 * 1)
 def apply_to_vacancy(request, vacancy_id):
     """
     Обрабатывает подачу заявки пользователем на вакансию.
@@ -504,6 +508,7 @@ def upload_resume(request):
             return redirect('profile')
     return redirect('profile')
 
+@cache_page(60 * 60)
 def privacy(request):
     """
     Отображает страницу политики конфиденциальности.
@@ -514,6 +519,7 @@ def privacy(request):
     logger.info("Privacy policy page requested")
     return render(request, 'info/privacy_policy.html')
 
+@cache_page(60 * 60)
 def terms(request):
     """
     Отображает страницу условий использования.
@@ -523,6 +529,7 @@ def terms(request):
     """
     return render(request, 'info/terms_of_use.html')
 
+@cache_page(60 * 30)
 def news(request):
     """
     Отображает страницу новостей.
@@ -533,6 +540,7 @@ def news(request):
     logger.info("News page requested")
     return render(request, 'info/news.html')
 
+@cache_page(60 * 30)
 def about_us(request):
     """
     Отображает страницу "О нас".
@@ -576,6 +584,7 @@ def download_logs(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+@cache_page(60 * 2)
 def chats(request):
     """
     Отображает интерфейс чатов для текущего пользователя (соискателя или компании).

@@ -1,375 +1,189 @@
 {% load static %}
 {% load custom_filters %}
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль - CareerAI</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/users/chat.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <style>
-        .profile-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .profile-info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .profile-info-label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-        .profile-info-value {
-            font-size: 15px;
-            color: #333;
-        }
-        .profile-description {
-            background: #f8f9fa;
-            padding: 16px;
-            border-radius: 8px;
-            border-left: 3px solid #0091ea;
-            font-size: 15px;
-            line-height: 1.5;
-            color: #555;
-            margin-top: 16px;
-        }
-        .profile-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .profile-btn {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            font-weight: 600;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .profile-btn-primary {
-            background: linear-gradient(135deg, #00c853, #0091ea);
-            color: white;
-        }
-        .profile-btn-danger {
-            background: white;
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-        .resume-section {
-            text-align: center;
-            padding: 30px;
-            border: 2px dashed #e5e5e5;
-            border-radius: 12px;
-            background: #fafafa;
-        }
-        .resume-icon {
-            font-size: 48px;
-            color: #0091ea;
-            margin-bottom: 15px;
-        }
-        .resume-text {
-            color: #666;
-            margin-bottom: 15px;
-        }
-        .profile-card-icon {
-            color: #0091ea;
-        }
-        .message.other .message-bubble {
-            border-radius: 18px !important;
-        }
-    </style>
 </head>
 <body>
     {% include "../main/menu.html" %}
     
-    <button class="mobile-menu-toggle" id="mobileMenuToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-    
-    <div class="container-fluid py-4">
-        <div class="chat-container">
-            <!-- Profile Sidebar -->
-            <div class="chat-sidebar" id="profileSidebar">
-                <div class="chat-sidebar-header">
-                    <i class="fas fa-user-circle"></i>
-                    Профиль
-                </div>
+    <main>
+        <div class="profile-container">
+            <aside class="profile-sidebar">
+                <a href="#info" class="profile-nav-item active" onclick="showSection('info', event)">
+                    <span style="font-size: 20px;">ℹ️</span>
+                    <div>
+                        <div style="font-weight: 600;">Информация</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Основные данные</div>
+                    </div>
+                </a>
                 
-                <div class="chat-list" id="profileNav">
-                    <a href="#" class="chat-item active" onclick="showSection('info')">
-                        <div class="chat-avatar">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Информация</div>
-                            <div class="chat-vacancy">Основные данные</div>
-                        </div>
-                    </a>
-                    
-                    {% if user.role == 'user' %}
-                    <a href="#" class="chat-item" onclick="showSection('resume')">
-                        <div class="chat-avatar">
-                            <i class="fas fa-file-pdf"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Резюме</div>
-                            <div class="chat-vacancy">Загрузка документов</div>
-                        </div>
-                    </a>
+                {% if user.role == 'user' %}
+                <a href="#resume" class="profile-nav-item" onclick="showSection('resume', event)">
+                    <span style="font-size: 20px;">📄</span>
+                    <div>
+                        <div style="font-weight: 600;">Резюме</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Загрузка документов</div>
+                    </div>
+                </a>
+                {% else %}
+                <a href="{% url 'profile_vacancies' %}" class="profile-nav-item">
+                    <span style="font-size: 20px;">💼</span>
+                    <div>
+                        <div style="font-weight: 600;">Вакансии</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Управление вакансиями</div>
+                    </div>
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'applications' %}" class="profile-nav-item">
+                    <span style="font-size: 20px;">📋</span>
+                    <div>
+                        <div style="font-weight: 600;">Заявки</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Отклики и предложения</div>
+                    </div>
+                </a>
+                
+                <a href="{% url 'chats' %}" class="profile-nav-item">
+                    <span style="font-size: 20px;">💬</span>
+                    <div>
+                        <div style="font-weight: 600;">Чаты</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Сообщения</div>
+                    </div>
+                </a>
+                
+                <a href="#settings" class="profile-nav-item" onclick="showSection('settings', event)">
+                    <span style="font-size: 20px;">⚙️</span>
+                    <div>
+                        <div style="font-weight: 600;">Настройки</div>
+                        <div style="font-size: 14px; color: var(--light-text);">Редактирование профиля</div>
+                    </div>
+                </a>
+            </aside>
+            
+            <div class="profile-main">
+                <div class="profile-header">
+                    {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="Avatar" class="profile-avatar-large">
                     {% else %}
-                    <a href="{% url 'profile_vacancies' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Вакансии</div>
-                            <div class="chat-vacancy">Управление вакансиями</div>
-                        </div>
-                    </a>
-                    {% endif %}
-                    
-                    <a href="{% url 'applications' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Заявки</div>
-                            <div class="chat-vacancy">Отклики и предложения</div>
-                        </div>
-                    </a>
-                    
-                    <a href="{% url 'chats' %}" class="chat-item">
-                        <div class="chat-avatar">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Чаты</div>
-                            <div class="chat-vacancy">Сообщения</div>
-                        </div>
-                    </a>
-                    
-                    <a href="#" class="chat-item" onclick="showSection('settings')">
-                        <div class="chat-avatar">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div class="chat-info">
-                            <div class="chat-name">Настройки</div>
-                            <div class="chat-vacancy">Редактирование профиля</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Main Profile Area -->
-            <div class="chat-main" id="profileMain">
-                <!-- Profile Header -->
-                <div class="chat-header">
-                    <div class="chat-header-avatar">
-                        {% if user.profile_image %}
-                            <img src="{{ user.profile_image.url }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" alt="Аватар">
+                    <div class="profile-avatar-large" style="background: linear-gradient(135deg, var(--primary-green), var(--primary-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: 600;">
+                        {% if user.role == 'user' %}
+                            {{ user.cuser.first_name|first|default:user.main_name|first|upper }}
                         {% else %}
-                            {% if user.role == 'user' %}
-                                {{ user.cuser.first_name|first|default:user.main_name|first|upper }}
-                            {% else %}
-                                {{ user.main_name|first|upper }}
-                            {% endif %}
+                            {{ user.main_name|first|upper }}
                         {% endif %}
                     </div>
-                    <div class="chat-header-info">
-                        <h3>
+                    {% endif %}
+                    <div class="profile-info">
+                        <h2>
                             {% if user.role == 'user' %}
                                 {{ user.cuser.first_name|default:user.main_name }} {{ user.cuser.last_name|default:"" }}
                             {% else %}
                                 {{ user.main_name }}
                             {% endif %}
-                        </h3>
+                        </h2>
                         <p>{{ user.email }} • Присоединился {{ user.date_joined|date:"d.m.Y" }}</p>
                     </div>
                 </div>
-
-                <!-- Profile Content -->
-                <div class="chat-messages" id="profileContent">
-                    <!-- Info Section -->
-                    <div id="info-section" class="profile-section">
-                        <div class="message other">
-                            <div class="message-bubble">
-                                <div class="message-sender"><i class="fas fa-user profile-card-icon"></i> Основная информация</div>
-                                <div class="message-content">
-                                    <div class="profile-info-grid">
-                                        <div class="profile-info-item">
-                                            <div class="profile-info-label">Email</div>
-                                            <div class="profile-info-value">{{ user.email }}</div>
-                                        </div>
-                                        <div class="profile-info-item">
-                                            <div class="profile-info-label">Роль</div>
-                                            <div class="profile-info-value">
-                                                {% if user.role == 'user' %}Соискатель{% else %}Компания{% endif %}
-                                            </div>
-                                        </div>
-                                        {% if user.role == 'company' and user.company.website %}
-                                        <div class="profile-info-item">
-                                            <div class="profile-info-label">Веб-сайт</div>
-                                            <div class="profile-info-value">
-                                                <a href="{{ user.company.website }}" target="_blank">{{ user.company.website }}</a>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                        <div class="profile-info-item">
-                                            <div class="profile-info-label">Дата регистрации</div>
-                                            <div class="profile-info-value">{{ user.date_joined|date:"d.m.Y" }}</div>
-                                        </div>
-                                    </div>
-                                    {% if user.description %}
-                                    <div class="profile-description">
-                                        {{ user.description }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                
+                <div id="info-section" class="profile-section">
+                    <h2 style="font-size: 24px; margin-bottom: 24px;">Основная информация</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--light-text); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Email</div>
+                            <div style="font-size: 16px;">{{ user.email }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--light-text); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Роль</div>
+                            <div style="font-size: 16px;">{% if user.role == 'user' %}Соискатель{% else %}Компания{% endif %}</div>
+                        </div>
+                        {% if user.role == 'company' and user.company.website %}
+                        <div>
+                            <div style="font-size: 12px; color: var(--light-text); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Веб-сайт</div>
+                            <div style="font-size: 16px;"><a href="{{ user.company.website }}" target="_blank" style="color: var(--primary-blue); text-decoration: none;">{{ user.company.website }}</a></div>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <div style="font-size: 12px; color: var(--light-text); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Дата регистрации</div>
+                            <div style="font-size: 16px;">{{ user.date_joined|date:"d.m.Y" }}</div>
                         </div>
                     </div>
-
-                    <!-- Resume Section -->
-                    {% if user.role == 'user' %}
-                    <div id="resume-section" class="profile-section" style="display: none;">
-                        <div class="message other">
-                            <div class="message-bubble">
-                                <div class="message-sender"><i class="fas fa-file-pdf profile-card-icon"></i> Резюме</div>
-                                <div class="message-content">
-                                    {% if user.cuser.resume %}
-                                        <div class="profile-info-item">
-                                            <div class="profile-info-label">Загруженное резюме</div>
-                                            <div class="profile-info-value">
-                                                <a href="{{ user.cuser.resume.url }}" class="profile-btn profile-btn-primary" style="width: auto;">
-                                                    <i class="fas fa-download"></i> Скачать резюме
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="resume-section">
-                                            <div class="resume-icon">
-                                                <i class="fas fa-file-upload"></i>
-                                            </div>
-                                            <div class="resume-text">Резюме не загружено</div>
-                                            <a href="{% url 'upload_resume' %}" class="profile-btn profile-btn-primary" style="width: auto;">
-                                                <i class="fas fa-upload"></i> Загрузить резюме
-                                            </a>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                    {% if user.description %}
+                    <div style="margin-top: 24px; padding: 20px; background: var(--bg-light); border-radius: 8px; border-left: 4px solid var(--primary-blue);">
+                        <div style="font-size: 12px; color: var(--light-text); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">О себе</div>
+                        <div style="line-height: 1.6;">{{ user.description }}</div>
                     </div>
                     {% endif %}
-
-                    <!-- Settings Section -->
-                    <div id="settings-section" class="profile-section" style="display: none;">
-                        <div class="message other">
-                            <div class="message-bubble">
-                                <div class="message-sender"><i class="fas fa-cog profile-card-icon"></i> Настройки аккаунта</div>
-                                <div class="message-content">
-                                    <div class="profile-actions">
-                                        <a href="{% url 'edit_user' %}" class="profile-btn profile-btn-primary">
-                                            <i class="fas fa-edit"></i> Редактировать профиль
-                                        </a>
-                                        <a href="{% url 'logout' %}" class="profile-btn profile-btn-danger">
-                                            <i class="fas fa-sign-out-alt"></i> Выйти
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                
+                {% if user.role == 'user' %}
+                <div id="resume-section" class="profile-section" style="display: none;">
+                    <h2 style="font-size: 24px; margin-bottom: 24px;">Резюме</h2>
+                    {% if user.cuser.resume %}
+                    <div style="padding: 32px; background: var(--bg-light); border-radius: 8px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+                        <p style="margin-bottom: 16px; color: var(--light-text);">Резюме загружено</p>
+                        <a href="{{ user.cuser.resume.url }}" class="btn btn-primary" download>Скачать резюме</a>
+                    </div>
+                    {% else %}
+                    <div style="padding: 32px; background: var(--bg-light); border-radius: 8px; text-align: center; border: 2px dashed var(--border-color);">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📤</div>
+                        <p style="margin-bottom: 16px; color: var(--light-text);">Резюме не загружено</p>
+                        <form action="{% url 'upload_resume' %}" method="post" enctype="multipart/form-data" style="display: inline-block;">
+                            {% csrf_token %}
+                            <input type="file" name="resume" id="resumeFile" style="display: none;" onchange="this.form.submit()">
+                            <label for="resumeFile" class="btn btn-primary" style="cursor: pointer;">Загрузить резюме</label>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div id="settings-section" class="profile-section" style="display: none;">
+                    <h2 style="font-size: 24px; margin-bottom: 24px;">Настройки аккаунта</h2>
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <a href="{% url 'edit_user' %}" class="btn btn-primary">Редактировать профиль</a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline" style="color: #dc3545; border-color: #dc3545;">Выйти</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </main>
+    
     {% include "../main/footer.html" %}
-
+    
     <script>
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('mobileMenuToggle');
-        const sidebar = document.getElementById('profileSidebar');
-        const overlay = document.getElementById('mobileOverlay');
-        
-        if (menuToggle && sidebar && overlay) {
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-                overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
-            });
+        function showSection(sectionName, event) {
+            if (event) event.preventDefault();
             
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-                overlay.style.display = 'none';
-            });
-            
-            // Close menu when clicking on a nav item
-            document.querySelectorAll('.chat-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('show');
-                        overlay.classList.remove('show');
-                        overlay.style.display = 'none';
-                    }
-                });
-            });
-        }
-        
-        function showSection(sectionName) {
-            // Hide all sections
             document.querySelectorAll('.profile-section').forEach(section => {
                 section.style.display = 'none';
             });
             
-            // Remove active class from all nav items
-            document.querySelectorAll('.chat-item').forEach(item => {
+            document.querySelectorAll('.profile-nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Show selected section
             const section = document.getElementById(sectionName + '-section');
             if (section) {
                 section.style.display = 'block';
             }
             
-            // Add active class to clicked nav item
-            if (event && event.target) {
-                event.target.closest('.chat-item').classList.add('active');
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
             }
         }
         
-        // Check for hash on page load
         document.addEventListener('DOMContentLoaded', function() {
             const hash = window.location.hash.substring(1);
-            if (hash === 'settings') {
-                showSection('settings');
-                // Update active nav item
-                document.querySelectorAll('.chat-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelector('a[href*="#settings"]').closest('.chat-item').classList.add('active');
+            if (hash && ['info', 'resume', 'settings'].includes(hash)) {
+                showSection(hash);
+                document.querySelector(`a[href="#${hash}"]`)?.classList.add('active');
             }
         });
     </script>
