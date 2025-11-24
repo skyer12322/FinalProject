@@ -95,11 +95,11 @@
                 </div>
                 
                 <!-- Chat List -->
-                <div style="font-weight: 600; color: #666; padding: 10px 15px; font-size: 14px;">
+                <div class="chat-list-header" style="font-weight: 600; color: #666; padding: 10px 15px; font-size: 14px;">
                     <i class="fas fa-comments"></i> Активные чаты
                 </div>
                 
-                <div class="chat-list" id="chatList">
+                <div class="chat-list chat-list-chats" id="chatList">
                     {% if user.is_authenticated %}
                         {% if chats %}
                             {% for chat in chats %}

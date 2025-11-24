@@ -322,6 +322,11 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .chat-list-header,
+    .chat-list-chats {
+        display: none !important;
+    }
+    
     .mobile-menu-toggle {
         display: flex;
         align-items: center;
