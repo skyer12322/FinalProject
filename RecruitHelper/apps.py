@@ -9,3 +9,6 @@ class RecruithelperConfig(AppConfig):
     """
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'RecruitHelper'
+
+    def ready(self):
+        import RecruitHelper.cache_utils

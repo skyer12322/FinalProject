@@ -1,20 +1,44 @@
 """
-Модуль с декораторами для приложения RecruitHelper.
+Декораторы для приложения RecruitHelper.
 """
-from django.contrib.auth.decorators import user_passes_test
+from functools import wraps
+from django.shortcuts import redirect
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
-anonymous_required = user_passes_test(
-    lambda user: not user.is_authenticated,
-    login_url='/',
-    redirect_field_name=None
-)
-company_required = user_passes_test(
-    lambda user: user.role == 'company',
-    login_url='/',
-    redirect_field_name=None
-)
-user_required = user_passes_test(
-    lambda user: user.role == 'user',
-    login_url='/',
-    redirect_field_name=None
-)
+
+def anonymous_required(view_func):
+    """
+    Декоратор, который перенаправляет аутентифицированных пользователей на главную страницу.
+    """
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def cache_per_user(timeout):
+    """
+    Кэширует страницу отдельно для каждого пользователя.
+    """
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if request.user.is_authenticated:
+                cache_key = f'{view_func.__name__}_user_{request.user.id}'
+            else:
+                cache_key = f'{view_func.__name__}_anonymous'
+            
+            version = cache.get(f'{view_func.__name__}_version', 1)
+            result = cache.get(cache_key, version=version)
+            
+            if result is None:
+                result = view_func(request, *args, **kwargs)
+                cache.set(cache_key, result, timeout, version=version)
+            
+            return result
+        return wrapper
+    return decorator

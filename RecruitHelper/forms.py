@@ -73,6 +73,15 @@ class UserRegistrationForm(forms.ModelForm):
             'autocomplete': 'new-password'
         })
     )
+    password_confirm = forms.CharField(
+        required=True,
+        label="Подтверждение пароля",
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Подтвердите пароль',
+            'class': 'form-control',
+            'autocomplete': 'new-password'
+        })
+    )
     class Meta:
         """
         Мета-опции формы UserRegistrationForm.

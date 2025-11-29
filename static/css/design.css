@@ -816,6 +816,7 @@ main {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow);
+    margin-top: 10px;
 }
 
 .new-chat-sidebar {
@@ -848,6 +849,13 @@ main {
     color: var(--dark-text);
     transition: background 0.2s;
     border-bottom: 1px solid var(--border-color);
+    min-height: 60px;
+}
+
+.new-chat-nav-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .new-chat-nav-item:hover {
@@ -869,11 +877,17 @@ main {
 .new-chat-nav-title {
     font-weight: 600;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .new-chat-nav-desc {
     font-size: 12px;
     color: var(--light-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .new-chat-list-header {
@@ -887,6 +901,8 @@ main {
 .new-chat-list {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 400px);
 }
 
 .new-chat-item {
@@ -1021,10 +1037,13 @@ main {
 .new-chat-messages {
     flex: 1;
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    scroll-behavior: smooth;
+    max-height: calc(100vh - 300px);
 }
 
 .message {

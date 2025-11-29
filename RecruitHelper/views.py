@@ -18,19 +18,20 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
+from django.core.cache import cache
 from RecruitHelper.models import (
     User, Company, Vacancy, Application, Chat, CUser, Notification
 )
 from RecruitHelper.forms import (
     UserRegistrationForm, VacancyForm, EditUserForm, EditCUserForm, EditCompanyForm
 )
-from .decorators import anonymous_required
+from .decorators import anonymous_required, cache_per_user
 from .chatgpt import ChatGPT
 from . import prompts
 
 logger = logging.getLogger(__name__)
 
-@cache_page(60 * 15)  # Cache for 15 minutes
+@cache_per_user(60 * 15)
 def home(request):
     """
     Отображает главную страницу с вакансиями, тегами и популярными категориями.
@@ -163,8 +164,11 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-@cache_page(60 * 30)  # Cache for 30 minutes
 def company(request, company_id):
+    cache_key = f'company_{company_id}'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу компании по её ID.
 
@@ -176,12 +180,16 @@ def company(request, company_id):
     logger.debug(f"Requesting company page ID: {company_id}")
     company_obj = get_object_or_404(Company, id=company_id)
     context = {"company": company_obj}
-    return render(request, 'users/HRpage.html', context)
+    result = render(request, 'users/HRpage.html', context)
+    cache.set(cache_key, result, 60 * 30)
+    return result
 
 @login_required
-@vary_on_cookie
-@cache_page(60 * 10)  # Cache for 10 minutes
 def profile(request):
+    cache_key = f'profile_{request.user.id}'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу профиля текущего пользователя.
 
@@ -192,12 +200,16 @@ def profile(request):
     logger.debug(f"Profile request for user: {request.user.email}")
     user = request.user
     context = {'user': user}
-    return render(request, 'users/profile.html', context)
+    result = render(request, 'users/profile.html', context)
+    cache.set(cache_key, result, 60 * 10)
+    return result
 
 @login_required
-@vary_on_cookie
-@cache_page(60 * 5)  # Cache for 5 minutes
 def profile_vacancies(request):
+    cache_key = f'profile_vacancies_{request.user.id}'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает вакансии, созданные текущим пользователем (для компаний).
 
@@ -208,10 +220,11 @@ def profile_vacancies(request):
     logger.debug(f"Profile vacancies request for user: {request.user.email}")
     vacancies = Vacancy.objects.filter(company=request.user.company)
     context = {'vacancies': vacancies}
-    return render(request, 'users/vacancies.html', context)
+    result = render(request, 'users/vacancies.html', context)
+    cache.set(cache_key, result, 60 * 5)
+    return result
 
 @login_required
-@cache_page(60 * 5)
 def edit_user(request):
     """
     Обрабатывает редактирование профиля текущего пользователя.
@@ -249,7 +262,6 @@ def edit_user(request):
     return render(request, 'users/profileedit.html', context)
 
 @login_required
-@cache_page(60 * 5)
 def applications(request):
     """
     Отображает список заявок на вакансии для текущего пользователя (соискателя или компании).
@@ -279,11 +291,12 @@ def applications(request):
                     if action == 'approve':
                         application.status = 'accepted'
                         application.save()
-                        Chat.objects.create(id=application.vacancy.id,
-                                            user=application.candidate,
-                                            company=request.user.company,
-                                            name=application.vacancy.title,
-                                            vacancy=application.vacancy)
+                        Chat.objects.get_or_create(
+                            user=application.candidate,
+                            company=request.user.company,
+                            vacancy=application.vacancy,
+                            defaults={'name': application.vacancy.title}
+                        )
                     elif action == 'reject':
                         application.status = 'rejected'
                         application.save()
@@ -292,8 +305,11 @@ def applications(request):
         return redirect('applications')
     return render(request, 'users/applications.html', context)
 
-@cache_page(60 * 30)  # Cache for 30 minutes
 def candidate(request, user_id):
+    cache_key = f'candidate_{user_id}'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу кандидата по ID пользователя.
 
@@ -305,10 +321,16 @@ def candidate(request, user_id):
     logger.debug(f"Requesting candidate page ID: {user_id}")
     candidate_user = get_object_or_404(User, id=user_id)
     context = {'user': candidate_user}
-    return render(request, 'users/candidatepage.html', context)
+    result = render(request, 'users/candidatepage.html', context)
+    cache.set(cache_key, result, 60 * 30)
+    return result
 
-@cache_page(60 * 5)  # Cache for 5 minutes
 def vacancies(request):
+    cache_key = 'vacancies_list'
+    version = cache.get('vacancies_version', 1)
+    result = cache.get(cache_key, version=version)
+    if result:
+        return result
     """
     Отображает список всех вакансий с возможностью фильтрации.
 
@@ -346,11 +368,12 @@ def vacancies(request):
         "max_salary": max_salary,
         "min_salary": min_salary
     }
-    return render(request, 'vacancies/vacancy_list.html', context)
+    result = render(request, 'vacancies/vacancy_list.html', context)
+    cache.set(cache_key, result, 60 * 5, version=version)
+    return result
 
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
-@cache_page(60 * 2)
 def add_vacancy(request):
     """
     Обрабатывает создание новой вакансии пользователем-компанией.
@@ -446,7 +469,6 @@ def vacancy(request, vacancy_id):
 
 @login_required
 @user_passes_test(lambda u: u.role == 'user')
-@cache_page(60 * 1)
 def apply_to_vacancy(request, vacancy_id):
     """
     Обрабатывает подачу заявки пользователем на вакансию.
@@ -508,8 +530,11 @@ def upload_resume(request):
             return redirect('profile')
     return redirect('profile')
 
-@cache_page(60 * 60)
 def privacy(request):
+    cache_key = 'privacy_page'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу политики конфиденциальности.
 
@@ -517,20 +542,30 @@ def privacy(request):
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
     logger.info("Privacy policy page requested")
-    return render(request, 'info/privacy_policy.html')
+    result = render(request, 'info/privacy_policy.html')
+    cache.set(cache_key, result, 60 * 60)
+    return result
 
-@cache_page(60 * 60)
 def terms(request):
+    cache_key = 'terms_page'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу условий использования.
 
     :param request: Объект запроса Django.
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
-    return render(request, 'info/terms_of_use.html')
+    result = render(request, 'info/terms_of_use.html')
+    cache.set(cache_key, result, 60 * 60)
+    return result
 
-@cache_page(60 * 30)
 def news(request):
+    cache_key = 'news_page'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу новостей.
 
@@ -538,10 +573,15 @@ def news(request):
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
     logger.info("News page requested")
-    return render(request, 'info/news.html')
+    result = render(request, 'info/news.html')
+    cache.set(cache_key, result, 60 * 30)
+    return result
 
-@cache_page(60 * 30)
 def about_us(request):
+    cache_key = 'about_us_page'
+    result = cache.get(cache_key)
+    if result:
+        return result
     """
     Отображает страницу "О нас".
 
@@ -550,7 +590,9 @@ def about_us(request):
     """
     logger.info("About us page requested")
     context = { }
-    return render(request, 'info/about_us.html', context)
+    result = render(request, 'info/about_us.html', context)
+    cache.set(cache_key, result, 60 * 30)
+    return result
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -584,44 +626,46 @@ def download_logs(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-@cache_page(60 * 2)
+@login_required
 def chats(request):
     """
-    Отображает интерфейс чатов для текущего пользователя (соискателя или компании).
+    Отображает список чатов для текущего пользователя.
 
     :param request: Объект запроса Django.
     :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
-    if request.user.is_authenticated:
-        user = request.user
-        if user.role == 'company':
-            chats = Chat.objects.filter(company=user.company)
-        else:
-            chats = Chat.objects.filter(user=user.cuser)
+    user = request.user
+    if user.role == 'company':
+        chats = Chat.objects.filter(company=user.company)
     else:
-        chats = []
+        chats = Chat.objects.filter(user=user.cuser)
 
-    return render(request, 'users/chat_interface.html', {'chats': chats})
-
-def chat_interface(request):
-    """
-    Отображает объединенный интерфейс чатов.
-
-    :param request: Объект запроса Django.
-    :return: Объект HttpResponse с отрендеренной HTML-страницей.
-    """
-    return chats(request)
+    return render(request, 'users/chat_list.html', {'chats': chats})
 
 @login_required
 def chat(request, chat_id):
     """
-    Перенаправляет на новый интерфейс чатов.
+    Отображает конкретный чат с сообщениями.
 
     :param request: Объект запроса Django.
     :param chat_id: ID чата.
-    :return: Объект HttpResponse (перенаправление).
+    :return: Объект HttpResponse с отрендеренной HTML-страницей.
     """
-    return redirect('chats')
+    chat = get_object_or_404(Chat, id=chat_id)
+    
+    # Проверка прав доступа
+    if request.user.role == 'company' and chat.company.user != request.user:
+        return redirect('chats')
+    elif request.user.role == 'user' and chat.user.user != request.user:
+        return redirect('chats')
+    
+    # Получаем все чаты для сайдбара
+    if request.user.role == 'company':
+        chats = Chat.objects.filter(company=request.user.company)
+    else:
+        chats = Chat.objects.filter(user=request.user.cuser)
+    
+    return render(request, 'users/chat_interface.html', {'chat': chat, 'chats': chats})
 
 @login_required
 def chat_api(request, chat_id):

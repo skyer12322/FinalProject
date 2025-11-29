@@ -81,24 +81,24 @@
                     <div class="new-chat-list" id="chatList">
                         {% if user.is_authenticated %}
                             {% if chats %}
-                                {% for c in chats %}
-                                    <a href="{% url 'chat' c.id %}" class="new-chat-item {% if c.id == chat.id %}active{% endif %}">
+                                {% for chat in chats %}
+                                    <a href="{% url 'chat' chat.id %}" class="new-chat-item">
                                         <div class="new-chat-avatar">
                                             {% if user.role == 'user' %}
-                                                {{ c.company.user.main_name|first|upper }}
+                                                {{ chat.company.user.main_name|first|upper }}
                                             {% else %}
-                                                {{ c.user.first_name|first|upper }}{{ c.user.last_name|first|upper }}
+                                                {{ chat.user.first_name|first|upper }}{{ chat.user.last_name|first|upper }}
                                             {% endif %}
                                         </div>
                                         <div class="new-chat-info">
                                             <div class="new-chat-name">
                                                 {% if user.role == 'user' %}
-                                                    {{ c.company.user.main_name }}
+                                                    {{ chat.company.user.main_name }}
                                                 {% else %}
-                                                    {{ c.user.first_name }} {{ c.user.last_name }}
+                                                    {{ chat.user.first_name }} {{ chat.user.last_name }}
                                                 {% endif %}
                                             </div>
-                                            <div class="new-chat-vacancy">{{ c.vacancy.title }}</div>
+                                            <div class="new-chat-vacancy">{{ chat.vacancy.title }}</div>
                                             <div class="new-chat-last-message">Нажмите для просмотра сообщений</div>
                                         </div>
                                     </a>
@@ -126,36 +126,10 @@
 
                 <!-- Main Chat Area -->
                 <div class="new-chat-main" id="chatMain">
-                    <!-- Chat Header -->
-                    <div class="new-chat-header" id="chatHeader">
-                        <div class="new-chat-header-avatar" id="chatHeaderAvatar">
-                            {% if user.role == 'user' %}
-                                {{ chat.company.user.main_name|first|upper }}
-                            {% else %}
-                                {{ chat.user.first_name|first|upper }}{{ chat.user.last_name|first|upper }}
-                            {% endif %}
-                        </div>
-                        <div class="new-chat-header-info">
-                            <h3 id="chatHeaderName">
-                                {% if user.role == 'user' %}
-                                    {{ chat.company.user.main_name }}
-                                {% else %}
-                                    {{ chat.user.first_name }} {{ chat.user.last_name }}
-                                {% endif %}
-                            </h3>
-                            <p id="chatHeaderVacancy">{{ chat.vacancy.title }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Messages Area -->
-                    <div class="new-chat-messages" id="chatMessages"></div>
-
-                    <!-- Chat Input -->
-                    <div class="new-chat-input-container" id="chatInputContainer">
-                        <input type="text" class="new-chat-input" id="chatInput" placeholder="Введите сообщение...">
-                        <button class="new-chat-send-btn" id="sendButton" onclick="sendMessage()">
-                            ➤
-                        </button>
+                    <div class="new-chat-empty" id="chatEmpty">
+                        <div class="new-chat-empty-icon">💬</div>
+                        <h3>Выберите чат</h3>
+                        <p>Выберите чат из списка слева, чтобы начать общение</p>
                     </div>
                 </div>
             </div>
@@ -163,98 +137,5 @@
     </main>
 
     {% include "../main/footer.html" %}
-
-    <script>
-        const chatId = {{ chat.id }};
-        let chatSocket = null;
-
-        function loadMessages() {
-            fetch(`/api/chat/${chatId}/`)
-                .then(r => r.json())
-                .then(data => {
-                    const messagesContainer = document.getElementById('chatMessages');
-                    messagesContainer.innerHTML = '';
-                    data.messages.forEach(message => {
-                        addMessageToUI(message, false);
-                    });
-                    setTimeout(() => {
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    }, 100);
-                })
-                .catch(console.error);
-        }
-
-        function addMessageToUI(message, autoScroll = true) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            
-            const isOwn = message.user_id === {{ user.id }};
-            messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
-
-            const time = new Date(message.timestamp).toLocaleTimeString('ru-RU', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-
-            messageDiv.innerHTML = `
-                <div class="message-bubble">
-                    ${!isOwn ? `<div class="message-sender">${message.user_name}</div>` : ''}
-                    <div class="message-content">${message.content}</div>
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(messageDiv);
-            
-            if (autoScroll) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-        }
-
-        function setupWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            chatSocket = new WebSocket(`${protocol}//${window.location.host}/ws/chat/${chatId}/`);
-            
-            chatSocket.onmessage = (e) => addMessageToUI(JSON.parse(e.data));
-            chatSocket.onclose = () => console.log('Chat socket closed');
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-
-            if (message === '' || !chatSocket) return;
-
-            addMessageToUI({
-                id: Date.now(),
-                content: message,
-                timestamp: new Date().toISOString(),
-                user_id: {{ user.id }},
-                user_name: '{{ user.main_name }}'
-            });
-
-            chatSocket.send(JSON.stringify({
-                'content': message
-            }));
-
-            input.value = '';
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMessages();
-            setupWebSocket();
-            
-            const input = document.getElementById('chatInput');
-            if (input) {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
-            }
-        });
-
-
-    </script>
 </body>
 </html>
