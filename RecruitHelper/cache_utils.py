@@ -11,7 +11,11 @@ def invalidate_cache(*keys):
     """Инвалидирует кэш по ключам."""
     for key in keys:
         cache.delete(key)
-        cache.incr(f'{key}_version', delta=1)
+        try:
+            cache.incr(f"{key}_version", delta=1)
+        except ValueError:
+            # Some cache backends (e.g. LocMemCache) raise if key is missing.
+            cache.set(f"{key}_version", 2)
 
 
 def get_cache_version(key):
@@ -31,7 +35,10 @@ def invalidate_user_cache(sender, instance, **kwargs):
         f'profile_{instance.id}',
         f'edit_user_{instance.id}',
     ])
-    cache.incr('home_version', delta=1)
+    try:
+        cache.incr("home_version", delta=1)
+    except ValueError:
+        cache.set("home_version", 2)
 
 
 @receiver([post_save, post_delete], sender=Vacancy)
@@ -43,8 +50,15 @@ def invalidate_vacancy_cache(sender, instance, **kwargs):
         f'vacancy_{instance.id}',
         f'profile_vacancies_{instance.company.user.id}',
     ])
-    cache.incr('home_version', delta=1)
-    cache.incr('vacancies_version', delta=1)
+    try:
+        cache.incr("home_version", delta=1)
+    except ValueError:
+        cache.set("home_version", 2)
+
+    try:
+        cache.incr("vacancies_version", delta=1)
+    except ValueError:
+        cache.set("vacancies_version", 2)
 
 
 @receiver([post_save, post_delete], sender=Application)
