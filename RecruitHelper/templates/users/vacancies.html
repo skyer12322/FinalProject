@@ -12,16 +12,16 @@
     {% include "../main/menu.html" %}
     
     <main>
-        <div class="vacancies" style="margin-top: 40px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+        <section class="vacancies" style="margin-top: 40px;">
+            <header class="d-flex align-center justify-between" style="margin-bottom: 32px;">
                 <h1 style="font-size: 32px; margin: 0;">Мои вакансии</h1>
                 <a href="{% url 'add_vacancy' %}" class="btn btn-primary">Добавить вакансию</a>
-            </div>
+            </header>
             
             {% if vacancies %}
-            <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="d-flex" style="flex-direction: column; gap: 16px;">
                 {% for vacancy in vacancies %}
-                <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="vacancy-card">
+                <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="vacancy-card" aria-label="Открыть вакансию: {{ vacancy.title }}">
                     <div class="vacancy-header">
                         <div style="flex: 1;">
                             <h3 class="vacancy-title">{{ vacancy.title }}</h3>
@@ -34,7 +34,7 @@
                         </div>
                         <div class="ai-badge">AIR: {{ vacancy.ai_rating }}</div>
                     </div>
-                    <p style="color: var(--light-text); margin-top: 12px;">
+                    <p class="text-muted line-clamp-3" style="margin-top: 12px;">
                         {{ vacancy.description|truncatewords:30 }}
                     </p>
                 </a>
@@ -44,11 +44,11 @@
             <div class="text-center" style="padding: 60px 20px;">
                 <div style="font-size: 64px; margin-bottom: 16px;">💼</div>
                 <h2>У вас пока нет вакансий</h2>
-                <p style="color: var(--light-text); margin-top: 12px;">Создайте первую вакансию, чтобы начать поиск кандидатов</p>
+                <p class="text-muted" style="margin-top: 12px;">Создайте первую вакансию, чтобы начать поиск кандидатов</p>
                 <a href="{% url 'add_vacancy' %}" class="btn btn-primary mt-3">Добавить вакансию</a>
             </div>
             {% endif %}
-        </div>
+        </section>
     </main>
     
     {% include "../main/footer.html" %}

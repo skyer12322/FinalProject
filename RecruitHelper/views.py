@@ -6,6 +6,9 @@ import random
 import os
 import json
 from collections import defaultdict, Counter
+from django.db.models import Q
+from django.db.models.functions import Cast
+from django.db.models import TextField
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -13,6 +16,7 @@ from rest_framework import status
 from django.http import FileResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages as dj_messages
 from django.contrib.auth import login, authenticate, logout
 from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -30,6 +34,67 @@ from .chatgpt import ChatGPT
 from . import prompts
 
 logger = logging.getLogger(__name__)
+
+@login_required
+@user_passes_test(lambda u: u.role == 'company')
+def edit_vacancy(request, vacancy_id):
+    """
+    Редактирование вакансии пользователем-компанией (только для владельца вакансии).
+    """
+    vacancy_obj = get_object_or_404(Vacancy, id=vacancy_id)
+    if not vacancy_obj.company or vacancy_obj.company.user != request.user:
+        return redirect('profile_vacancies')
+
+    if request.method == 'POST':
+        form = VacancyForm(request.POST, instance=vacancy_obj)
+        if form.is_valid():
+            vacancy_obj = form.save(commit=False)
+
+            tags = {
+                'specialization': list(request.POST.get('specialization', '').split(',')),
+                'occupancy': list(request.POST.get('occupancy', '').split(',')),
+                'position': list(request.POST.get('position', '').split(',')),
+                'tech': list(request.POST.get('tech', '').split(',')),
+                'industry': list(request.POST.get('industry', '').split(',')),
+            }
+            tags = {k: [t for t in v if t] for k, v in tags.items()}
+            vacancy_obj.tags_ai = tags
+
+            vacancy_obj.save()
+            return redirect('vacancy', vacancy_id=vacancy_obj.id)
+    else:
+        form = VacancyForm(instance=vacancy_obj)
+
+    context = {'form': form, 'vacancy': vacancy_obj}
+    return render(request, 'vacancies/edit_vacancy.html', context)
+
+@login_required
+def notifications(request):
+    """
+    Центр уведомлений пользователя: просмотр, отметка прочитанным.
+    """
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        notification_id = request.POST.get('notification_id')
+
+        if action == 'mark_all_read':
+            Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+            return redirect('notifications')
+
+        if action == 'mark_read' and notification_id:
+            Notification.objects.filter(id=notification_id, user=request.user).update(is_read=True)
+            return redirect('notifications')
+
+    notifications_qs = Notification.objects.filter(user=request.user).select_related('vacancy', 'chat').order_by('-created_at')
+    unread_count = notifications_qs.filter(is_read=False).count()
+    return render(
+        request,
+        'users/notifications.html',
+        {
+            'notifications': notifications_qs,
+            'unread_count': unread_count,
+        },
+    )
 
 @cache_per_user(60 * 15)
 def home(request):
@@ -66,14 +131,63 @@ def home(request):
     application_counts = Counter()
     for application in Application.objects.all():
         try:
-            industries = application.vacancy.tags_ai.get("tags", {}).get("industry", [])
+            tags_dict = application.vacancy.tags_ai if isinstance(application.vacancy.tags_ai, dict) else {}
+            industries = tags_dict.get("industry") if isinstance(tags_dict.get("industry"), list) else []
         except Exception as e:
             logger.warning(f"Error counting applications by industry: {str(e)}")
             continue
         for industry in industries:
-            application_counts[industry] += 1
-    top_categories = [tag for tag, count in application_counts.most_common(3)]
-    context = {"vacancies": vacancies_context, "tags": tags, "top_categories": top_categories}
+            if industry:
+                application_counts[industry] += 1
+
+    def pick_icon(name: str) -> str:
+        lowered = (name or "").lower()
+        if any(k in lowered for k in ("it", "айти", "dev", "разработ", "software", "програм")):
+            return "💻"
+        if any(k in lowered for k in ("финанс", "банк", "account", "audit", "бух")):
+            return "💰"
+        if any(k in lowered for k in ("sales", "продаж", "bizdev", "аккаунт")):
+            return "📈"
+        if any(k in lowered for k in ("инжен", "engineer", "hardware", "мех", "элект")):
+            return "⚙️"
+        if any(k in lowered for k in ("hr", "рекрут", "кадр")):
+            return "🧑‍💼"
+        if any(k in lowered for k in ("маркет", "marketing", "smm", "pr")):
+            return "📣"
+        return "🏷️"
+
+    vacancy_list_for_counts = list(Vacancy.objects.all())
+    vacancy_industry_counts = Counter()
+    for v in vacancy_list_for_counts:
+        tags_dict = v.tags_ai if isinstance(v.tags_ai, dict) else {}
+        industry_tags = tags_dict.get("industry") if isinstance(tags_dict.get("industry"), list) else []
+        for tag in industry_tags:
+            if tag:
+                vacancy_industry_counts[tag] += 1
+
+    # Prefer "popular by applications", fallback to "popular by vacancies",
+    # fallback to a stable default list so the block is never empty.
+    top_categories = [tag for tag, _ in application_counts.most_common(6)]
+    if not top_categories:
+        top_categories = [tag for tag, _ in vacancy_industry_counts.most_common(6)]
+    if not top_categories:
+        top_categories = ["IT и разработка", "Финансы", "Продажи", "Инженерия"]
+
+    popular_categories = []
+    for category_name in top_categories:
+        popular_categories.append(
+            {
+                "name": category_name,
+                "icon": pick_icon(category_name),
+                "count": vacancy_industry_counts.get(category_name, 0),
+            }
+        )
+
+    context = {
+        "vacancies": vacancies_context,
+        "tags": tags,
+        "popular_categories": popular_categories,
+    }
     return render(request, 'main/index.html', context)
 
 @anonymous_required
@@ -100,7 +214,8 @@ def login_view(request):
         logger.warning(
             f'''Failed login attempt for user: {email}. Reason:
             {'Invalid credentials' if user is None else 'Other error'}''')
-        return render(request, "auth/login.html", {"messages": "Неверный email или пароль"})
+        dj_messages.error(request, "Неверный email или пароль")
+        return render(request, "auth/login.html")
     return render(request, "auth/login.html")
 
 @anonymous_required
@@ -326,11 +441,8 @@ def candidate(request, user_id):
     return result
 
 def vacancies(request):
-    cache_key = 'vacancies_list'
-    version = cache.get('vacancies_version', 1)
-    result = cache.get(cache_key, version=version)
-    if result:
-        return result
+    # Note: this page supports GET search params (q/location),
+    # so we intentionally do not cache the rendered response globally.
     """
     Отображает список всех вакансий с возможностью фильтрации.
 
@@ -339,8 +451,30 @@ def vacancies(request):
     """
     logger.info("Vacancies page request received")
     logger.debug("Vacancies list request")
-    vacancies = Vacancy.objects.all()
-    vacancies_list = list(vacancies)
+    q = (request.GET.get('q') or '').strip()
+    location = (request.GET.get('location') or '').strip()
+    industry = (request.GET.get('industry') or '').strip()
+
+    vacancies_qs = Vacancy.objects.all()
+    if q:
+        vacancies_qs = vacancies_qs.filter(
+            Q(title__icontains=q) | Q(description__icontains=q)
+        )
+    if location:
+        vacancies_qs = vacancies_qs.annotate(
+            geography_text=Cast('geography', TextField())
+        ).filter(geography_text__icontains=location)
+
+    vacancies_list = list(vacancies_qs)
+    if industry:
+        industry_lower = industry.casefold()
+        filtered = []
+        for v in vacancies_list:
+            tags_dict = v.tags_ai if isinstance(v.tags_ai, dict) else {}
+            industry_tags = tags_dict.get("industry") if isinstance(tags_dict.get("industry"), list) else []
+            if any((t or "").casefold() == industry_lower for t in industry_tags):
+                filtered.append(v)
+        vacancies_list = filtered
     logger.info(f"Found {len(vacancies_list)} vacancies after filtering")
     tags_by_category = {
         'specialization': set(),
@@ -366,11 +500,12 @@ def vacancies(request):
         "vacancies": vacancies_list,
         "tags_by_category": tags_by_category,
         "max_salary": max_salary,
-        "min_salary": min_salary
+        "min_salary": min_salary,
+        "q": q,
+        "location": location,
+        "industry": industry,
     }
-    result = render(request, 'vacancies/vacancy_list.html', context)
-    cache.set(cache_key, result, 60 * 5, version=version)
-    return result
+    return render(request, 'vacancies/vacancy_list.html', context)
 
 @login_required
 @user_passes_test(lambda u: u.role == 'company')
@@ -431,7 +566,8 @@ def add_vacancy(request):
                         for elem in tags_ai['tags']:
                             tags[elem] = tags_ai['tags'][elem]
                     vacancy.tags_ai = tags
-                    logger.debug(f"ChatGPT request for tags: {tags_text if 'tags_text' in locals() else 'N/A'}")
+                    # tags_text is not guaranteed to exist; log the raw response instead.
+                    logger.debug(f"ChatGPT tags response (raw): {tags_text_raw if 'tags_text_raw' in locals() else 'N/A'}")
                     logger.debug(f"ChatGPT response for rating: {response_text if 'response_text' in locals() else 'N/A'}")
                     logger.info(f"Successfully processed ChatGPT data for vacancy: {vacancy.title}")
                 except Exception as e:

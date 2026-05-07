@@ -28,26 +28,27 @@
         <section class="categories">
             <h2 class="section-title">Популярные категории</h2>
             <div class="categories-grid">
-                <div class="category-card">
-                    <div class="category-icon">💻</div>
-                    <h3>IT и разработка</h3>
-                    <p>Более 1000 вакансий</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">💰</div>
-                    <h3>Финансы</h3>
-                    <p>Более 500 вакансий</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">📈</div>
-                    <h3>Продажи</h3>
-                    <p>Более 800 вакансий</p>
-                </div>
-                <div class="category-card">
-                    <div class="category-icon">⚙️</div>
-                    <h3>Инженерия</h3>
-                    <p>Более 600 вакансий</p>
-                </div>
+                {% if popular_categories %}
+                    {% for category in popular_categories %}
+                        <a class="category-card" href="{% url 'vacancies_list' %}?industry={{ category.name|urlencode }}">
+                            <div class="category-icon" aria-hidden="true">{{ category.icon }}</div>
+                            <h3>{{ category.name }}</h3>
+                            <p>
+                                {% if category.count %}
+                                    {{ category.count }} вакансий
+                                {% else %}
+                                    Смотреть вакансии
+                                {% endif %}
+                            </p>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <a class="category-card" href="{% url 'vacancies_list' %}">
+                        <div class="category-icon" aria-hidden="true">🏷️</div>
+                        <h3>Все категории</h3>
+                        <p>Смотреть вакансии</p>
+                    </a>
+                {% endif %}
             </div>
         </section>
         
@@ -69,7 +70,7 @@
                         </div>
                         <div class="ai-badge">AIR: {{ vacancy.ai_rating }}</div>
                     </div>
-                    <p style="color: var(--light-text); margin-top: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    <p class="text-muted line-clamp-2" style="margin-top: 12px;">
                         {{ vacancy.description|truncatewords:20 }}
                     </p>
                 </a>

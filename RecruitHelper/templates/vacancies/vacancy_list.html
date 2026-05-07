@@ -17,12 +17,20 @@
                 <h2 style="margin-bottom: 24px; font-size: 20px;">Фильтры</h2>
                 
                 <div class="filter-group">
-                    <label>Поиск</label>
-                    <input type="text" id="searchInput" placeholder="Начните вводить...">
+                    <label for="searchInput">Поиск</label>
+                    <input type="text" id="searchInput" placeholder="Начните вводить..." value="{{ q|default:'' }}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="locationInput">Город или регион</label>
+                    <input type="text" id="locationInput" placeholder="Например: Москва" value="{{ location|default:'' }}" disabled>
+                    <div class="text-muted" style="font-size: 12px; margin-top: 6px;">
+                        Поиск по географии работает через форму на главной странице.
+                    </div>
                 </div>
                 
                 <div class="filter-group">
-                    <label>Отрасль</label>
+                    <label for="industryList">Отрасль</label>
                     <input list="industryListOptions" id="industryList" placeholder="Выберите отрасль">
                     <datalist id="industryListOptions">
                         {% for industry in tags_by_category.industry %}
@@ -32,7 +40,7 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label>Технологии</label>
+                    <label for="techList">Технологии</label>
                     <input list="techListOptions" id="techList" placeholder="Выберите технологию">
                     <datalist id="techListOptions">
                         {% for tech in tags_by_category.tech %}
@@ -42,7 +50,7 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label>Тип занятости</label>
+                    <label for="occupancyList">Тип занятости</label>
                     <input list="occupancyListOptions" id="occupancyList" placeholder="Выберите тип">
                     <datalist id="occupancyListOptions">
                         {% for occupancy in tags_by_category.occupancy %}
@@ -52,7 +60,7 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label>Специализация</label>
+                    <label for="specializationList">Специализация</label>
                     <input list="specializationListOptions" id="specializationList" placeholder="Выберите специализацию">
                     <datalist id="specializationListOptions">
                         {% for specialization in tags_by_category.specialization %}
@@ -62,7 +70,7 @@
                 </div>
                 
                 <div class="filter-group">
-                    <label>Позиция</label>
+                    <label for="positionList">Позиция</label>
                     <input list="positionListOptions" id="positionList" placeholder="Выберите позицию">
                     <datalist id="positionListOptions">
                         {% for position in tags_by_category.position %}
@@ -88,14 +96,21 @@
                 <button type="button" onclick="applyFilters()" class="btn btn-primary" style="width: 100%; margin-top: 16px;">Применить</button>
             </aside>
             
-            <div>
-                <h1 style="font-size: 32px; margin-bottom: 24px;">Все вакансии</h1>
+            <section>
+                <h1 style="font-size: 32px; margin-bottom: 24px;">
+                    Все вакансии
+                    {% if q or location or industry %}
+                        <span class="text-muted" style="font-size: 14px; font-weight: 500;">
+                            (по запросу{% if q %} «{{ q }}»{% endif %}{% if location %}{% if q %},{% endif %} {{ location }}{% endif %}{% if industry %}{% if q or location %},{% endif %} {{ industry }}{% endif %})
+                        </span>
+                    {% endif %}
+                </h1>
                 
                 <div id="vacanciesList">
                     {% if vacancies %}
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="d-flex" style="flex-direction: column; gap: 16px;">
                         {% for vacancy in vacancies %}
-                        <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="vacancy-card">
+                        <a href="{% url 'vacancy' vacancy_id=vacancy.id %}" class="vacancy-card" aria-label="Открыть вакансию: {{ vacancy.title }}">
                             <div class="vacancy-header">
                                 <div style="flex: 1;">
                                     <h3 class="vacancy-title">{{ vacancy.title }}</h3>
@@ -108,7 +123,7 @@
                                 </div>
                                 <div class="ai-badge">AIR: {{ vacancy.ai_rating }}</div>
                             </div>
-                            <p style="color: var(--light-text); margin-top: 12px;">
+                            <p class="text-muted line-clamp-3" style="margin-top: 12px;">
                                 {{ vacancy.description|truncatewords:30 }}
                             </p>
                         </a>
@@ -117,11 +132,11 @@
                     {% else %}
                     <div class="text-center" style="padding: 60px 20px;">
                         <h2>Вакансии не найдены</h2>
-                        <p style="color: var(--light-text); margin-top: 12px;">Попробуйте изменить параметры поиска</p>
+                        <p class="text-muted" style="margin-top: 12px;">Попробуйте изменить параметры поиска</p>
                     </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
         </div>
     </main>
     

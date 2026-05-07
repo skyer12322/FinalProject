@@ -9,6 +9,7 @@ from RecruitHelper.views import login_view, register, privacy, news, about_us, l
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume
 from RecruitHelper.views import download_logs
 from RecruitHelper.views import apply_to_vacancy, profile_vacancies, applications, upload_resume, chats, chat, chat_api
+from RecruitHelper.views import edit_vacancy, notifications
 from RecruitHelper.ajax_handlers import filters_handler, search_handler
 
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('vacancies/', vacancies, name='vacancies_list'),
     path('vacancies/add/', add_vacancy, name='add_vacancy'),
     path('vacancies/<int:vacancy_id>/', vacancy, name='vacancy'),
+    path('vacancies/<int:vacancy_id>/edit/', edit_vacancy, name='edit_vacancy'),
     path('profile/', profile, name='profile'),
     path('profile/edit/', edit_user, name='edit_user'),
     path('candidate/<int:user_id>/', candidate, name='candidate'),
@@ -38,6 +40,7 @@ urlpatterns = [
     path('vacancies/search', search_handler),
     path('profile/chats/', chats, name='chats'),
     path('profile/chat/<int:chat_id>', chat, name='chat'),
+    path('profile/notifications/', notifications, name='notifications'),
     path('api/chat/<int:chat_id>/', chat_api, name='chat_api'),
     re_path(r'^docs/(?P<path>.*)$', serve, {
         'document_root': settings.STATIC_ROOT + '/docs/',

@@ -163,6 +163,11 @@
             {% endif %}
             <a href="{% url 'vacancies_list' %}" class="btn btn-outline">Назад к списку</a>
         </div>
+        {% elif user.is_authenticated and user.role == 'company' and vacancy.company.user == user %}
+        <div class="apply-section">
+            <a href="{% url 'edit_vacancy' vacancy_id=vacancy.id %}" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px;">Редактировать</a>
+            <a href="{% url 'profile_vacancies' %}" class="btn btn-outline">Мои вакансии</a>
+        </div>
         {% endif %}
     </main>
     

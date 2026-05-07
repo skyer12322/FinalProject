@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Уведомления - CareerAI</title>
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <style>
+        .notifications-page {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .notification-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .notification-card.unread {
+            border-left: 4px solid var(--primary-blue);
+        }
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            font-size: 18px;
+        }
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .notification-meta {
+            color: var(--light-text);
+            font-size: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .notification-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .notification-card {
+                flex-direction: column;
+            }
+            .notification-actions {
+                margin-left: 0;
+                width: 100%;
+            }
+            .notification-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "../main/menu.html" %}
+    <main>
+        <div class="notifications-page">
+            <div class="d-flex align-center justify-between" style="margin-bottom: 24px; gap: 12px;">
+                <h1 style="font-size: 32px; margin: 0;">Уведомления</h1>
+                {% if unread_count %}
+                <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="mark_all_read">
+                    <button type="submit" class="btn btn-outline">Отметить все как прочитанные</button>
+                </form>
+                {% endif %}
+            </div>
+
+            {% if notifications %}
+                {% for n in notifications %}
+                    <div class="notification-card {% if not n.is_read %}unread{% endif %}">
+                        <div class="notification-icon" aria-hidden="true">
+                            {% if n.notification_type == 'application' %}📋{% elif n.notification_type == 'message' %}💬{% elif n.notification_type == 'vacancy_update' %}💼{% else %}🔔{% endif %}
+                        </div>
+                        <div style="min-width: 0;">
+                            <div class="notification-title">{{ n.title }}</div>
+                            <div class="notification-meta">
+                                <span>📅 <time class="js-localtime" datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|date:"d.m.Y H:i" }}</time></span>
+                                {% if n.vacancy %}<span>💼 {{ n.vacancy.title }}</span>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="notification-actions">
+                            {% if n.vacancy %}
+                                <a class="btn btn-primary" href="{% url 'vacancy' vacancy_id=n.vacancy.id %}">Открыть</a>
+                            {% elif n.chat %}
+                                <a class="btn btn-primary" href="{% url 'chat' n.chat.id %}">Открыть</a>
+                            {% endif %}
+
+                            {% if not n.is_read %}
+                            <form method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="mark_read">
+                                <input type="hidden" name="notification_id" value="{{ n.id }}">
+                                <button type="submit" class="btn btn-outline">Прочитано</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center" style="padding: 60px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🔔</div>
+                    <h2>Уведомлений пока нет</h2>
+                    <p class="text-muted" style="margin-top: 12px;">Здесь появятся события по откликам и сообщениям.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+    {% include "../main/footer.html" %}
+    <script>
+        (function () {
+            const nodes = document.querySelectorAll('time.js-localtime[datetime]');
+            if (!nodes.length) return;
+
+            const fmt = new Intl.DateTimeFormat('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+
+            nodes.forEach((node) => {
+                const iso = node.getAttribute('datetime');
+                if (!iso) return;
+                const dt = new Date(iso);
+                if (Number.isNaN(dt.getTime())) return;
+                node.textContent = fmt.format(dt);
+            });
+        })();
+    </script>
+</body>
+</html>
+

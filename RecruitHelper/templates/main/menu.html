@@ -7,8 +7,8 @@
             <span>CareerAI</span>
         </a>
         
-        <nav>
-            <ul class="nav-menu">
+        <nav aria-label="Основная навигация">
+            <ul class="nav-menu" id="siteNavMenu">
                 <li><a href="{% url 'home' %}">Главная</a></li>
                 <li><a href="{% url 'vacancies_list' %}">Вакансии</a></li>
                 <li><a href="{% url 'news' %}">Новости</a></li>
@@ -21,6 +21,12 @@
                 {% if user.role == 'company' %}
                     <a href="{% url 'add_vacancy' %}" class="btn btn-primary">Разместить вакансию</a>
                 {% endif %}
+                <a href="{% url 'notifications' %}" class="icon-btn" aria-label="Уведомления">
+                    🔔
+                    {% if notifications_unread_count %}
+                        <span class="badge-dot" aria-label="Непрочитанных уведомлений: {{ notifications_unread_count }}">{{ notifications_unread_count }}</span>
+                    {% endif %}
+                </a>
                 <a href="{% url 'profile' %}">
                     {% if user.profile_image %}
                         <img src="{{ user.profile_image.url }}" alt="Avatar" class="user-avatar">
@@ -32,24 +38,35 @@
                 <a href="{% url 'login' %}" class="btn btn-outline">Войти</a>
                 <a href="{% url 'register' %}" class="btn btn-primary">Регистрация</a>
             {% endif %}
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Открыть меню" aria-controls="siteNavMenu" aria-expanded="false">☰</button>
         </div>
     </div>
 </header>
 
 <script>
-document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
-    const nav = document.querySelector('.nav-menu');
-    nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-    if (window.innerWidth <= 768) {
-        nav.style.position = 'absolute';
-        nav.style.top = '64px';
-        nav.style.left = '0';
-        nav.style.right = '0';
-        nav.style.background = 'white';
-        nav.style.flexDirection = 'column';
-        nav.style.padding = '20px';
-        nav.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+(function () {
+    const btn = document.getElementById('mobileMenuBtn');
+    const nav = document.getElementById('siteNavMenu');
+    if (!btn || !nav) return;
+
+    function setOpen(isOpen) {
+        nav.classList.toggle('show', isOpen);
+        btn.setAttribute('aria-expanded', String(isOpen));
+        btn.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
     }
-});
+
+    btn.addEventListener('click', function () {
+        const isOpen = nav.classList.contains('show');
+        setOpen(!isOpen);
+        if (!isOpen) nav.querySelector('a')?.focus();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 768) setOpen(false);
+    });
+})();
 </script>
